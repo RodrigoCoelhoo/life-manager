@@ -1,5 +1,6 @@
 package com.rodrigocoelhoo.lifemanager.security;
 
+import com.rodrigocoelhoo.lifemanager.exceptions.DuplicateFieldException;
 import com.rodrigocoelhoo.lifemanager.security.dto.SignInDTO;
 import com.rodrigocoelhoo.lifemanager.security.dto.SignInResponseDTO;
 import com.rodrigocoelhoo.lifemanager.security.dto.SignUpDTO;
@@ -30,9 +31,9 @@ public class AuthenticationController {
     private TokenService tokenService;
 
     @PostMapping("/signin")
-    public ResponseEntity<?> login(@RequestBody @Valid SignInDTO data) {
-        var UsernamePassword = new UsernamePasswordAuthenticationToken(data.username(), data.password());
-        var auth = this.authenticationManager.authenticate(UsernamePassword);
+    public ResponseEntity<?> signin(@RequestBody @Valid SignInDTO data) {
+        var UsernamePasswordToken = new UsernamePasswordAuthenticationToken(data.username(), data.password());
+        var auth = this.authenticationManager.authenticate(UsernamePasswordToken);
 
         var token = tokenService.generateToken((UserModel) auth.getPrincipal());
 
@@ -40,12 +41,21 @@ public class AuthenticationController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<?> register(@RequestBody @Valid SignUpDTO data) {
-        if(this.userRepository.findByUsername(data.username()) != null)
-            return ResponseEntity.badRequest().build();
+    public ResponseEntity<?> signup(@RequestBody @Valid SignUpDTO data) {
+        if (userRepository.findByUsername(data.username()) != null)
+            throw new DuplicateFieldException("username", data.username());
+
+        if (userRepository.findByEmail(data.email()) != null)
+            throw new DuplicateFieldException("email", data.email());
 
         String encryptedPassword = new BCryptPasswordEncoder().encode(data.password());
-        UserModel newUser = new UserModel(data.username(), encryptedPassword, data.role());
+        UserModel newUser = new UserModel(
+                data.username(),
+                data.firstName(),
+                data.lastName(),
+                data.email(),
+                encryptedPassword
+        );
 
         this.userRepository.save(newUser);
         return ResponseEntity.ok().build();
