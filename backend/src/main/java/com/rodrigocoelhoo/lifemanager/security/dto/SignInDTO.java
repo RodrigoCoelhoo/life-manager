@@ -1,4 +1,11 @@
 package com.rodrigocoelhoo.lifemanager.security.dto;
 
-public record SignInDTO(String username, String password) {
-}
+import jakarta.validation.constraints.NotNull;
+
+public record SignInDTO(
+        @NotNull(message = "Username must be provided")
+        String username,
+
+        @NotNull(message = "Password must be provided")
+        String password
+) { }

@@ -1,0 +1,2 @@
+ALTER TABLE tb_session_exercises
+ALTER COLUMN weight TYPE DOUBLE PRECISION;
