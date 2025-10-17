@@ -57,7 +57,7 @@ public class TrainingPlanService {
         List<ExerciseModel> exercises = exerciseService.getExercisesForUser(data.exerciseIds());
 
         plan.setName(data.name());
-        plan.setDescription(data.name());
+        plan.setDescription(data.description());
         plan.setExercises(exercises);
 
         return trainingPlanRepository.save(plan);

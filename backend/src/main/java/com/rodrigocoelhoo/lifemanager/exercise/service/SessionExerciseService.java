@@ -17,17 +17,14 @@ public class SessionExerciseService {
 
     private final SessionExerciseRepository sessionExerciseRepository;
     private final TrainingSessionService trainingSessionService;
-    private final ExerciseService exerciseService;
 
     public SessionExerciseService(
             SessionExerciseRepository sessionExerciseRepository,
-            TrainingSessionService trainingSessionService,
-            ExerciseService exerciseService
+            TrainingSessionService trainingSessionService
 
     ) {
         this.sessionExerciseRepository = sessionExerciseRepository;
         this.trainingSessionService = trainingSessionService;
-        this.exerciseService = exerciseService;
     }
 
     public List<SessionExerciseModel> getAllSessionExercises(Long id) {
