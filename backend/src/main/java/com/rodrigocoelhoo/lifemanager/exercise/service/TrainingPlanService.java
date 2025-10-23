@@ -8,6 +8,7 @@ import com.rodrigocoelhoo.lifemanager.exercise.model.TrainingPlanModel;
 import com.rodrigocoelhoo.lifemanager.exercise.repository.TrainingPlanRepository;
 import com.rodrigocoelhoo.lifemanager.users.UserModel;
 import com.rodrigocoelhoo.lifemanager.users.UserService;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -40,6 +41,7 @@ public class TrainingPlanService {
                 .orElseThrow(() -> new ResourceNotFound("Training plan with ID '" + id + "' does not belong to the current user"));
     }
 
+    @Transactional
     public TrainingPlanModel createTrainingPlan(TrainingPlanDTO data) {
         UserModel user = userService.getLoggedInUser();
         TrainingPlanModel trainingPlanModel = TrainingPlanModel.builder()
@@ -52,6 +54,7 @@ public class TrainingPlanService {
         return trainingPlanRepository.save(trainingPlanModel);
     }
 
+    @Transactional
     public TrainingPlanModel updateTrainingPlan(Long id, TrainingPlanUpdateDTO data) {
         TrainingPlanModel plan = getTrainingPlan(id);
         List<ExerciseModel> exercises = exerciseService.getExercisesForUser(data.exerciseIds());
@@ -63,6 +66,7 @@ public class TrainingPlanService {
         return trainingPlanRepository.save(plan);
     }
 
+    @Transactional
     public void deleteTrainingPlan(Long id) {
         UserModel user = userService.getLoggedInUser();
 

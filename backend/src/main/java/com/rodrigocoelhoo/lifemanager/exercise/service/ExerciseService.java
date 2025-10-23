@@ -8,6 +8,7 @@ import com.rodrigocoelhoo.lifemanager.exercise.model.ExerciseType;
 import com.rodrigocoelhoo.lifemanager.exercise.repository.ExerciseRepository;
 import com.rodrigocoelhoo.lifemanager.users.UserModel;
 import com.rodrigocoelhoo.lifemanager.users.UserService;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -45,6 +46,7 @@ public class ExerciseService {
                 .orElseThrow(() -> new ResourceNotFound("Exercise with ID '" + exercise_id + "' does not belong to the current user"));
     }
 
+    @Transactional
     public ExerciseModel create(ExerciseDTO data) {
         UserModel user = userService.getLoggedInUser();
         ExerciseType type = ExerciseType.valueOf(data.type().toUpperCase());
@@ -60,6 +62,7 @@ public class ExerciseService {
         return exerciseRepository.save(exercise);
     }
 
+    @Transactional
     public ExerciseModel update(Long exerciseId, ExerciseUpdateDTO data) {
         ExerciseModel exercise = getExercise(exerciseId);
 
@@ -70,6 +73,7 @@ public class ExerciseService {
         return exerciseRepository.save(exercise);
     }
 
+    @Transactional
     public void delete(Long exerciseId) {
         ExerciseModel exercise = getExercise(exerciseId);
         exerciseRepository.delete(exercise);

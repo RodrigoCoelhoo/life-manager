@@ -1,11 +1,17 @@
 package com.rodrigocoelhoo.lifemanager.food.model;
 
 import jakarta.persistence.*;
+import lombok.*;
 
 import java.util.List;
 
 @Entity
 @Table(name = "tb_ingredientbrands")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class IngredientBrandModel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

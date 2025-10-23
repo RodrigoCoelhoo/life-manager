@@ -7,6 +7,7 @@ import com.rodrigocoelhoo.lifemanager.exercise.model.ExerciseType;
 import com.rodrigocoelhoo.lifemanager.exercise.model.SessionExerciseModel;
 import com.rodrigocoelhoo.lifemanager.exercise.model.TrainingSessionModel;
 import com.rodrigocoelhoo.lifemanager.exercise.repository.SessionExerciseRepository;
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.stereotype.Service;
 
@@ -31,6 +32,7 @@ public class SessionExerciseService {
         return sessionExerciseRepository.findAllBySessionId_Id(id);
     }
 
+    @Transactional
     public SessionExerciseModel createExerciseDetails(Long session_id, Long exercise_id, SessionExerciseDTO data) {
         TrainingSessionModel session = trainingSessionService.getSession(session_id);
         ExerciseModel exercise = session.getTrainingPlan().getExercises().stream()
@@ -49,6 +51,7 @@ public class SessionExerciseService {
         return sessionExerciseRepository.save(sessionExercise);
     }
 
+    @Transactional
     public SessionExerciseModel updateExerciseDetails(Long session_id, Long exercise_id, Long sessionSet_id ,@Valid SessionExerciseDTO data) {
         TrainingSessionModel session = trainingSessionService.getSession(session_id);
         ExerciseModel exercise = session.getTrainingPlan().getExercises().stream()
@@ -85,6 +88,7 @@ public class SessionExerciseService {
         }
     }
 
+    @Transactional
     public void deleteExerciseDetails(Long session_id, Long exercise_id, Long sessionSet_id) {
         TrainingSessionModel session = trainingSessionService.getSession(session_id);
 

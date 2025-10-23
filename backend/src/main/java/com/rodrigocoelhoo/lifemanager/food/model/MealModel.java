@@ -4,29 +4,31 @@ import com.rodrigocoelhoo.lifemanager.users.UserModel;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
-@Table(name = "tb_ingredients")
-@NoArgsConstructor
-@AllArgsConstructor
+@Table(name = "tb_meals")
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
-public class IngredientModel {
+public class MealModel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(nullable = false)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
     private UserModel user;
 
-    @Column(nullable = false, length = 50)
-    private String name;
+    @Column(nullable = false)
+    private LocalDateTime date;
 
-    @OneToMany(mappedBy = "ingredient", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    private List<IngredientBrandModel> brands;
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "meal_id")
+    private List<MealIngredientModel> ingredients;
 }
+

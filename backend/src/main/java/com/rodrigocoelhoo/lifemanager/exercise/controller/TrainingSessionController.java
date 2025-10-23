@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/training-session")
+@RequestMapping("/api/training-sessions")
 public class TrainingSessionController {
 
 
@@ -37,25 +37,34 @@ public class TrainingSessionController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<TrainingSessionDetailsDTO> getSession(@PathVariable Long id) {
+    public ResponseEntity<TrainingSessionDetailsDTO> getSession(
+            @PathVariable Long id
+    ) {
         TrainingSessionModel session = trainingSessionService.getSession(id);
         return ResponseEntity.ok(TrainingSessionDetailsDTO.fromEntity(session));
     }
 
     @PostMapping
-    public ResponseEntity<TrainingSessionResponseDTO> createSession(@RequestBody @Valid TrainingSessionDTO data) {
+    public ResponseEntity<TrainingSessionResponseDTO> createSession(
+            @RequestBody @Valid TrainingSessionDTO data
+    ) {
         TrainingSessionModel session = trainingSessionService.createSession(data);
         return ResponseEntity.status(HttpStatus.CREATED).body(TrainingSessionResponseDTO.fromEntity(session));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<TrainingSessionResponseDTO> updateSession(@PathVariable Long id, @RequestBody @Valid TrainingSessionDTO data) {
+    public ResponseEntity<TrainingSessionResponseDTO> updateSession(
+            @PathVariable Long id,
+            @RequestBody @Valid TrainingSessionDTO data
+    ) {
         TrainingSessionModel session = trainingSessionService.updateSession(id, data);
         return ResponseEntity.ok(TrainingSessionResponseDTO.fromEntity(session));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteSession(@PathVariable Long id) {
+    public ResponseEntity<?> deleteSession(
+            @PathVariable Long id
+    ) {
         trainingSessionService.deleteSession(id);
         return ResponseEntity.noContent().build();
     }

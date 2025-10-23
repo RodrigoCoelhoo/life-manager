@@ -1,16 +1,13 @@
 package com.rodrigocoelhoo.lifemanager.exercise.controller;
 
-import com.rodrigocoelhoo.lifemanager.exceptions.BadRequestException;
 import com.rodrigocoelhoo.lifemanager.exercise.dto.exercisedto.ExerciseDetailsDTO;
 import com.rodrigocoelhoo.lifemanager.exercise.dto.sessionexercisedto.SessionDetailsDTO;
 import com.rodrigocoelhoo.lifemanager.exercise.dto.sessionexercisedto.SessionExerciseBaseDTO;
 import com.rodrigocoelhoo.lifemanager.exercise.dto.sessionexercisedto.SessionExerciseDTO;
-import com.rodrigocoelhoo.lifemanager.exercise.dto.sessionexercisedto.SessionExerciseResponseDTO;
 import com.rodrigocoelhoo.lifemanager.exercise.mapper.SessionExerciseMapper;
 import com.rodrigocoelhoo.lifemanager.exercise.model.ExerciseModel;
 import com.rodrigocoelhoo.lifemanager.exercise.model.SessionExerciseModel;
 import com.rodrigocoelhoo.lifemanager.exercise.model.TrainingSessionModel;
-import com.rodrigocoelhoo.lifemanager.exercise.service.ExerciseService;
 import com.rodrigocoelhoo.lifemanager.exercise.service.SessionExerciseService;
 import com.rodrigocoelhoo.lifemanager.exercise.service.TrainingSessionService;
 import jakarta.validation.Valid;
@@ -23,7 +20,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/training-session")
+@RequestMapping("/api/training-sessions")
 public class SessionExerciseController {
 
     private final TrainingSessionService trainingSessionService;
@@ -41,7 +38,9 @@ public class SessionExerciseController {
     }
 
     @GetMapping("/{id}/details")
-    public ResponseEntity<SessionDetailsDTO> getSessionDetails(@PathVariable Long id) {
+    public ResponseEntity<SessionDetailsDTO> getSessionDetails(
+            @PathVariable Long id
+    ) {
         TrainingSessionModel session = trainingSessionService.getSession(id);
         List<SessionExerciseModel> sessionExercises = sessionExerciseService.getAllSessionExercises(session.getId());
 
@@ -62,7 +61,7 @@ public class SessionExerciseController {
     }
 
 
-    @PostMapping("/{session_id}/exercise/{exercise_id}")
+    @PostMapping("/{session_id}/exercises/{exercise_id}")
     public ResponseEntity<SessionExerciseBaseDTO> createSessionExerciseDetails(
             @PathVariable Long session_id,
             @PathVariable Long exercise_id,
@@ -72,7 +71,7 @@ public class SessionExerciseController {
         return ResponseEntity.status(HttpStatus.CREATED).body(mapper.toDTO(model));
     }
 
-    @PutMapping("/{session_id}/exercise/{exercise_id}/set/{sessionSet_id}")
+    @PutMapping("/{session_id}/exercises/{exercise_id}/sets/{sessionSet_id}")
     public ResponseEntity<SessionExerciseBaseDTO> updateSessionExerciseDetails(
             @PathVariable Long session_id,
             @PathVariable Long exercise_id,
@@ -83,7 +82,7 @@ public class SessionExerciseController {
         return ResponseEntity.ok(mapper.toDTO(model));
     }
 
-    @DeleteMapping("/{session_id}/exercise/{exercise_id}/set/{sessionSet_id}")
+    @DeleteMapping("/{session_id}/exercises/{exercise_id}/sets/{sessionSet_id}")
     public ResponseEntity<?> deleteSessionExerciseDetails(
             @PathVariable Long session_id,
             @PathVariable Long exercise_id,

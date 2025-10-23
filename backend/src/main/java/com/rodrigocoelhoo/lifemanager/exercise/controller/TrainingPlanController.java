@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/training-plan")
+@RequestMapping("/api/training-plans")
 public class TrainingPlanController {
 
 
@@ -38,25 +38,34 @@ public class TrainingPlanController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<TrainingPlanDetailsDTO> getTrainingPlan(@PathVariable Long id) {
+    public ResponseEntity<TrainingPlanDetailsDTO> getTrainingPlan(
+            @PathVariable Long id
+    ) {
         TrainingPlanModel plan = trainingPlanService.getTrainingPlan(id);
         return ResponseEntity.ok(TrainingPlanDetailsDTO.fromEntity(plan));
     }
 
     @PostMapping
-    public ResponseEntity<TrainingPlanResponseDTO> createTrainingPlan(@RequestBody @Valid TrainingPlanDTO data) {
+    public ResponseEntity<TrainingPlanResponseDTO> createTrainingPlan(
+            @RequestBody @Valid TrainingPlanDTO data
+    ) {
         TrainingPlanModel plan = trainingPlanService.createTrainingPlan(data);
         return ResponseEntity.status(HttpStatus.CREATED).body(TrainingPlanResponseDTO.fromEntity(plan));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<TrainingPlanDetailsDTO> updateTrainingPlan(@PathVariable Long id, @RequestBody @Valid TrainingPlanUpdateDTO data) {
+    public ResponseEntity<TrainingPlanDetailsDTO> updateTrainingPlan(
+            @PathVariable Long id,
+            @RequestBody @Valid TrainingPlanUpdateDTO data
+    ) {
         TrainingPlanModel plan = trainingPlanService.updateTrainingPlan(id, data);
         return ResponseEntity.ok(TrainingPlanDetailsDTO.fromEntity(plan));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteTrainingPlan(@PathVariable Long id) {
+    public ResponseEntity<?> deleteTrainingPlan(
+            @PathVariable Long id
+    ) {
         trainingPlanService.deleteTrainingPlan(id);
         return ResponseEntity.noContent().build();
     }

@@ -1,0 +1,2 @@
+ALTER TABLE tb_meal_ingredients
+ADD COLUMN unit VARCHAR(20) NOT NULL;

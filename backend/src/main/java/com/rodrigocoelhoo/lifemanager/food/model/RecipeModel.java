@@ -7,17 +7,16 @@ import lombok.*;
 import java.util.List;
 
 @Entity
-@Table(name = "tb_ingredients")
-@NoArgsConstructor
-@AllArgsConstructor
+@Table(name = "tb_recipes")
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
-public class IngredientModel {
+public class RecipeModel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(nullable = false)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
@@ -27,6 +26,8 @@ public class IngredientModel {
     @Column(nullable = false, length = 50)
     private String name;
 
-    @OneToMany(mappedBy = "ingredient", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    private List<IngredientBrandModel> brands;
+    @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<RecipeIngredientModel> ingredients;
 }
+
+
