@@ -1,0 +1,8 @@
+ALTER TABLE tb_wallets
+    ALTER COLUMN balance TYPE NUMERIC(18,2) USING ROUND(balance::NUMERIC, 2);
+
+ALTER TABLE tb_transactions
+    ALTER COLUMN amount TYPE NUMERIC(18,2) USING ROUND(amount::NUMERIC, 2);
+
+ALTER TABLE tb_transferences
+    ALTER COLUMN amount TYPE NUMERIC(18,2) USING ROUND(amount::NUMERIC, 2);
