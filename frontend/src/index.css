@@ -1,0 +1,68 @@
+@import "tailwindcss";
+
+@theme {
+  --color-textcolor: #e0e0e6;
+  --color-background: #232538;
+  --color-foreground: #282841;
+  --color-primary: #895af6;
+  --color-secondary: #b5a8d6;
+  --color-accent: #a855f7;
+
+  --color-muted: color-mix(in oklab, var(--color-background), var(--color-foreground) 5%);
+  --color-muted-foreground: color-mix(in oklab, var(--color-foreground), var(--color-background) 70%);
+  --color-border: color-mix(in oklab, var(--color-foreground), var(--color-background) 90%);
+  --color-hover: color-mix(in oklab, var(--color-primary), black 10%);
+  --color-active: color-mix(in oklab, var(--color-primary), black 20%);
+}
+
+@layer utilities {
+  @keyframes logo-spin {
+    from {
+      transform: rotate(0deg);
+    }
+
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  @keyframes float {
+
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+
+    50% {
+      transform: translateY(-5px);
+    }
+  }
+
+  @keyframes wave {
+
+    0%,
+    100% {
+      transform: translateX(0) rotate(0deg);
+    }
+
+    25% {
+      transform: translateX(6px) rotate(6deg);
+    }
+
+    75% {
+      transform: translateX(-6px) rotate(-6deg);
+    }
+  }
+
+  .animate-float {
+    animation: float 2s ease-in-out infinite;
+  }
+
+  .animate-spin-slow {
+    animation: logo-spin 20s linear infinite;
+  }
+
+  .animate-wave {
+    animation: wave 5s ease-in-out infinite;
+  }
+}
