@@ -3,7 +3,7 @@ import { FaGithub } from 'react-icons/fa';
 
 export default function Footer() {
 	return (
-		<footer className="bg-foreground mt-16 w-full drop-shadow-[0_4px_6px_rgba(0,0,0,1.0)] text-textcolor px-8 sm:px-20 py-6 flex flex-col sm:flex-row justify-between items-center gap-6">
+		<footer className="bg-foreground w-full drop-shadow-[0_4px_6px_rgba(0,0,0,1.0)] text-textcolor px-8 sm:px-20 py-6 flex flex-col sm:flex-row justify-between items-center gap-6">
 
 			<div className="flex flex-col justify-center items-center sm:items-start ">
 				<h3 className="font-semibold text-lg mb-2">Contacts</h3>

@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import reactLogo from '../assets/react.svg'
 import springLogo from '../assets/spring.svg'
 import tailwindLogo from '../assets/tailwind.svg'
@@ -5,14 +6,13 @@ import dashboard from '../assets/dashboard.png'
 import meal from '../assets/meal.png'
 import finances from '../assets/finances.png'
 import exercise from '../assets/exercise.png'
-import Header from "../components/HomePage/Header";
-import Footer from "../components/HomePage/Footer";
+import { useAuth } from '../contexts/AuthContext'
 
-export function HomePage() {
+export default function HomePage() {
+	const { isLoggedIn } = useAuth();
+
 	return (
 		<div className="bg-background font-sans">
-			<Header />
-
 			<main className="pt-16">
 				<section className="bg-background text-textcolor flex flex-col xl:flex-row justify-center items-center overflow-hidden py-32">
 
@@ -22,20 +22,19 @@ export function HomePage() {
 							<span className="text-primary">Your Life</span>
 						</h1>
 
-						{/* Subtext */}
 						<p className="text-xl max-w-2xl text-textcolor/80 mb-10 pr-10">
 							Track your <span className="text-secondary font-semibold">finances</span>,
 							plan your <span className="text-secondary font-semibold">meals</span>,
 							and monitor your <span className="text-secondary font-semibold">trainings</span>.
 						</p>
 
-						{/* Buttons */}
 						<div className="flex flex-row gap-4">
-							<button
+							<Link
+								to={isLoggedIn ? "/dashboard" : "/signup"}
 								className="bg-primary hover:bg-primary/80 text-white font-semibold px-8 py-3 rounded-lg shadow-lg transition-all hover:cursor-pointer"
 							>
 								Get Started
-							</button>
+							</Link>
 							<button
 								onClick={() => window.open("https://github.com/RodrigoCoelhoo/life-manager", "_blank")}
 								className="bg-foreground border border-secondary text-textcolor font-semibold px-8 py-3 rounded-lg hover:border-primary hover:text-primary transition-all hover:cursor-pointer"
@@ -58,7 +57,6 @@ export function HomePage() {
 						Features
 					</h2>
 
-					{/* Nutrition */}
 					<div className="bg-foreground mx-4 lg:mx-20 px-6 lg:px-16 py-10 rounded-4xl drop-shadow-[0px_4px_6px_rgba(0,0,0,0.4)]">
 						<div className="flex flex-col lg:flex-row items-center justify-between gap-10">
 							<div className="lg:w-3/5 text-center lg:text-left">
@@ -76,7 +74,6 @@ export function HomePage() {
 						</div>
 					</div>
 
-					{/* Finances */}
 					<div className="bg-foreground mx-4 lg:mx-20 px-6 lg:px-16 py-10 rounded-4xl drop-shadow-[0px_4px_6px_rgba(0,0,0,0.4)]">
 						<div className="flex flex-col lg:flex-row-reverse items-center justify-between gap-10">
 							<div className="lg:w-3/5 text-center lg:text-right">
@@ -94,7 +91,6 @@ export function HomePage() {
 						</div>
 					</div>
 
-					{/* Training */}
 					<div className="bg-foreground mx-4 lg:mx-20 px-6 lg:px-16 py-10 rounded-4xl drop-shadow-[0px_4px_6px_rgba(0,0,0,0.4)]">
 						<div className="flex flex-col lg:flex-row items-center justify-between gap-10">
 							<div className="lg:w-3/5 text-center lg:text-left">
@@ -114,13 +110,11 @@ export function HomePage() {
 				</section>
 
 
-				{/* Technologies */}
-				<section className="bg-background flex flex-col items-center px-2 sm:px-4 md:px-8 lg:px-16 xl:px-32 py-16">
+				<section className="bg-background flex flex-col items-center px-2 sm:px-4 md:px-8 lg:px-16 xl:px-32 py-32">
 					<h2 className="text-5xl font-bold text-textcolor mt-10 mb-20">Technologies Used</h2>
 
 					<div className="flex flex-col sm:flex-row flex-wrap justify-center items-center w-full gap-8 h-auto">
 
-						{/* Spring */}
 						<a
 							href="https://spring.io/projects/spring-boot"
 							target="_blank"
@@ -145,7 +139,6 @@ export function HomePage() {
 							</p>
 						</a>
 
-						{/* React */}
 						<a
 							href="https://react.dev"
 							target="_blank"
@@ -170,7 +163,6 @@ export function HomePage() {
 							</p>
 						</a>
 
-						{/* Tailwind */}
 						<a
 							href="https://tailwindcss.com/"
 							target="_blank"
@@ -198,8 +190,6 @@ export function HomePage() {
 					</div>
 				</section>
 			</main>
-
-			<Footer />
 		</div>
 	);
 }
