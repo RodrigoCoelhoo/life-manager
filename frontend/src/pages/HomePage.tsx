@@ -14,9 +14,9 @@ export default function HomePage() {
 	return (
 		<div className="bg-background font-sans">
 			<main className="pt-16">
-				<section className="bg-background text-textcolor flex flex-col xl:flex-row justify-center items-center overflow-hidden py-32">
+				<section className="bg-background text-textcolor flex flex-col xl:flex-row overflow-hidden py-32">
 
-					<div className="bg-background flex flex-col items-center xl:items-start text-center xl:text-left py-16 w-full my-16 px-8 sm:px-16 md:px-24 lg:px-32 xl:px-48">
+					<div className="bg-background flex flex-col items-center xl:items-start text-center xl:text-left w-full mt-25 mb-25 px-8 sm:px-16 md:px-24 lg:px-32 xl:px-48">
 						<h1 className="text-5xl sm:text-6xl font-bold mb-6 leading-tight">
 							Visualize & Organize<br />
 							<span className="text-primary">Your Life</span>

@@ -16,7 +16,7 @@ export default function Login() {
 		setError(null);
 
 		try {
-			const { token } = await authService.signin({ username, password });~
+			const { token } = await authService.signin({ username, password });
 			login(token);
 			navigate("/dashboard");
 		} catch (err: any) {
@@ -68,7 +68,7 @@ export default function Login() {
 
 					<button
 						type="submit"
-						className="mt-4 bg-primary text-white py-2 rounded-lg hover:bg-primary/90 transition-all"
+						className="cursor-pointer mt-4 bg-primary text-white py-2 rounded-lg hover:bg-primary/90 transition-all"
 					>
 						Log In
 					</button>

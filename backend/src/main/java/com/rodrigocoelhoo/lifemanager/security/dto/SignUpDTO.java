@@ -36,7 +36,7 @@ public record SignUpDTO(
     String email,
 
     @NotBlank
-    @Size(min = 8, max = 100)
+    @Size(min = 8, max = 100, message = "Password must have between 8 and 100 characters.")
     @Pattern(
             regexp = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[@$!%*?&\\-_])[A-Za-z\\d@$!%*?&\\-_]+$",
             message = "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character (@$!%*?&-_)"

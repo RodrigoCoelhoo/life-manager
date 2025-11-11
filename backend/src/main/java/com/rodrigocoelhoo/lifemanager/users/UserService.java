@@ -17,10 +17,10 @@ public class UserService {
 
     public UserModel createUser(SignUpDTO data) {
         if (userRepository.findByUsername(data.username()).isPresent())
-            throw new DuplicateFieldException("username", data.username());
+            throw new DuplicateFieldException("That username is already taken. Please choose another.");
 
         if (userRepository.findByEmail(data.email()).isPresent())
-            throw new DuplicateFieldException("email", data.email());
+            throw new DuplicateFieldException("An account with this email already exists. Try logging in instead.");
 
         String encryptedPassword = new BCryptPasswordEncoder().encode(data.password());
         UserModel newUser = new UserModel(
