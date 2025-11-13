@@ -17,7 +17,11 @@ export default function Login() {
 		event.preventDefault();
 		setError(null);
 
-		{/** Check if password match */ }
+		if (password !== confirmPassword) {
+			setError("Passwords don't match.");
+			return; 
+		}
+
 		try {
 			await authService.signup({ username, firstName, lastName, email, password });
 			navigate("/login");

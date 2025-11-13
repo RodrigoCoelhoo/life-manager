@@ -1,4 +1,4 @@
-export default function Dashboard() {
+export default function Transferences() {
 	return (
 		<div className="h-full w-full p-6 text-textcolor text-4xl rounded-lg grid gap-2 grid-rows-[1fr_3fr_1fr] grid-cols-3">
 
@@ -15,7 +15,7 @@ export default function Dashboard() {
 			</div>
 
 			<div className="bg-foreground flex justify-center items-center rounded-lg col-span-2">
-				Dashboard
+				Transferences
 			</div>
 
 			<div className="bg-foreground flex justify-center items-center rounded-lg col-span-1">

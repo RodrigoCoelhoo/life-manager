@@ -60,23 +60,6 @@ export default function HomePage() {
 					<div className="bg-foreground mx-4 lg:mx-20 px-6 lg:px-16 py-10 rounded-4xl drop-shadow-[0px_4px_6px_rgba(0,0,0,0.4)]">
 						<div className="flex flex-col lg:flex-row items-center justify-between gap-10">
 							<div className="lg:w-3/5 text-center lg:text-left">
-								<h3 className="text-3xl font-semibold mb-2">Nutrition</h3>
-								<p className="text-textcolor/80 font-extralight leading-relaxed text-lg">
-									Keep track of your daily meals by creating ingredients and recipes with full nutritional data.
-									Build meals from your saved ingredients or recipes and monitor your calorie and macro intake with ease.
-								</p>
-							</div>
-							<img
-								src={meal}
-								alt="Meal tracking dashboard"
-								className="h-52 sm:h-60 md:h-72 xl:h-96 object-contain lg:w-2/5 transition-all duration-300"
-							/>
-						</div>
-					</div>
-
-					<div className="bg-foreground mx-4 lg:mx-20 px-6 lg:px-16 py-10 rounded-4xl drop-shadow-[0px_4px_6px_rgba(0,0,0,0.4)]">
-						<div className="flex flex-col lg:flex-row-reverse items-center justify-between gap-10">
-							<div className="lg:w-3/5 text-center lg:text-right">
 								<h3 className="text-3xl font-semibold mb-2">Finances</h3>
 								<p className="text-textcolor/80 font-extralight leading-relaxed text-lg">
 									Stay in control of your finances with custom wallets, categorized transactions, and easy transfers.
@@ -86,6 +69,23 @@ export default function HomePage() {
 							<img
 								src={finances}
 								alt="Finance dashboard"
+								className="h-52 sm:h-60 md:h-72 xl:h-96 object-contain lg:w-2/5 transition-all duration-300"
+							/>
+						</div>
+					</div>
+
+					<div className="bg-foreground mx-4 lg:mx-20 px-6 lg:px-16 py-10 rounded-4xl drop-shadow-[0px_4px_6px_rgba(0,0,0,0.4)]">
+						<div className="flex flex-col lg:flex-row-reverse items-center justify-between gap-10">
+							<div className="lg:w-3/5 text-center lg:text-right">
+								<h3 className="text-3xl font-semibold mb-2">Nutrition</h3>
+								<p className="text-textcolor/80 font-extralight leading-relaxed text-lg">
+									Keep track of your daily meals by creating ingredients and recipes with full nutritional data.
+									Build meals from your saved ingredients or recipes and monitor your calorie and macro intake with ease.
+								</p>
+							</div>
+							<img
+								src={meal}
+								alt="Meal tracking dashboard"
 								className="h-52 sm:h-60 md:h-72 xl:h-96 object-contain lg:w-2/5 transition-all duration-300"
 							/>
 						</div>

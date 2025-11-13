@@ -1,14 +1,17 @@
 import { Outlet } from "react-router-dom";
-import Header from "../components/HomePage/Header.tsx"
-import Footer from "../components/HomePage/Footer.tsx";
+import Sidebar from '../components/common/Sidebar';
 
 const MainLayout = () => {
 	return (
-		<>
-			<Header />
-			<Outlet />
-			<Footer />
-		</>
+		<div className="flex flex-col h-screen">
+			<div className="flex flex-1 overflow-hidden">
+				<Sidebar />
+
+				<main className="flex-1 overflow-y-auto bg-background">
+					<Outlet />
+				</main>
+			</div>
+		</div>
 	);
 };
 export default MainLayout;

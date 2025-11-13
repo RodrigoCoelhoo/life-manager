@@ -7,12 +7,23 @@
   --color-primary: #895af6;
   --color-secondary: #b5a8d6;
   --color-accent: #a855f7;
+  --color-background-accent: #2b2b48;
 
   --color-muted: color-mix(in oklab, var(--color-background), var(--color-foreground) 5%);
   --color-muted-foreground: color-mix(in oklab, var(--color-foreground), var(--color-background) 70%);
   --color-border: color-mix(in oklab, var(--color-foreground), var(--color-background) 90%);
   --color-hover: color-mix(in oklab, var(--color-primary), black 10%);
   --color-active: color-mix(in oklab, var(--color-primary), black 20%);
+}
+
+@layer components {
+  .menu-title {
+    @apply text-2xl font-semibold text-textcolor p-2;
+  }
+
+  .menu-option {
+    @apply text-lg font-light text-textcolor flex flex-row items-center gap-3 p-2 rounded-lg bg-background hover:bg-foreground hover:border-l-5 hover:border-primary hover:font-normal;
+  }
 }
 
 @layer utilities {
@@ -37,6 +48,22 @@
       transform: translateY(-5px);
     }
   }
+
+  @layer utilities {
+    .scrollbar-hide::-webkit-scrollbar {
+      display: none;
+    }
+
+    .scrollbar-hide {
+      -ms-overflow-style: none;
+      /* IE/Edge */
+      scrollbar-width: none;
+      /* Firefox */
+    }
+
+  }
+
+
 
   @keyframes wave {
 
