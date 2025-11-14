@@ -22,7 +22,7 @@
   }
 
   .menu-option {
-    @apply text-lg font-light text-textcolor flex flex-row items-center gap-3 p-2 rounded-lg bg-background hover:bg-foreground hover:border-l-5 hover:border-primary hover:font-normal;
+    @apply text-lg font-light text-textcolor flex flex-row items-center gap-3 p-2 rounded-lg bg-background hover:bg-foreground hover:border-l-5 hover:border-primary hover:font-normal ml-3;
   }
 }
 
@@ -60,7 +60,6 @@
       scrollbar-width: none;
       /* Firefox */
     }
-
   }
 
 

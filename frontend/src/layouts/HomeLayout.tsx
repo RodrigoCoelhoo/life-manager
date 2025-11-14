@@ -1,11 +1,19 @@
 import { Outlet } from "react-router-dom";
-import HomeHeader from "../components/common/HomeHeader.tsx"
+import HomeHeader from "../components/common/header/HomeHeader.tsx"
+import MobileHeader from "../components/common/header/MobileHeader.tsx"
 import Footer from "../components/common/Footer.tsx";
+import { useAuth } from "../contexts/AuthContext";
 
 const HomeLayout = () => {
+	const { isLoggedIn } = useAuth();
+
 	return (
 		<>
-			<HomeHeader />
+			{isLoggedIn ? (
+				<MobileHeader />
+			) : (
+				<HomeHeader />
+			)}
 			<Outlet />
 			<Footer />
 		</>
