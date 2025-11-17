@@ -5,9 +5,9 @@ import com.rodrigocoelhoo.lifemanager.finances.model.WalletModel;
 import java.math.BigDecimal;
 
 public record WalletResponseDTO(
-    Long walletId,
+    Long id,
     String name,
-    String walletType,
+    String type,
     BigDecimal balance,
     String currency
 ) {

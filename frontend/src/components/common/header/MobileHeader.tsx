@@ -35,9 +35,11 @@ export default function MobileHeader() {
 					</div>
 				</button>
 
-				<div className="absolute left-1/2 transform -translate-x-1/2">
+				<Link
+					to="/home"
+					className="absolute left-1/2 transform -translate-x-1/2">
 					<img src={logo} alt="LifeManager Logo" className="h-16" />
-				</div>
+				</Link>
 
 				<Link
 					to="/profile"

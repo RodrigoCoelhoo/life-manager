@@ -6,7 +6,7 @@ import com.rodrigocoelhoo.lifemanager.finances.model.WalletModel;
 import java.time.LocalDate;
 
 public record TransactionResponseDTO(
-    Long transactionId,
+    Long id,
     WalletResponseDTO wallet,
     String amount,
     String type,

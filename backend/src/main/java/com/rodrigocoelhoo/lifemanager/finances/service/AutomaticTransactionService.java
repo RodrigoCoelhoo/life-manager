@@ -77,7 +77,7 @@ public class AutomaticTransactionService {
         TransactionRecurrence recurrence = validateRecurrence(data.recurrence());
 
         UserModel user = userService.getLoggedInUser();
-        WalletModel wallet = walletService.getWallet(data.wallet_id());
+        WalletModel wallet = walletService.getWallet(data.walletId());
         AutomaticTransactionModel automaticTransaction = AutomaticTransactionModel.builder()
                 .user(user)
                 .wallet(wallet)
@@ -102,7 +102,7 @@ public class AutomaticTransactionService {
         TransactionRecurrence recurrence = validateRecurrence(data.recurrence());
 
         AutomaticTransactionModel automaticTransaction = getAutomaticTransaction(id);
-        WalletModel wallet = walletService.getWallet(data.wallet_id());
+        WalletModel wallet = walletService.getWallet(data.walletId());
 
         automaticTransaction.setWallet(wallet);
         automaticTransaction.setAmount(data.amount());

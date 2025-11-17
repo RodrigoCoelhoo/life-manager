@@ -10,8 +10,12 @@ export default function Sidebar() {
 	return (
 		<aside className="h-screen flex flex-col justify-between w-60 shrink-0 bg-background drop-shadow-[0_4px_6px_rgba(0,0,0,0.2)] text-textcolor">
 			<div className="flex flex-col flex-1 overflow-hidden">
-				<div className="w-full border-b-4 border-background-accent p-2">
-					<img src={logo} alt="LifeManager Logo" />
+				<div className="border-b-4 border-background-accent p-2 flex items-center justify-center">
+					<Link
+						to="/home">
+						<img src={logo} alt="LifeManager Logo" />
+					</Link>
+
 				</div>
 
 				<div className="flex-1 overflow-hidden">

@@ -7,7 +7,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 public record TransferenceResponseDTO(
-    Long transferenceId,
+    Long id,
     String fromWalletName,
     String fromAmount,
     String toWalletName,

@@ -10,7 +10,7 @@ import java.time.LocalDate;
 
 public record AutomaticTransactionDTO(
         @NotNull(message = "Wallet ID is required")
-        Long wallet_id,
+        Long walletId,
 
         @NotNull(message = "Amount is required")
         @Positive(message = "Amount must be greater than zero")
