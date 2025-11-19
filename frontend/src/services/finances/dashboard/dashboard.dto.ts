@@ -1,8 +1,13 @@
 export interface DashboardOverviewDTO {
-	yearMonth: string;
-	totalIncome: string;
-	incomeCategories: Record<string, string>;
-	totalExpenses: string;
-	expenseCategories: Record<string, string>;
-	netBalance: string;
+  yearMonth: string;                     
+  totalIncome: string;                   
+  incomeCategories: CategorySummaryDTO[];
+  totalExpenses: string;                 
+  expenseCategories: CategorySummaryDTO[];
+  netBalance: string;                    
+}
+
+export interface CategorySummaryDTO {
+  category: string;  
+  amount: string;    
 }

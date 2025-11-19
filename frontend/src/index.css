@@ -4,8 +4,8 @@
   --color-textcolor: #e0e0e6;
   --color-background: #232538;
   --color-foreground: #282841;
-  --color-primary: #895af6;
-  --color-secondary: #b5a8d6;
+  --color-primary: #6F5DC1;
+  --color-secondary: #A599F0;
   --color-accent: #a855f7;
   --color-background-accent: #2b2b48;
 
@@ -23,6 +23,14 @@
 
   .menu-option {
     @apply text-lg font-light text-textcolor flex flex-row items-center gap-3 p-2 rounded-lg bg-background hover:bg-foreground hover:border-l-5 hover:border-primary hover:font-normal ml-3;
+  }
+
+  .form-input {
+    @apply p-2 border border-secondary/50 rounded-lg bg-background hover:border-primary/80 focus:outline-none focus:border-primary/80 focus:border-2
+  }
+
+  .form-submit {
+    @apply cursor-pointer mt-4 bg-primary text-white py-2 rounded-lg hover:bg-primary/90 transition-all
   }
 }
 
@@ -59,6 +67,30 @@
       /* IE/Edge */
       scrollbar-width: none;
       /* Firefox */
+    }
+  }
+
+  @layer utilities {
+
+    /* Custom scrollbar */
+    .scrollbar-custom::-webkit-scrollbar {
+      width: 4px;
+      height: 8px;
+    }
+
+    .scrollbar-custom::-webkit-scrollbar-track {
+      background: theme('colors.primary');
+    }
+
+    .scrollbar-custom::-webkit-scrollbar-thumb {
+      background: theme('colors.primary');
+      border-radius: 9999px;
+    }
+
+    /* Firefox support */
+    .scrollbar-custom {
+      scrollbar-color: theme('colors.primary') theme('colors.foreground');
+      scrollbar-width: thin;
     }
   }
 

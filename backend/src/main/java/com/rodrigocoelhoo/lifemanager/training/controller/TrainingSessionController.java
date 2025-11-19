@@ -1,11 +1,16 @@
 package com.rodrigocoelhoo.lifemanager.training.controller;
 
+import com.rodrigocoelhoo.lifemanager.finances.dto.PageResponseDTO;
 import com.rodrigocoelhoo.lifemanager.training.dto.trainingsessiondto.TrainingSessionDTO;
 import com.rodrigocoelhoo.lifemanager.training.dto.trainingsessiondto.TrainingSessionDetailsDTO;
 import com.rodrigocoelhoo.lifemanager.training.dto.trainingsessiondto.TrainingSessionResponseDTO;
 import com.rodrigocoelhoo.lifemanager.training.model.TrainingSessionModel;
 import com.rodrigocoelhoo.lifemanager.training.service.TrainingSessionService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,14 +31,16 @@ public class TrainingSessionController {
     }
 
     @GetMapping
-    public ResponseEntity<List<TrainingSessionResponseDTO>> getSessions() {
-        List<TrainingSessionModel> sessions = trainingSessionService.getAllSessions();
+    public ResponseEntity<PageResponseDTO<TrainingSessionResponseDTO>> getSessions(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size
+    ) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("date").descending());
+        Page<TrainingSessionModel> sessions = trainingSessionService.getAllSessions(pageable);
 
-        List<TrainingSessionResponseDTO> response = sessions.stream()
-                .map(TrainingSessionResponseDTO::fromEntity)
-                .toList();
+        Page<TrainingSessionResponseDTO> response = sessions.map(TrainingSessionResponseDTO::fromEntity);
 
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(PageResponseDTO.fromPage(response));
     }
 
     @GetMapping("/{id}")

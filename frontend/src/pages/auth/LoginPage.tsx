@@ -43,7 +43,7 @@ export default function Login() {
 							id="username"
 							name="username"
 							placeholder="Enter your username"
-							className="p-2 border border-secondary/50 rounded-lg bg-background focus:outline-none focus:border-primary/80"
+							className="form-input"
 							required
 							value={username}
 							onChange={(event) => setUsername(event.target.value)}
@@ -59,7 +59,7 @@ export default function Login() {
 							id="password"
 							name="password"
 							placeholder="Enter your password"
-							className="p-2 border border-secondary/50 rounded-lg bg-background focus:outline-none focus:border-primary/80"
+							className="form-input"
 							required
 							value={password}
 							onChange={(event) => setPassword(event.target.value)}
@@ -68,7 +68,7 @@ export default function Login() {
 
 					<button
 						type="submit"
-						className="cursor-pointer mt-4 bg-primary text-white py-2 rounded-lg hover:bg-primary/90 transition-all"
+						className="form-submit"
 					>
 						Log In
 					</button>

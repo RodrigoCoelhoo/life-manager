@@ -27,7 +27,7 @@ export const transactionService = {
 	},
 
 	updateAutomaticTransaction: async (
-		id: string,
+		id: number,
 		payload: AutomaticTransactionDTO
 	): Promise<AutomaticTransactionResponseDTO> => {
 		try {
@@ -39,7 +39,7 @@ export const transactionService = {
 		}
 	},
 
-	deleteAutomaticTransaction: async (id: string): Promise<void> => {
+	deleteAutomaticTransaction: async (id: number): Promise<void> => {
 		try {
 			const { data } = await api.delete(`${BASE_URL}/${id}`);
 			return data;

@@ -15,7 +15,7 @@ export const walletService = {
 		}
 	},
 
-	getWallet: async (id: string): Promise<WalletResponseDTO> => {
+	getWallet: async (id: number): Promise<WalletResponseDTO> => {
 		try {
 			const { data } = await api.get<WalletResponseDTO>(`${BASE_URL}/${id}`);
 			return data;
@@ -36,7 +36,7 @@ export const walletService = {
 	},
 
 	updateWallet: async (
-		id: string,
+		id: number,
 		payload: WalletUpdateDTO
 	): Promise<WalletResponseDTO> => {
 		try {
@@ -48,7 +48,7 @@ export const walletService = {
 		}
 	},
 
-	deleteWallet: async (id: string): Promise<void> => {
+	deleteWallet: async (id: number): Promise<void> => {
 		try {
 			await api.delete(`${BASE_URL}/${id}`);
 		} catch (error) {

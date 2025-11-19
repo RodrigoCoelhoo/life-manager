@@ -2,7 +2,7 @@ import { useState } from "react";
 import { FaUserCircle } from "react-icons/fa";
 import { RiMenu2Line, RiMenuLine, RiMenu4Line } from "react-icons/ri";
 import SidebarNav from "../sidebar/SidebarNav";
-import logo from "../../../assets/logo64.png"
+import logo from "../../../assets/logo.png"
 import { Link } from "react-router-dom";
 
 export default function MobileHeader() {

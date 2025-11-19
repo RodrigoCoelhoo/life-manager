@@ -25,8 +25,8 @@ public record ExerciseDTO(
         @NotNull(message = "demoUrl cannot be null, but can be empty")
         @Size(max = 2048, message = "demoUrl cannot exceed 2048 characters")
         @Pattern(
-                regexp = "^(http|https)://.*$",
-                message = "Must be a valid URL starting with http or https"
+                regexp = "^$|^(http|https)://.*$",
+                message = "Must be empty or a valid URL starting with http or https"
         )
         String demoUrl
 ) { }

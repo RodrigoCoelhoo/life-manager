@@ -35,7 +35,7 @@ public class ExerciseModel {
     @Column(nullable = false)
     private ExerciseType type;
 
-    @Pattern(regexp = "^(http|https)://.*$", message = "Must be a valid URL starting with http or https")
+    @Pattern(regexp = "^$|^(http|https)://.*$", message = "Must be empty or a valid URL starting with http or https")
     @Column(length = 2048)
     private String demoUrl;
 

@@ -8,6 +8,8 @@ import com.rodrigocoelhoo.lifemanager.training.repository.TrainingSessionReposit
 import com.rodrigocoelhoo.lifemanager.users.UserModel;
 import com.rodrigocoelhoo.lifemanager.users.UserService;
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -29,9 +31,9 @@ public class TrainingSessionService {
         this.trainingPlanService = trainingPlanService;
     }
 
-    public List<TrainingSessionModel> getAllSessions() {
+    public Page<TrainingSessionModel> getAllSessions(Pageable pageable) {
         UserModel user = userService.getLoggedInUser();
-        return trainingSessionRepository.findAllByUser(user);
+        return trainingSessionRepository.findAllByUser(user, pageable);
     }
 
     public TrainingSessionModel getSession(Long id) {

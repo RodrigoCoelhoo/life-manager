@@ -1,11 +1,17 @@
 package com.rodrigocoelhoo.lifemanager.training.controller;
 
+import com.rodrigocoelhoo.lifemanager.finances.dto.PageResponseDTO;
+import com.rodrigocoelhoo.lifemanager.finances.dto.TransactionResponseDTO;
 import com.rodrigocoelhoo.lifemanager.training.dto.exercisedto.ExerciseDTO;
 import com.rodrigocoelhoo.lifemanager.training.dto.exercisedto.ExerciseResponseDTO;
 import com.rodrigocoelhoo.lifemanager.training.dto.exercisedto.ExerciseUpdateDTO;
 import com.rodrigocoelhoo.lifemanager.training.model.ExerciseModel;
 import com.rodrigocoelhoo.lifemanager.training.service.ExerciseService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,14 +31,16 @@ public class ExerciseController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ExerciseResponseDTO>> getExercises() {
-        List<ExerciseModel> exercises = exerciseService.getAllExercisesByUser();
+    public ResponseEntity<PageResponseDTO<ExerciseResponseDTO>> getExercises(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size
+    ) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("updatedAt").descending());
+        Page<ExerciseModel> exercises = exerciseService.getAllExercisesByUser(pageable);
 
-        List<ExerciseResponseDTO> response = exercises.stream()
-                .map(ExerciseResponseDTO::fromEntity)
-                .toList();
+        Page<ExerciseResponseDTO> response = exercises.map(ExerciseResponseDTO::fromEntity);
 
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(PageResponseDTO.fromPage(response));
     }
 
     @GetMapping("/{exercise_id}")

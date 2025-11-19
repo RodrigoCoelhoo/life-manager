@@ -61,7 +61,7 @@ export default function Login() {
 							id="username"
 							name="username"
 							placeholder="Enter your username"
-							className="p-2 border border-secondary/50 rounded-lg bg-background focus:outline-none focus:border-primary/80"
+							className="form-input"
 							required
 							value={username}
 							onChange={(event) => setUsername(event.target.value)}
@@ -78,7 +78,7 @@ export default function Login() {
 								id="firstName"
 								name="firstName"
 								placeholder="Enter your first name"
-								className="p-2 border border-secondary/50 rounded-lg bg-background focus:outline-none focus:border-primary/80 w-full text-sm"
+								className="form-input w-full text-sm"
 								required
 								value={firstName}
 								onChange={(event) => setFirstName(event.target.value)}
@@ -94,7 +94,7 @@ export default function Login() {
 								id="lastName"
 								name="lastName"
 								placeholder="Enter your last name"
-								className="p-2 border border-secondary/50 rounded-lg bg-background focus:outline-none focus:border-primary/80 w-full text-sm"
+								className="form-input w-full text-sm"
 								required
 								value={lastName}
 								onChange={(event) => setLastName(event.target.value)}
@@ -111,7 +111,7 @@ export default function Login() {
 							id="email"
 							name="email"
 							placeholder="Enter your email"
-							className="p-2 border border-secondary/50 rounded-lg bg-background focus:outline-none focus:border-primary/80"
+							className="form-input"
 							required
 							value={email}
 							onChange={(event) => setEmail(event.target.value)}
@@ -127,7 +127,7 @@ export default function Login() {
 							id="password"
 							name="password"
 							placeholder="Enter your password"
-							className="p-2 border border-secondary/50 rounded-lg bg-background focus:outline-none focus:border-primary/80"
+							className="form-input"
 							required
 							value={password}
 							onChange={(event) => setPassword(event.target.value)}
@@ -143,7 +143,7 @@ export default function Login() {
 							id="confirmPassword"
 							name="confirmPassword"
 							placeholder="Confirm your password"
-							className="p-2 border border-secondary/50 rounded-lg bg-background focus:outline-none focus:border-primary/80"
+							className="form-input"
 							required
 							value={confirmPassword}
 							onChange={(event) => setConfirmPassword(event.target.value)}

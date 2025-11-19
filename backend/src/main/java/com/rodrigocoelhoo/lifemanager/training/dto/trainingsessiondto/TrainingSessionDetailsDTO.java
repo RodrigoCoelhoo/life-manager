@@ -6,7 +6,7 @@ import com.rodrigocoelhoo.lifemanager.training.model.TrainingSessionModel;
 import java.time.LocalDateTime;
 
 public record TrainingSessionDetailsDTO(
-    Long sessionId,
+    Long id,
     TrainingPlanDetailsDTO trainingPlan,
     LocalDateTime date,
     LocalDateTime createdAt,

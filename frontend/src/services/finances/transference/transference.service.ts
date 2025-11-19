@@ -16,7 +16,7 @@ export const transactionService = {
 		}
 	},
 
-	getTransference: async (id: string): Promise<TransferenceResponseDTO> => {
+	getTransference: async (id: number): Promise<TransferenceResponseDTO> => {
 		try {
 			const { data } = await api.get(`${BASE_URL}/${id}`);
 			return data;
@@ -37,7 +37,7 @@ export const transactionService = {
 	},
 
 	updateTransaction: async (
-		id: string,
+		id: number,
 		payload: TransferenceDTO
 	): Promise<TransferenceResponseDTO> => {
 		try {
@@ -49,7 +49,7 @@ export const transactionService = {
 		}
 	},
 
-	deleteTransaction: async (id: string): Promise<void> => {
+	deleteTransaction: async (id: number): Promise<void> => {
 		try {
 			const { data } = await api.delete(`${BASE_URL}/${id}`);
 			return data;

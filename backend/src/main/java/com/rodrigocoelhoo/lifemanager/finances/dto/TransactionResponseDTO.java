@@ -9,10 +9,10 @@ public record TransactionResponseDTO(
     Long id,
     WalletResponseDTO wallet,
     String amount,
+    String category,
     String type,
     String description,
-    LocalDate date,
-    String category
+    LocalDate date
 ) {
     public static TransactionResponseDTO fromEntity(TransactionModel model) {
         WalletModel wallet = model.getWallet();
@@ -21,10 +21,10 @@ public record TransactionResponseDTO(
                 model.getId(),
                 WalletResponseDTO.fromEntity(wallet),
                 wallet.getCurrency().format(model.getAmount()),
+                model.getCategory().toString(),
                 model.getType().toString(),
                 model.getDescription(),
-                model.getDate(),
-                model.getCategory().toString()
+                model.getDate()
         );
     }
 }

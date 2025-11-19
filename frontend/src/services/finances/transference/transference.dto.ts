@@ -1,13 +1,13 @@
 export interface TransferenceDTO {
-	fromWalletId: string;
-	toWalletId: string;
+	fromWalletId: number;
+	toWalletId: number;
 	amount: string;
 	date: string;
 	description: string;
 }
 
 export interface TransferenceResponseDTO {
-	id: string;
+	id: number;
 	fromWalletName: string;
 	fromAmount: string;
 	toWalletName: string;

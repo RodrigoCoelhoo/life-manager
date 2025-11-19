@@ -1,20 +1,26 @@
+export const WalletType = {
+  BANK: "BANK",
+  CASH: "CASH",
+} as const;
+export type WalletType = (typeof WalletType)[keyof typeof WalletType];
+
 export interface WalletDTO {
 	name: string;
-	type: string;
+	type: WalletType;
 	balance: string;
 	currency: string;
 }
 
 export interface WalletResponseDTO {
-	id: string;
+	id: number;
 	name: string;
-	type: string;
+	type: WalletType;
 	balance: string;
 	currency: string;
 }
 
 export interface WalletUpdateDTO {
 	name: string;
-	type: string;
+	type: WalletType;
 	currency: string;
 }

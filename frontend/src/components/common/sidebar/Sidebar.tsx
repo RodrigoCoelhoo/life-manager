@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { useAuth } from "../../../contexts/AuthContext";
-import logo from "../../../assets/logo64.png"
+import logo from "../../../assets/logo.png"
 import { FaUserCircle } from 'react-icons/fa';
 import SidebarNav from "./SidebarNav";
 
@@ -13,7 +13,7 @@ export default function Sidebar() {
 				<div className="border-b-4 border-background-accent p-2 flex items-center justify-center">
 					<Link
 						to="/home">
-						<img src={logo} alt="LifeManager Logo" />
+						<img src={logo} alt="LifeManager Logo" className="h-16"/>
 					</Link>
 
 				</div>

@@ -4,7 +4,7 @@ import MobileHeader from "../components/common/header/MobileHeader";
 
 const MainLayout = () => {
 	return (
-		<div className="flex flex-col h-screen bg-background">
+		<div className="flex flex-col h-screen bg-background scrollbar-custom ">
 
 			<div className="lg:hidden">
 				<MobileHeader />

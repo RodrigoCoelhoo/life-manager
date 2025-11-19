@@ -9,6 +9,8 @@ import com.rodrigocoelhoo.lifemanager.training.repository.ExerciseRepository;
 import com.rodrigocoelhoo.lifemanager.users.UserModel;
 import com.rodrigocoelhoo.lifemanager.users.UserService;
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -25,9 +27,9 @@ public class ExerciseService {
         this.userService = userService;
     }
 
-    public List<ExerciseModel> getAllExercisesByUser() {
+    public Page<ExerciseModel> getAllExercisesByUser(Pageable pageable) {
         UserModel user = userService.getLoggedInUser();
-        return exerciseRepository.findAllByUser(user);
+        return exerciseRepository.findAllByUser(user, pageable);
     }
 
     public List<ExerciseModel> getExercisesForUser(List<Long> ids) {

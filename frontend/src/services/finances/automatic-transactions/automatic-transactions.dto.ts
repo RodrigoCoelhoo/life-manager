@@ -1,7 +1,9 @@
+import type { ExpenseCategory, ExpenseType } from "../transaction/transaction.dto";
+
 export interface AutomaticTransactionDTO {
-	walletId: string;
+	walletId: number;
 	amount: string;
-	category: string;
+	category: ExpenseCategory;
 	recurrence: string;
 	interval: number;
 	description: string;
@@ -9,11 +11,11 @@ export interface AutomaticTransactionDTO {
 };
 
 export interface AutomaticTransactionResponseDTO {
-	id: string;
+	id: number;
 	walletName: string;
 	amount: string;
-	category: string;
-	type: string;
+	category: ExpenseCategory;
+	type: ExpenseType;
 	recurrence: string;
 	interval: number;
 	description: string;
