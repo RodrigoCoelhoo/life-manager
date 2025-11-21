@@ -1,5 +1,6 @@
 package com.rodrigocoelhoo.lifemanager.training.controller;
 
+import com.rodrigocoelhoo.lifemanager.finances.dto.PageResponseDTO;
 import com.rodrigocoelhoo.lifemanager.training.dto.trainingplandto.TrainingPlanDTO;
 import com.rodrigocoelhoo.lifemanager.training.dto.trainingplandto.TrainingPlanDetailsDTO;
 import com.rodrigocoelhoo.lifemanager.training.dto.trainingplandto.TrainingPlanResponseDTO;
@@ -7,6 +8,10 @@ import com.rodrigocoelhoo.lifemanager.training.dto.trainingplandto.TrainingPlanU
 import com.rodrigocoelhoo.lifemanager.training.model.TrainingPlanModel;
 import com.rodrigocoelhoo.lifemanager.training.service.TrainingPlanService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,14 +32,17 @@ public class TrainingPlanController {
     }
 
     @GetMapping
-    public ResponseEntity<List<TrainingPlanResponseDTO>> getTrainingPlans() {
-        List<TrainingPlanModel> plans = trainingPlanService.getAllTrainingPlansByUser();
+    public ResponseEntity<PageResponseDTO<TrainingPlanResponseDTO>> getTrainingPlans(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size
+    ) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("updatedAt").descending());
 
-        List<TrainingPlanResponseDTO> response = plans.stream()
-                .map(TrainingPlanResponseDTO::fromEntity)
-                .toList();
+        Page<TrainingPlanModel> plans = trainingPlanService.getAllTrainingPlansByUser(pageable);
 
-        return ResponseEntity.ok(response);
+        Page<TrainingPlanResponseDTO> response = plans.map(TrainingPlanResponseDTO::fromEntity);
+
+        return ResponseEntity.ok(PageResponseDTO.fromPage(response));
     }
 
     @GetMapping("/{id}")

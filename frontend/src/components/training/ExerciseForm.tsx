@@ -1,5 +1,7 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import type { ExerciseDTO, ExerciseResponseDTO, ExerciseUpdateDTO } from "../../services/training/exercise/exercise.dto";
+import { descriptionRules, nameRules, urlRules } from "../../rules/rules";
+import { InputField } from "../common/InputField";
 
 interface ExerciseFormProps {
 	exercise?: ExerciseResponseDTO;
@@ -14,6 +16,10 @@ export default function ExerciseForm({ onClose, exercise, onCreate, onUpdate, on
 	const [description, setDescription] = useState(exercise?.description || "");
 	const [type, setType] = useState<"SET_REP" | "TIME">(exercise?.type || "SET_REP");
 	const [demoUrl, setDemoUrl] = useState(exercise?.demoUrl || "");
+
+	const nameRef = useRef<any>(null);
+	const descriptionRef = useRef<any>(null);
+	const demoUrlRef = useRef<any>(null);
 
 	const handleUpdate = async () => {
 		if (!onUpdate || !exercise) return;
@@ -33,6 +39,23 @@ export default function ExerciseForm({ onClose, exercise, onCreate, onUpdate, on
 		onClose();
 	};
 
+	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+		e.preventDefault();
+
+		const isNameValid = nameRef.current?.validate();
+		const isDescriptionValid = descriptionRef.current?.validate();
+		const isDemoUrlValid = demoUrlRef.current?.validate();
+
+		if (!isNameValid || !isDescriptionValid || !isDemoUrlValid) {
+			return;
+		}
+
+		if (exercise) {
+			await handleUpdate();
+		} else {
+			await handleCreate();
+		}
+	}
 
 	return (
 		<div className="
@@ -53,20 +76,17 @@ export default function ExerciseForm({ onClose, exercise, onCreate, onUpdate, on
 				>
 					✕
 				</button>
-				<form className="flex flex-col space-y-4 w-80 sm:w-100" onSubmit={exercise ? handleUpdate : handleCreate}>
+				<form className="flex flex-col space-y-4 w-80 sm:w-100" onSubmit={handleSubmit}>
 					<div className="flex flex-col text-left">
 						<label htmlFor="name" className="text-sm mb-1">
 							Name
 						</label>
-						<input
-							type="text"
-							id="name"
-							name="name"
-							placeholder="Exercise name"
-							className="form-input"
-							required
+						<InputField
+							ref={nameRef}
 							value={name}
-							onChange={(event) => setName(event.target.value)}
+							onChange={setName}
+							placeholder="Exercise name"
+							rules={nameRules()}
 						/>
 					</div>
 
@@ -74,13 +94,13 @@ export default function ExerciseForm({ onClose, exercise, onCreate, onUpdate, on
 						<label htmlFor="description" className="text-sm mb-1">
 							Description
 						</label>
-						<textarea
-							id="description"
-							name="description"
-							placeholder="Exercise description"
-							className="form-input h-25"
+						<InputField
+							ref={descriptionRef}
 							value={description}
-							onChange={(event) => setDescription(event.target.value)}
+							onChange={setDescription}
+							placeholder="Exercise description"
+							rules={descriptionRules()}
+							multiline={true}
 						/>
 					</div>
 
@@ -114,14 +134,13 @@ export default function ExerciseForm({ onClose, exercise, onCreate, onUpdate, on
 						<label htmlFor="demoUrl" className="text-sm mb-1">
 							Demo Url
 						</label>
-						<input
-							type="url"
-							id="demoUrl"
-							name="demoUrl"
-							placeholder="Exercise demo"
-							className="form-input"
+						<InputField
+							ref={demoUrlRef}
 							value={demoUrl}
-							onChange={(event) => setDemoUrl(event.target.value)}
+							onChange={setDemoUrl}
+							placeholder="Exercise demo"
+							rules={urlRules()}
+							type="url"
 						/>
 					</div>
 

@@ -38,8 +38,8 @@ public class TrainingPlanModel {
             joinColumns = @JoinColumn(name = "plan_id"),
             inverseJoinColumns = @JoinColumn(name = "exercise_id")
     )
+    @OrderColumn(name = "list_order")
     private List<ExerciseModel> exercises;
-
 
     @CreationTimestamp
     private LocalDateTime createdAt;

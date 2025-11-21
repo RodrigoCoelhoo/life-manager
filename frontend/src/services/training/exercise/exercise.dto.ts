@@ -23,6 +23,12 @@ export interface ExerciseResponseDTO {
 	updatedAt: string;
 }
 
+export interface ExerciseSimpleDTO {
+	id: number;
+	name: string;
+	type: ExerciseType;
+}
+
 export interface ExerciseDetailsDTO {
 	id: number;
 	name: string;

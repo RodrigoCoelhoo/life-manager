@@ -105,7 +105,7 @@ export default function Exercises() {
 						className="bg-primary p-2 px-4 rounded-xl cursor-pointer hover:bg-primary/80 font-semibold"
 						onClick={() => setCreateExerciseOpen(true)}
 					>
-						Create Exercise +
+						Create +
 					</button>
 
 					<div className="flex items-center gap-6">

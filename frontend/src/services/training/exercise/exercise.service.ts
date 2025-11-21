@@ -6,9 +6,22 @@ const BASE_URL = '/exercises';
 
 export const exerciseService = {
 
-	getExercises: async (page: number, size: number): Promise<PageResponseDTO<ExerciseResponseDTO>> => {
+	getExercises: async (
+		page: number,
+		size: number,
+		name?: string
+	): Promise<PageResponseDTO<ExerciseResponseDTO>> => {
 		try {
-			const { data } = await api.get<PageResponseDTO<ExerciseResponseDTO>>(`${BASE_URL}?page=${page}&size=${size}`);
+			const params = new URLSearchParams({
+				page: page.toString(),
+				size: size.toString(),
+			});
+
+			if (name && name.trim() !== "") {
+				params.append("name", name);
+			}
+
+			const { data } = await api.get<PageResponseDTO<ExerciseResponseDTO>>(`${BASE_URL}?${params.toString()}`);
 			return data;
 		} catch (error) {
 			console.error('Failed to fetch exercises.', error);

@@ -27,9 +27,11 @@ public class ExerciseService {
         this.userService = userService;
     }
 
-    public Page<ExerciseModel> getAllExercisesByUser(Pageable pageable) {
+    public Page<ExerciseModel> getAllExercisesByUser(Pageable pageable, String name) {
         UserModel user = userService.getLoggedInUser();
-        return exerciseRepository.findAllByUser(user, pageable);
+        if(name == null || name.isBlank())
+            return exerciseRepository.findAllByUser(user, pageable);
+        return exerciseRepository.findByUserAndNameContainingIgnoreCase(user, name, pageable);
     }
 
     public List<ExerciseModel> getExercisesForUser(List<Long> ids) {

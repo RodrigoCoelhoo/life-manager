@@ -1,4 +1,4 @@
-import type { ExerciseResponseDTO } from "../exercise/exercise.dto";
+import type { ExerciseResponseDTO, ExerciseSimpleDTO } from "../exercise/exercise.dto";
 
 export interface TrainingPlanDTO {
 	name: string;
@@ -9,6 +9,7 @@ export interface TrainingPlanResponseDTO {
 	id: number;
 	name: string;
 	description: string;
+	exercises: ExerciseSimpleDTO[];
 	createdAt: string;
 	updatedAt: string;
 }

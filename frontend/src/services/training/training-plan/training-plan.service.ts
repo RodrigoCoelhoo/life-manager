@@ -1,13 +1,14 @@
 import { api } from '../../api';
+import type { PageResponseDTO } from '../../api.dto';
 import type { TrainingPlanDetailsDTO, TrainingPlanDTO, TrainingPlanResponseDTO, TrainingPlanUpdateDTO } from './training-plan.dto';
 
 const BASE_URL = '/training-plans';
 
 export const trainingPlanService = {
 
-	getTrainingPlans: async (): Promise<TrainingPlanResponseDTO[]> => {
+	getTrainingPlans: async (page: number, size: number): Promise<PageResponseDTO<TrainingPlanResponseDTO>> => {
 		try {
-			const { data } = await api.get<TrainingPlanResponseDTO[]>(BASE_URL);
+			const { data } = await api.get<PageResponseDTO<TrainingPlanResponseDTO>>(`${BASE_URL}?page=${page}&size=${size}`);
 			return data;
 		} catch (error) {
 			console.error('Failed to fetch training plans.', error);

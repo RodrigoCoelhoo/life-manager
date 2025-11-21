@@ -13,6 +13,7 @@ import java.util.Optional;
 @Repository
 public interface ExerciseRepository extends JpaRepository<ExerciseModel, Long> {
     Page<ExerciseModel> findAllByUser(UserModel user, Pageable pageable);
+    Page<ExerciseModel> findByUserAndNameContainingIgnoreCase(UserModel user, String name, Pageable pageable);
     List<ExerciseModel> findAllByIdInAndUser(List<Long> ids, UserModel user);
     Optional<ExerciseModel> findByIdAndUser(Long id, UserModel user);
 }

@@ -1,6 +1,8 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { authService } from "../../services/auth/authService";
+import { InputField } from "../../components/common/InputField";
+import { emailRules, personalNameRules, passwordRules, usernameRules } from "../../rules/rules";
 
 export default function Login() {
 	const [username, setUsername] = useState<string>("");
@@ -11,15 +13,33 @@ export default function Login() {
 	const [lastName, setLastName] = useState<string>("");
 	const [error, setError] = useState<string | null>(null);
 
+	const usernameRef = useRef<any>(null);
+	const emailRef = useRef<any>(null);
+	const passwordRef = useRef<any>(null);
+	const firstNameRef = useRef<any>(null);
+	const lastNameRef = useRef<any>(null);
+	const confirmPasswordRef = useRef<any>(null);
+
 	const navigate = useNavigate();
 
 	const submitForm = async (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
 		setError(null);
 
+		const isUsernameValid = usernameRef.current?.validate();
+		const isEmailValid = emailRef.current?.validate();
+		const isPasswordValid = passwordRef.current?.validate();
+		const isConfirmPasswordValid = confirmPasswordRef.current?.validate();
+		const isFirstNameValid = firstNameRef.current?.validate();
+		const isLastNameValid = lastNameRef.current?.validate();
+
+		if (!isUsernameValid || !isEmailValid || !isPasswordValid || !isConfirmPasswordValid || !isFirstNameValid || !isLastNameValid) {
+			return;
+		}
+
 		if (password !== confirmPassword) {
 			setError("Passwords don't match.");
-			return; 
+			return;
 		}
 
 		try {
@@ -34,7 +54,7 @@ export default function Login() {
 			if (typeof apiMessage === "string") {
 				message = apiMessage;
 			} else if (typeof apiMessage === "object" && apiMessage !== null) {
-				message = Object.values(apiMessage).join(" ");
+				message = Object.values(apiMessage).join("\n");
 			} else {
 				message = "Something went wrong.";
 			}
@@ -50,71 +70,60 @@ export default function Login() {
 					Life<span className="text-primary">Manager</span>
 				</h1>
 
-				{error && <p className="text-red-500 text-sm mb-2">{error}</p>}
+				{error !== "Passwords don't match." && <p className="text-red-500 text-sm mb-2">{error}</p>}
 				<form className="flex flex-col space-y-4" onSubmit={submitForm}>
 					<div className="flex flex-col text-left">
 						<label htmlFor="username" className="text-sm mb-1">
 							Username
 						</label>
-						<input
-							type="text"
-							id="username"
-							name="username"
-							placeholder="Enter your username"
-							className="form-input"
-							required
+						<InputField
+							ref={usernameRef}
 							value={username}
-							onChange={(event) => setUsername(event.target.value)}
+							onChange={setUsername}
+							placeholder="Enter your username"
+							rules={usernameRules()}
+							type="text"
 						/>
 					</div>
 
-					<div className="flex flex-row justify-between w-full gap-4">
-						<div className="flex flex-col text-left w-1/2">
-							<label htmlFor="firstName" className="text-sm mb-1">
-								First Name
-							</label>
-							<input
-								type="text"
-								id="firstName"
-								name="firstName"
-								placeholder="Enter your first name"
-								className="form-input w-full text-sm"
-								required
+					<div className="flex flex-row gap-4 w-full">
+						<div className="flex flex-col flex-1">
+							<label htmlFor="firstName" className="text-sm mb-1">First Name</label>
+							<InputField
+								ref={firstNameRef}
 								value={firstName}
-								onChange={(event) => setFirstName(event.target.value)}
+								onChange={setFirstName}
+								placeholder="Enter your first name"
+								rules={personalNameRules()}
+								type="text"
 							/>
 						</div>
 
-						<div className="flex flex-col text-left w-1/2">
-							<label htmlFor="lastName" className="text-sm mb-1">
-								Last Name
-							</label>
-							<input
-								type="text"
-								id="lastName"
-								name="lastName"
-								placeholder="Enter your last name"
-								className="form-input w-full text-sm"
-								required
+						<div className="flex flex-col flex-1">
+							<label htmlFor="lastName" className="text-sm mb-1">Last Name</label>
+							<InputField
+								ref={lastNameRef}
 								value={lastName}
-								onChange={(event) => setLastName(event.target.value)}
+								onChange={setLastName}
+								placeholder="Enter your last name"
+								rules={personalNameRules()}
+								type="text"
 							/>
 						</div>
 					</div>
+
 
 					<div className="flex flex-col text-left">
 						<label htmlFor="email" className="text-sm mb-1">
 							Email
 						</label>
-						<input
+						<InputField
 							type="email"
-							id="email"
-							name="email"
-							placeholder="Enter your email"
-							className="form-input"
-							required
+							ref={emailRef}
 							value={email}
-							onChange={(event) => setEmail(event.target.value)}
+							onChange={setEmail}
+							placeholder="Enter your email"
+							rules={emailRules()}
 						/>
 					</div>
 
@@ -122,15 +131,13 @@ export default function Login() {
 						<label htmlFor="password" className="text-sm mb-1">
 							Password
 						</label>
-						<input
+						<InputField
 							type="password"
-							id="password"
-							name="password"
-							placeholder="Enter your password"
-							className="form-input"
-							required
+							ref={passwordRef}
 							value={password}
-							onChange={(event) => setPassword(event.target.value)}
+							onChange={setPassword}
+							placeholder="Password"
+							rules={passwordRules()}
 						/>
 					</div>
 
@@ -138,16 +145,14 @@ export default function Login() {
 						<label htmlFor="confirmPassword" className="text-sm mb-1">
 							Confirm Password
 						</label>
-						<input
+						<InputField
 							type="password"
-							id="confirmPassword"
-							name="confirmPassword"
-							placeholder="Confirm your password"
-							className="form-input"
-							required
+							ref={confirmPasswordRef}
 							value={confirmPassword}
-							onChange={(event) => setConfirmPassword(event.target.value)}
+							onChange={setConfirmPassword}
+							placeholder="Confirm your password"
 						/>
+						{error === "Passwords don't match." && <p className="text-red-500 text-sm mb-2">{error}</p>}
 					</div>
 
 					<button

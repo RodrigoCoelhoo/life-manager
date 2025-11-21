@@ -9,8 +9,11 @@ import com.rodrigocoelhoo.lifemanager.training.repository.TrainingPlanRepository
 import com.rodrigocoelhoo.lifemanager.users.UserModel;
 import com.rodrigocoelhoo.lifemanager.users.UserService;
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -30,9 +33,9 @@ public class TrainingPlanService {
         this.exerciseService = exerciseService;
     }
 
-    public List<TrainingPlanModel> getAllTrainingPlansByUser() {
+    public Page<TrainingPlanModel> getAllTrainingPlansByUser(Pageable pageable) {
         UserModel user = userService.getLoggedInUser();
-        return trainingPlanRepository.findAllByUser(user);
+        return trainingPlanRepository.findAllByUser(user, pageable);
     }
 
     public TrainingPlanModel getTrainingPlan(Long id) {
@@ -58,6 +61,10 @@ public class TrainingPlanService {
     public TrainingPlanModel updateTrainingPlan(Long id, TrainingPlanUpdateDTO data) {
         TrainingPlanModel plan = getTrainingPlan(id);
         List<ExerciseModel> exercises = exerciseService.getExercisesForUser(data.exerciseIds());
+
+        exercises.sort(Comparator.comparingInt(
+                e -> data.exerciseIds().indexOf(e.getId())
+        ));
 
         plan.setName(data.name());
         plan.setDescription(data.description());
