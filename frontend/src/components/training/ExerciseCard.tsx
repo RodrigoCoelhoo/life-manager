@@ -20,7 +20,7 @@ export default function ExerciseCard({ onUpdate, onDelete, ...exercise }: Exerci
 				<h2 className="text-xl font-bold">{exercise.name}</h2>
 
 				<div className="flex-1 my-2 text-sm overflow-y-auto">
-					<p className="mb-2">{exercise.description || "No description available"}</p>
+					<p className="mb-2 font-extralight">{exercise.description || "No description available"}</p>
 				</div>
 
 				<a

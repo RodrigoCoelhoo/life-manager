@@ -1,9 +1,15 @@
 import { useState } from "react";
 import { Modal } from "../common/Modal";
-import type { TrainingPlanResponseDTO } from "../../services/training/training-plan/training-plan.dto";
+import type { TrainingPlanResponseDTO, TrainingPlanUpdateDTO } from "../../services/training/training-plan/training-plan.dto";
 import TrainingPlanForm from "./TrainingPlanForm";
+import { FaCircle } from "react-icons/fa";
 
-export default function TrainingPlanCard(trainingPlan: TrainingPlanResponseDTO) {
+interface TrainingPlanCardProps extends TrainingPlanResponseDTO {
+	onUpdate: (id: number, data: TrainingPlanUpdateDTO) => Promise<void>;
+	onDelete: (id: number) => Promise<void>;
+}
+
+export default function TrainingPlanCard({ onUpdate, onDelete, ...trainingPlan }: TrainingPlanCardProps) {
 	const [isOpen, setIsOpen] = useState(false);
 
 	return (
@@ -15,20 +21,22 @@ export default function TrainingPlanCard(trainingPlan: TrainingPlanResponseDTO) 
 				<div>
 					<h2 className="text-xl font-bold">{trainingPlan.name}</h2>
 
-					<div className="max-h-32 my-2 text-sm overflow-y-auto">
+					<div className="max-h-32 my-2 text-sm overflow-y-auto font-extralight">
 						<p className="mb-2">{trainingPlan.description || "No description available"}</p>
 					</div>
 
 					<ul className="max-h-60 overflow-y-auto flex flex-col list-disc list-inside font-extralight">
-						{trainingPlan.exercises.map((exercise, index) => (
-							<div className="flex justify-between">
-								<li key={index} className="">
-									{exercise.name}
-								</li>
-								<div className="text-xs text-gray-400">
-									{exercise.type}
+						{trainingPlan.exercises.map((exercise) => (
+							<li
+								key={exercise.id}
+								className="flex justify-between"
+							>
+								<div className="flex flex-row gap-2 items-center">
+									<FaCircle size={6} className="text-secondary mt-1" />
+									<span className="">{exercise.name}</span>
 								</div>
-							</div>
+								<div className="text-xs text-gray-400">{exercise.type}</div>
+							</li>
 						))}
 					</ul>
 				</div>
@@ -45,6 +53,8 @@ export default function TrainingPlanCard(trainingPlan: TrainingPlanResponseDTO) 
 				<TrainingPlanForm
 					trainingPlan={trainingPlan}
 					onClose={() => setIsOpen(false)}
+					onUpdate={onUpdate}
+					onDelete={onDelete}
 				/>
 			</Modal>
 		</>

@@ -6,7 +6,7 @@ import Loading from "../../components/common/Loading";
 import ErrorMessage from "../../components/common/Error";
 import { Modal } from "../../components/common/Modal";
 import { Pagination } from "../../components/common/Pagination";
-import type { TrainingPlanResponseDTO } from "../../services/training/training-plan/training-plan.dto";
+import type { TrainingPlanDTO, TrainingPlanResponseDTO, TrainingPlanUpdateDTO } from "../../services/training/training-plan/training-plan.dto";
 import TrainingPlanForm from "../../components/training/TrainingPlanForm";
 
 export default function TrainingPlans() {
@@ -19,7 +19,7 @@ export default function TrainingPlans() {
 	const [totalElements, setTotalElements] = useState<number>(1);
 	const [elementsPerPage, setElementsPerPage] = useState<number>(18);
 
-	const [createTrainingPlan, setCreateTrainingPlan] = useState<boolean>(false);
+	const [createTrainingPlanOpen, setCreateTrainingPlanOpen] = useState<boolean>(false);
 
 	const fetchTrainingPlans = async () => {
 		try {
@@ -38,6 +38,45 @@ export default function TrainingPlans() {
 		}
 	};
 
+	const createTrainingPlan = async (trainingPlan: TrainingPlanDTO) => {
+		try {
+			setLoading(true);
+			const data: TrainingPlanResponseDTO = await trainingPlanService.createTrainingPlan(trainingPlan);
+			setTrainingPlans((prevTrainingPlans) => [data, ...prevTrainingPlans]);
+			setTotalElements(prev => prev + 1);
+			if (trainingPlans.length > totalElements) trainingPlans.pop();
+		} catch (err) {
+			console.error(err);
+			setError("Failed to create training plan");
+		} finally {
+			setLoading(false);
+		}
+	};
+
+	const updateTrainingPlan = async (id: number, updatedData: TrainingPlanUpdateDTO) => {
+		try {
+			setLoading(true);
+			const updated = await trainingPlanService.updateTrainingPlan(id, updatedData);
+			setTrainingPlans(prev => prev.map(e => (e.id === id ? updated : e)));
+		} catch (err) {
+			setError("Failed to update training plan");
+		} finally {
+			setLoading(false);
+		}
+	};
+
+	const deleteTrainingPlan = async (id: number) => {
+		try {
+			setLoading(true);
+			await trainingPlanService.deleteTrainingPlan(id);
+			fetchTrainingPlans();
+			setTotalElements(prev => prev - 1);
+		} catch (err) {
+			setError("Failed to delete training plan");
+		} finally {
+			setLoading(false);
+		}
+	};
 
 	useEffect(() => {
 		fetchTrainingPlans();
@@ -63,12 +102,12 @@ export default function TrainingPlans() {
 				<div className="flex items-center justify-between gap-4">
 					<button
 						className="bg-primary p-2 px-4 rounded-xl cursor-pointer hover:bg-primary/80 font-semibold"
-						onClick={() => setCreateTrainingPlan(true)}
+						onClick={() => setCreateTrainingPlanOpen(true)}
 					>
-						Create Exercise +
+						Create +
 					</button>
 
-					<div className="flex items-center gap-6">
+					<div className="flex items-center gap-3">
 						<div className="flex gap-3 items-center">
 							<label htmlFor="exercisesPerPage" className="text-sm mb-1 font-extralight">
 								Training plans per page
@@ -78,7 +117,7 @@ export default function TrainingPlans() {
 								id="exercisesPerPage"
 								name="exercisesPerPage"
 								required
-								className="form-input w-18"
+								className="form-input w-14"
 								value={elementsPerPage}
 								onChange={(e) => setElementsPerPage(Number(e.target.value))}
 							>
@@ -99,6 +138,8 @@ export default function TrainingPlans() {
 							<TrainingPlanCard
 								key={trainingPlan.id}
 								{...trainingPlan}
+								onUpdate={updateTrainingPlan}
+								onDelete={deleteTrainingPlan}
 							/>
 						))}
 					</div>
@@ -113,11 +154,11 @@ export default function TrainingPlans() {
 				</div>
 			</div>
 
-			<Modal isOpen={createTrainingPlan} onClose={() => setCreateTrainingPlan(false)}>
-				<TrainingPlanForm 
-					onClose={() => setCreateTrainingPlan(false)}
-					
-				/> 
+			<Modal isOpen={createTrainingPlanOpen} onClose={() => setCreateTrainingPlanOpen(false)}>
+				<TrainingPlanForm
+					onClose={() => setCreateTrainingPlanOpen(false)}
+					onCreate={createTrainingPlan}
+				/>
 			</Modal>
 		</>
 	);

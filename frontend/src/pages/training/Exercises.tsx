@@ -108,7 +108,7 @@ export default function Exercises() {
 						Create +
 					</button>
 
-					<div className="flex items-center gap-6">
+					<div className="flex items-center gap-3">
 						<div className="flex gap-3 items-center">
 							<label htmlFor="exercisesPerPage" className="text-sm mb-1 font-extralight">
 								Exercises per page
@@ -118,7 +118,7 @@ export default function Exercises() {
 								id="exercisesPerPage"
 								name="exercisesPerPage"
 								required
-								className="form-input w-18"
+								className="form-input w-14"
 								value={elementsPerPage}
 								onChange={(e) => setElementsPerPage(Number(e.target.value))}
 							>
