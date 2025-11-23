@@ -6,9 +6,17 @@ const BASE_URL = '/training-sessions';
 
 export const trainingSessionService = {
 
-	getTrainingSessions: async (): Promise<PageResponseDTO<TrainingSessionResponseDTO>> => {
+	getTrainingSessions: async (
+		page: number,
+		size: number
+	): Promise<PageResponseDTO<TrainingSessionResponseDTO>> => {
 		try {
-			const { data } = await api.get<PageResponseDTO<TrainingSessionResponseDTO>>(BASE_URL);
+			const params = new URLSearchParams({
+				page: page.toString(),
+				size: size.toString(),
+			});
+
+			const { data } = await api.get<PageResponseDTO<TrainingSessionResponseDTO>>(`${BASE_URL}?${params.toString()}`);
 			return data;
 		} catch (error) {
 			console.error('Failed to fetch training sessions.', error);

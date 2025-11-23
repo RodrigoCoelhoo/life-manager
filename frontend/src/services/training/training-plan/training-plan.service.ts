@@ -6,9 +6,22 @@ const BASE_URL = '/training-plans';
 
 export const trainingPlanService = {
 
-	getTrainingPlans: async (page: number, size: number): Promise<PageResponseDTO<TrainingPlanResponseDTO>> => {
+	getTrainingPlans: async (
+		page: number,
+		size: number,
+		name?: string
+	): Promise<PageResponseDTO<TrainingPlanResponseDTO>> => {
 		try {
-			const { data } = await api.get<PageResponseDTO<TrainingPlanResponseDTO>>(`${BASE_URL}?page=${page}&size=${size}`);
+			const params = new URLSearchParams({
+				page: page.toString(),
+				size: size.toString(),
+			});
+
+			if (name && name.trim() !== "") {
+				params.append("name", name);
+			}
+
+			const { data } = await api.get<PageResponseDTO<TrainingPlanResponseDTO>>(`${BASE_URL}?${params.toString()}`);
 			return data;
 		} catch (error) {
 			console.error('Failed to fetch training plans.', error);

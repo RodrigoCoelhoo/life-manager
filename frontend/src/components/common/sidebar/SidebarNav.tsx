@@ -21,7 +21,6 @@ export default function SidebarNav({ onNavigate }: { onNavigate?: () => void }) 
 
 	return (
 		<div className="flex-1 overflow-y-auto p-4 space-y-6 scrollbar-hide">
-
 			<div>
 				<button
 					className={`w-full flex flex-row items-center mb-1 cursor-pointer ${isFinancesActive ? "border-b-4 border-background-accent" : "border-b-0 border-transparent"} hover:bg-background-accent hover:rounded-xl`}

@@ -1,4 +1,4 @@
-import type { ExerciseDetailsDTO } from "../exercise/exercise.dto";
+import type { ExerciseDetailsDTO, ExerciseSimpleDTO } from "../exercise/exercise.dto";
 import type { TrainingPlanDetailsDTO, TrainingPlanResponseDTO } from "../training-plan/training-plan.dto";
 
 export interface TrainingSessionDTO {
@@ -16,8 +16,8 @@ export interface TrainingSessionDetailsDTO {
 
 export interface TrainingSessionResponseDTO {
 	id: number;
-	trainingPlan: TrainingPlanResponseDTO;
 	date: string;
+	exercises: ExerciseSimpleDTO[];
 	createdAt: string;
 	updatedAt: string;
 }

@@ -19,6 +19,7 @@ interface TrainingPlanFormProps {
 export default function TrainingPlanForm({ onClose, trainingPlan, onCreate, onUpdate, onDelete }: TrainingPlanFormProps) {
 	const [isHover, setIsHover] = useState<boolean>(false);
 	const [addExerciseOpen, setAddExerciseOpen] = useState<boolean>(false);
+	const [submitting, setSubmitting] = useState<boolean>(false);
 
 	const [name, setName] = useState<string>(trainingPlan?.name || "");
 	const [description, setDescription] = useState<string>(trainingPlan?.description || "");
@@ -26,7 +27,6 @@ export default function TrainingPlanForm({ onClose, trainingPlan, onCreate, onUp
 
 	const nameRef = useRef<any>(null);
 	const descriptionRef = useRef<any>(null);
-
 
 	const handleUpdate = async () => {
 		if (!onUpdate || !trainingPlan) return;
@@ -70,10 +70,17 @@ export default function TrainingPlanForm({ onClose, trainingPlan, onCreate, onUp
 			return;
 		}
 
-		if (trainingPlan) {
-			await handleUpdate();
-		} else {
-			await handleCreate();
+		setSubmitting(true);
+		try {
+			if (trainingPlan) {
+				await handleUpdate();
+			} else {
+				await handleCreate();
+			}
+		} catch (error) {
+			console.error("Error submitting training plan form:", error);
+		} finally {
+			setSubmitting(false);
 		}
 	}
 
@@ -218,8 +225,9 @@ export default function TrainingPlanForm({ onClose, trainingPlan, onCreate, onUp
 						<button
 							type="submit"
 							className="form-submit"
+							disabled={submitting}
 						>
-							{trainingPlan ? "Save Changes" : "Create"}
+							{trainingPlan ? (submitting ? "Saving" : "Save Changes") : (submitting ? "Creating" : "Create")}
 						</button>
 					</form>
 				</div>
@@ -240,9 +248,12 @@ export default function TrainingPlanForm({ onClose, trainingPlan, onCreate, onUp
 				<SearchList<ExerciseSimpleDTO>
 					fetchItems={exerciseService.getExercises}
 					onSelect={(exercise) => {
-						setExercises(prev => [...prev, exercise]);
+						if(exercises.findIndex(ex => ex.id === exercise.id) === -1) {
+							setExercises(prev => [...prev, exercise]);
+						}
 						setAddExerciseOpen(false);
 					}}
+					onClose={() => setAddExerciseOpen(false)}
 				/>
 			</Modal>
 		</>

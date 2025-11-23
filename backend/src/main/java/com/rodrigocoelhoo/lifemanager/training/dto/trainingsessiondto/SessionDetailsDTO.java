@@ -1,4 +1,4 @@
-package com.rodrigocoelhoo.lifemanager.training.dto.sessionexercisedto;
+package com.rodrigocoelhoo.lifemanager.training.dto.trainingsessiondto;
 
 import com.rodrigocoelhoo.lifemanager.training.dto.exercisedto.ExerciseDetailsDTO;
 import com.rodrigocoelhoo.lifemanager.training.model.TrainingSessionModel;
@@ -6,12 +6,12 @@ import com.rodrigocoelhoo.lifemanager.training.model.TrainingSessionModel;
 import java.util.List;
 
 public record SessionDetailsDTO(
-    SessionDTO session,
+    SessionSimpleDTO session,
     List<ExerciseDetailsDTO> exercises
 ) {
     public static SessionDetailsDTO fromEntities(TrainingSessionModel trainingSessionModel, List<ExerciseDetailsDTO> exercisesDTO) {
         return new SessionDetailsDTO(
-                SessionDTO.fromEntity(trainingSessionModel),
+                SessionSimpleDTO.fromEntity(trainingSessionModel),
                 exercisesDTO
         );
     }

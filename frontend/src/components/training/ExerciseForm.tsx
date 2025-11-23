@@ -12,6 +12,8 @@ interface ExerciseFormProps {
 }
 
 export default function ExerciseForm({ onClose, exercise, onCreate, onUpdate, onDelete }: ExerciseFormProps) {
+	const [submitting, setSubmitting] = useState<boolean>(false);
+
 	const [name, setName] = useState(exercise?.name || "");
 	const [description, setDescription] = useState(exercise?.description || "");
 	const [type, setType] = useState<"SET_REP" | "TIME">(exercise?.type || "SET_REP");
@@ -50,10 +52,17 @@ export default function ExerciseForm({ onClose, exercise, onCreate, onUpdate, on
 			return;
 		}
 
-		if (exercise) {
-			await handleUpdate();
-		} else {
-			await handleCreate();
+		setSubmitting(true);
+		try {
+			if (exercise) {
+				await handleUpdate();
+			} else {
+				await handleCreate();
+			}
+		} catch (error) {
+			console.error("Error submitting exercise form:", error);
+		} finally {
+			setSubmitting(false);
 		}
 	}
 
@@ -147,8 +156,9 @@ export default function ExerciseForm({ onClose, exercise, onCreate, onUpdate, on
 					<button
 						type="submit"
 						className="form-submit"
+						disabled={submitting}
 					>
-						{exercise ? "Save Changes" : "Create"}
+						{exercise ? (submitting ? "Saving" : "Save Changes") : (submitting ? "Creating" : "Create")}
 					</button>
 				</form>
 			</div>

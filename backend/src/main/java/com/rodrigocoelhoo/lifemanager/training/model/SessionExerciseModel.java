@@ -23,7 +23,7 @@ public class SessionExerciseModel {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "session_id", nullable = false)
-    private TrainingSessionModel sessionId;
+    private TrainingSessionModel session;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "exercise_id", nullable = false)

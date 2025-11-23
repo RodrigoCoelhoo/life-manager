@@ -1,8 +1,8 @@
 package com.rodrigocoelhoo.lifemanager.training.controller;
 
 import com.rodrigocoelhoo.lifemanager.finances.dto.PageResponseDTO;
+import com.rodrigocoelhoo.lifemanager.training.dto.trainingsessiondto.SessionDetailsDTO;
 import com.rodrigocoelhoo.lifemanager.training.dto.trainingsessiondto.TrainingSessionDTO;
-import com.rodrigocoelhoo.lifemanager.training.dto.trainingsessiondto.TrainingSessionDetailsDTO;
 import com.rodrigocoelhoo.lifemanager.training.dto.trainingsessiondto.TrainingSessionResponseDTO;
 import com.rodrigocoelhoo.lifemanager.training.model.TrainingSessionModel;
 import com.rodrigocoelhoo.lifemanager.training.service.TrainingSessionService;
@@ -14,8 +14,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/training-sessions")
@@ -43,12 +41,10 @@ public class TrainingSessionController {
         return ResponseEntity.ok(PageResponseDTO.fromPage(response));
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<TrainingSessionDetailsDTO> getSession(
-            @PathVariable Long id
-    ) {
-        TrainingSessionModel session = trainingSessionService.getSession(id);
-        return ResponseEntity.ok(TrainingSessionDetailsDTO.fromEntity(session));
+    @GetMapping("/{id}/details")
+    public ResponseEntity<SessionDetailsDTO> getSessionDetails(@PathVariable Long id) {
+        SessionDetailsDTO session = trainingSessionService.getSessionDetails(id);
+        return ResponseEntity.ok(session);
     }
 
     @PostMapping

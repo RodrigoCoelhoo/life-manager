@@ -8,7 +8,7 @@ export default function Sidebar() {
 	const { username } = useAuth();
 
 	return (
-		<aside className="h-screen flex flex-col justify-between w-60 shrink-0 bg-background drop-shadow-[0_4px_6px_rgba(0,0,0,0.2)] text-textcolor">
+		<aside className="h-screen flex flex-col justify-between w-60 shrink-0 bg-background drop-shadow-[0_4px_6px_rgba(0,0,0,0.2)] text-textcolor scrollbar-hide">
 			<div className="flex flex-col flex-1 overflow-hidden">
 				<div className="border-b-4 border-background-accent p-2 flex items-center justify-center">
 					<Link
@@ -18,7 +18,7 @@ export default function Sidebar() {
 
 				</div>
 
-				<div className="flex-1 overflow-hidden">
+				<div className="flex-1 overflow-y-auto">
 					<SidebarNav />
 				</div>
 			</div>

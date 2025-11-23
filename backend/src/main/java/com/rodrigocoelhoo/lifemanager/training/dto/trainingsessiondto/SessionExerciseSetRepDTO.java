@@ -1,9 +1,6 @@
-package com.rodrigocoelhoo.lifemanager.training.dto.sessionexercisedto;
+package com.rodrigocoelhoo.lifemanager.training.dto.trainingsessiondto;
 
 public record SessionExerciseSetRepDTO(
-        Long id,
-        Long sessionId,
-        Long exerciseId,
         Integer setNumber,
         Integer reps,
         Double weight

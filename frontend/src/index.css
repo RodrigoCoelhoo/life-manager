@@ -34,6 +34,10 @@
   }
 }
 
+input[type="date"], [type="time"] {
+  color-scheme: dark;
+}
+
 @layer utilities {
   @keyframes logo-spin {
     from {

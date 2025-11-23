@@ -4,6 +4,8 @@ import { authService } from "../../services/auth/authService";
 import { useAuth } from "../../contexts/AuthContext";
 
 export default function Login() {
+	const [submitting, setSubmitting] = useState<boolean>(false);
+
 	const [username, setUsername] = useState<string>("");
 	const [password, setPassword] = useState<string>("");
 	const [error, setError] = useState<string | null>(null);
@@ -15,6 +17,7 @@ export default function Login() {
 		event.preventDefault();
 		setError(null);
 
+		setSubmitting(true);
 		try {
 			const { token } = await authService.signin({ username, password });
 			login(token);
@@ -22,6 +25,8 @@ export default function Login() {
 		} catch (err: any) {
 			console.error(err);
 			setError("Invalid credentials");
+		} finally {
+			setSubmitting(false);
 		}
 	};
 
@@ -69,6 +74,7 @@ export default function Login() {
 					<button
 						type="submit"
 						className="form-submit"
+						disabled={submitting}
 					>
 						Log In
 					</button>

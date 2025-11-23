@@ -5,6 +5,8 @@ import { InputField } from "../../components/common/InputField";
 import { emailRules, personalNameRules, passwordRules, usernameRules } from "../../rules/rules";
 
 export default function Login() {
+	const [submitting, setSubmitting] = useState<boolean>(false);
+
 	const [username, setUsername] = useState<string>("");
 	const [password, setPassword] = useState<string>("");
 	const [confirmPassword, setConfirmPassword] = useState<string>("");
@@ -42,6 +44,7 @@ export default function Login() {
 			return;
 		}
 
+		setSubmitting(true);
 		try {
 			await authService.signup({ username, firstName, lastName, email, password });
 			navigate("/login");
@@ -60,6 +63,8 @@ export default function Login() {
 			}
 
 			setError(message);
+		} finally {
+			setSubmitting(false);
 		}
 	};
 
@@ -158,6 +163,7 @@ export default function Login() {
 					<button
 						type="submit"
 						className="cursor-pointer mt-4 bg-primary text-white py-2 rounded-lg hover:bg-primary/90 transition-all"
+						disabled={submitting}
 					>
 						Sign Up
 					</button>

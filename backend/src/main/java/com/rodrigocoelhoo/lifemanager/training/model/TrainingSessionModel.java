@@ -7,6 +7,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "tb_trainingsessions")
@@ -25,11 +26,10 @@ public class TrainingSessionModel {
     @JoinColumn(name = "user_id", nullable = false)
     private UserModel user;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "training_plan")
-    private TrainingPlanModel trainingPlan;
-
     private LocalDateTime date;
+
+    @OneToMany(mappedBy = "session", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<SessionExerciseModel> exercises;
 
     @CreationTimestamp
     private LocalDateTime createdAt;
