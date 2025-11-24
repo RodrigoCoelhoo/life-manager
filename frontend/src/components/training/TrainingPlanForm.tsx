@@ -215,7 +215,7 @@ export default function TrainingPlanForm({ onClose, trainingPlan, onCreate, onUp
 											))
 										) : (
 											<div>
-												<p className="p-2 text-center text-gray-500 cursor-default">No exercises added yet. Exercises can be added from the respective exercise page or directly from form.</p>
+												<p className="p-2 text-center text-gray-500 cursor-default">No exercises added yet.</p>
 											</div>
 										)}
 								</div>

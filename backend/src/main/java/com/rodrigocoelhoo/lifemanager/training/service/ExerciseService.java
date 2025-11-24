@@ -6,6 +6,7 @@ import com.rodrigocoelhoo.lifemanager.training.dto.exercisedto.ExerciseUpdateDTO
 import com.rodrigocoelhoo.lifemanager.training.model.ExerciseModel;
 import com.rodrigocoelhoo.lifemanager.training.model.ExerciseType;
 import com.rodrigocoelhoo.lifemanager.training.repository.ExerciseRepository;
+import com.rodrigocoelhoo.lifemanager.training.repository.TrainingPlanRepository;
 import com.rodrigocoelhoo.lifemanager.users.UserModel;
 import com.rodrigocoelhoo.lifemanager.users.UserService;
 import jakarta.transaction.Transactional;
@@ -18,13 +19,18 @@ import java.util.List;
 @Service
 public class ExerciseService {
 
-    private final ExerciseRepository exerciseRepository;
-
     private final UserService userService;
+    private final ExerciseRepository exerciseRepository;
+    private final TrainingPlanRepository trainingPlanRepository;
 
-    public ExerciseService(ExerciseRepository exerciseRepository, UserService userService) {
+    public ExerciseService(
+            ExerciseRepository exerciseRepository,
+            UserService userService,
+            TrainingPlanRepository trainingPlanRepository
+    ) {
         this.exerciseRepository = exerciseRepository;
         this.userService = userService;
+        this.trainingPlanRepository = trainingPlanRepository;
     }
 
     public Page<ExerciseModel> getAllExercisesByUser(Pageable pageable, String name) {
@@ -80,6 +86,10 @@ public class ExerciseService {
     @Transactional
     public void delete(Long exerciseId) {
         ExerciseModel exercise = getExercise(exerciseId);
+
+        trainingPlanRepository.findAllByExercisesContains(exercise)
+                .forEach(plan -> plan.getExercises().remove(exercise));
+
         exerciseRepository.delete(exercise);
     }
 }

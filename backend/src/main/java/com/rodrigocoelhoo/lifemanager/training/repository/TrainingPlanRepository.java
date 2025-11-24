@@ -1,5 +1,6 @@
 package com.rodrigocoelhoo.lifemanager.training.repository;
 
+import com.rodrigocoelhoo.lifemanager.training.model.ExerciseModel;
 import com.rodrigocoelhoo.lifemanager.training.model.TrainingPlanModel;
 import com.rodrigocoelhoo.lifemanager.users.UserModel;
 import org.springframework.data.domain.Page;
@@ -14,4 +15,5 @@ import java.util.Optional;
 public interface TrainingPlanRepository extends JpaRepository<TrainingPlanModel, Long> {
     Page<TrainingPlanModel> findAllByUser(UserModel user, Pageable pageable);
     Optional<TrainingPlanModel> findByIdAndUser(Long id, UserModel user);
+    List<TrainingPlanModel> findAllByExercisesContains(ExerciseModel exercise);
 }

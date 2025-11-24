@@ -1,6 +1,6 @@
 import { api } from '../../api';
 import type { PageResponseDTO } from '../../api.dto';
-import type { SessionDetailsDTO, SessionExerciseBaseDTO, TrainingSessionDetailsDTO, TrainingSessionDTO, TrainingSessionResponseDTO } from './training-session.dto';
+import type { SessionDetailsDTO, SessionExerciseBaseDTO, TrainingSessionDTO, TrainingSessionResponseDTO } from './training-session.dto';
 
 const BASE_URL = '/training-sessions';
 
@@ -24,9 +24,9 @@ export const trainingSessionService = {
 		}
 	},
 
-	getTrainingSession: async (id: number): Promise<TrainingSessionDetailsDTO> => {
+	getTrainingSession: async (id: number): Promise<SessionDetailsDTO> => {
 		try {
-			const { data } = await api.get<TrainingSessionDetailsDTO>(`${BASE_URL}/${id}`);
+			const { data } = await api.get<SessionDetailsDTO>(`${BASE_URL}/${id}`);
 			return data;
 		} catch (error) {
 			console.error(`Failed to fetch training session with id: ${id}`, error);

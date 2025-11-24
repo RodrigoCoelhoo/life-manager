@@ -1,4 +1,4 @@
-import type { SessionExerciseBaseDTO } from "../training-session/training-session.dto";
+import type { SessionExerciseSetRepDTO, SessionExerciseTimeDTO } from "../training-session/training-session.dto";
 
 export const ExerciseType = {
   SET_REP: "SET_REP",
@@ -27,14 +27,15 @@ export interface ExerciseSimpleDTO {
 	id: number;
 	name: string;
 	type: ExerciseType;
+	demoUrl: string;
 }
 
 export interface ExerciseDetailsDTO {
 	id: number;
 	name: string;
-	description: string;
 	type: ExerciseType;
-	sets: SessionExerciseBaseDTO[]
+	demoUrl: string;
+	sets: (SessionExerciseSetRepDTO | SessionExerciseTimeDTO)[]
 }
 
 export interface ExerciseUpdateDTO {

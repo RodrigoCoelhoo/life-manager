@@ -1,8 +1,15 @@
 import { Link } from 'react-router-dom'
 import { useAuth } from "../contexts/AuthContext"
+import { authService } from '../services/auth/authService';
 
 export default function Profile() {
-	const { logout } = useAuth();
+	const { logout, login } = useAuth();
+
+	const handleReLogin = async () => {
+		const { token } = await authService.signin({ username: 'RodrigoCoelho', password: 'Rodrigo-123' });
+		logout();
+		login(token);
+	}
 
 	return (
 		<div className="h-full w-full p-6 text-textcolor text-4xl rounded-lg">
@@ -15,7 +22,15 @@ export default function Profile() {
 				>
 					Logout
 				</Link>
+
+				<button
+					className='form-submit p-2'
+					onClick={handleReLogin}	
+				>
+					ReLogin
+				</button>
 			</div>
+
 		</div>
 	);
 }

@@ -14,6 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -54,7 +55,11 @@ public class TrainingSessionService {
         List<SessionExerciseModel> sessionExercises = session.getExercises();
 
         Map<ExerciseModel, List<SessionExerciseModel>> grouped = sessionExercises.stream()
-                .collect(Collectors.groupingBy(SessionExerciseModel::getExercise));
+                        .collect(Collectors.groupingBy(
+                                SessionExerciseModel::getExercise,
+                                LinkedHashMap::new,
+                                Collectors.toList()
+                        ));
 
         List<ExerciseDetailsDTO> exerciseDetails = grouped.keySet().stream()
                 .map(exercise -> {
@@ -75,6 +80,7 @@ public class TrainingSessionService {
 
         TrainingSessionModel session = TrainingSessionModel.builder()
                 .user(user)
+                .exercises(new ArrayList<>())
                 .build();
 
         applySessionData(session, data);
@@ -107,20 +113,39 @@ public class TrainingSessionService {
         for (SessionExerciseDTO ex : data.exercises()) {
             ExerciseModel exercise = exerciseService.getExercise(ex.exerciseId());
 
-            List<SessionExerciseModel> sets = ex.sets().stream().map(
-                    set -> {
-                        SessionExerciseSetDTO.validateForType(set, exercise.getType());
+            List<SessionExerciseSetDTO> exerciseSets = ex.sets();
 
-                        SessionExerciseModel sessionExercise = new SessionExerciseModel();
-                        sessionExercise.setSession(session);
-                        sessionExercise.setExercise(exercise);
+            if(exerciseSets.isEmpty()) {
+                SessionExerciseModel sessionExercise = new SessionExerciseModel();
+                sessionExercise.setSession(session);
+                sessionExercise.setExercise(exercise);
 
-                        applySessionExerciseData(sessionExercise, set, exercise.getType());
-                        return sessionExercise;
-                    }
-            ).toList();
+                if(exercise.getType().toString().equals("SET_REP")) {
+                    sessionExercise.setSetNumber(1);
+                    sessionExercise.setWeight(0.0);
+                    sessionExercise.setReps(0);
+                } else {
+                    sessionExercise.setDistance(0);
+                    sessionExercise.setDurationSecs(0);
+                }
 
-            newExercises.addAll(sets);
+                newExercises.add(sessionExercise);
+            } else {
+                List<SessionExerciseModel> sets = exerciseSets.stream().map(
+                        set -> {
+                            SessionExerciseSetDTO.validateForType(set, exercise.getType());
+
+                            SessionExerciseModel sessionExercise = new SessionExerciseModel();
+                            sessionExercise.setSession(session);
+                            sessionExercise.setExercise(exercise);
+
+                            applySessionExerciseData(sessionExercise, set, exercise.getType());
+                            return sessionExercise;
+                        }
+                ).toList();
+
+                newExercises.addAll(sets);
+            }
         }
 
         session.getExercises().clear();

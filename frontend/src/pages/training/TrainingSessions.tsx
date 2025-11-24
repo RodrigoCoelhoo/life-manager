@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react';
-import type { TrainingSessionResponseDTO } from '../../services/training/training-session/training-session.dto';
+import type { TrainingSessionDTO, TrainingSessionResponseDTO } from '../../services/training/training-session/training-session.dto';
 import Loading from '../../components/common/Loading';
 import ErrorMessage from '../../components/common/Error';
 import type { PageResponseDTO } from '../../services/api.dto';
 import { trainingSessionService } from '../../services/training/training-session/training-session.service';
 import { Pagination } from '../../components/common/Pagination';
 import TrainingSessionCard from '../../components/training/TrainingSessionCard';
+import { Modal } from '../../components/common/Modal';
+import { TrainingSessionForm } from '../../components/training/TrainingSessionForm';
 
 export default function TrainingSessions() {
 	const [trainingSessions, setTrainingSessions] = useState<TrainingSessionResponseDTO[]>([]);
@@ -16,6 +18,8 @@ export default function TrainingSessions() {
 	const [totalPages, setTotalPages] = useState<number>(1);
 	const [totalElements, setTotalElements] = useState<number>(1);
 	const [elementsPerPage, setElementsPerPage] = useState<number>(18);
+
+	const [createTrainingSessionOpen, setCreateTrainingSessionOpen] = useState<boolean>(false);
 
 	const fetchTrainingSessions = async () => {
 		try {
@@ -33,6 +37,49 @@ export default function TrainingSessions() {
 			setLoading(false);
 		}
 	};
+
+	const createTrainingSession = async (trainingSession: TrainingSessionDTO) => {
+		try {
+			setLoading(true);
+			const data: TrainingSessionResponseDTO = await trainingSessionService.createTrainingSession(trainingSession);
+			setTrainingSessions((prevTrainingSessions) => [data, ...prevTrainingSessions]);
+			setTotalElements(prev => prev + 1);
+			if (trainingSessions.length > totalElements) trainingSessions.pop();
+		} catch (err) {
+			console.error(err);
+			setError("Failed to create training session");
+		} finally {
+			setLoading(false);
+		}
+	};
+
+	const updateTrainingSession = async (id: number, trainingSession: TrainingSessionDTO) => {
+		try {
+			setLoading(true);
+			const updated: TrainingSessionResponseDTO = await trainingSessionService.updateTrainingSession(id, trainingSession);
+			setTrainingSessions(prev => prev.map(e => (e.id === id ? updated : e)));
+		} catch (err) {
+			console.error(err);
+			setError("Failed to update training session");
+		} finally {
+			setLoading(false);
+		}
+	};
+
+	const deleteTrainingPlan = async (id: number) => {
+		try {
+			setLoading(true);
+			await trainingSessionService.deleteTrainingSession(id);
+			fetchTrainingSessions();
+			setTotalElements(prev => prev - 1);
+		} catch (err) {
+			setError("Failed to delete training session");
+		} finally {
+			setLoading(false);
+		}
+	};
+
+
 
 	useEffect(() => {
 		fetchTrainingSessions();
@@ -54,15 +101,10 @@ export default function TrainingSessions() {
 	return (
 		<>
 			<div className="w-full p-6 text-textcolor flex flex-col gap-4">
-
-				<h1 className='text-red-500 font-bold'>O PLANO DE TREINO VAI SERVIR APENAS DE ESQUELETO PARA MONTAR A SESSÃO, APÓS SELECIONAR O PLANO DE TREINO É ADICIONADO À LISTA DE EXERCICIOS, E PODE SER ADICIONADO MAIS EXERCICIOS POSTERIORMENTE. ASSIM MESMO QUE UM PLANO DE TREINO SEJA APAGADO A SESSÃO CONTINUA
-					<br />
-					ALGUNS DTOS DO FRONTEND PODEM ESTAR DIFERENTES CUIDADO COM ISSO
-				</h1>
-
 				<div className="flex items-center justify-between gap-4">
 					<button
 						className="bg-primary p-2 px-4 rounded-xl cursor-pointer hover:bg-primary/80 font-semibold"
+						onClick={() => setCreateTrainingSessionOpen(true)}
 					>
 						Create +
 					</button>
@@ -98,6 +140,8 @@ export default function TrainingSessions() {
 							<TrainingSessionCard
 								key={trainingSession.id}
 								{...trainingSession}
+								onUpdate={updateTrainingSession}
+								onDelete={deleteTrainingPlan}
 							/>
 						))}
 					</div>
@@ -111,6 +155,13 @@ export default function TrainingSessions() {
 					/>
 				</div>
 			</div>
+
+			<Modal isOpen={createTrainingSessionOpen} onClose={() => setCreateTrainingSessionOpen(false)}>
+				<TrainingSessionForm
+					onClose={() => setCreateTrainingSessionOpen(false)}
+					onCreate={createTrainingSession}
+				/>
+			</Modal>
 		</>
 	);
 }

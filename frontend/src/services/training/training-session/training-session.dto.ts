@@ -1,9 +1,9 @@
 import type { ExerciseDetailsDTO, ExerciseSimpleDTO } from "../exercise/exercise.dto";
-import type { TrainingPlanDetailsDTO, TrainingPlanResponseDTO } from "../training-plan/training-plan.dto";
+import type { TrainingPlanDetailsDTO } from "../training-plan/training-plan.dto";
 
 export interface TrainingSessionDTO {
-	trainingPlanId: number;
 	date: string;
+	exercises: SessionExerciseDTO[];
 }
 
 export interface TrainingSessionDetailsDTO {
@@ -22,13 +22,17 @@ export interface TrainingSessionResponseDTO {
 	updatedAt: string;
 }
 
-export interface SessionDTO {
+export interface SessionSimpleDTO {
 	id: number;
-	trainingPlan: TrainingPlanResponseDTO;
 	date: string;
 }
 
 export interface SessionExerciseDTO {
+	exerciseId: number;
+	sets: SessionExerciseSetDTO[];
+}
+
+export interface SessionExerciseSetDTO {
 	setNumber: (number | null);
 	reps: (number | null);
 	weight: (number | null);
@@ -37,11 +41,7 @@ export interface SessionExerciseDTO {
 	distance: (number | null);
 }
 
-export interface SessionExerciseBaseDTO {
-	id: number;
-	sessionId: number;
-	exerciseId: number;
-}
+export interface SessionExerciseBaseDTO {}
 
 export interface SessionExerciseSetRepDTO extends SessionExerciseBaseDTO {
 	setNumber: number;
@@ -55,6 +55,6 @@ export interface SessionExerciseTimeDTO extends SessionExerciseBaseDTO {
 }
 
 export interface SessionDetailsDTO {
-	session: SessionDTO;
+	session: SessionSimpleDTO;
 	exercises: ExerciseDetailsDTO[];
 }

@@ -5,13 +5,15 @@ import com.rodrigocoelhoo.lifemanager.training.model.ExerciseModel;
 public record ExerciseSimpleDTO(
         Long id,
         String name,
-        String type
+        String type,
+        String demoUrl
 ) {
     public static ExerciseSimpleDTO fromEntity(ExerciseModel model) {
         return new ExerciseSimpleDTO(
                 model.getId(),
                 model.getName(),
-                model.getType().toString()
+                model.getType().toString(),
+                model.getDemoUrl()
         );
     }
 }

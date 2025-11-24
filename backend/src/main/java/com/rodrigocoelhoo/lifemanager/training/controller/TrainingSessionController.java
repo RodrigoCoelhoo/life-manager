@@ -41,7 +41,7 @@ public class TrainingSessionController {
         return ResponseEntity.ok(PageResponseDTO.fromPage(response));
     }
 
-    @GetMapping("/{id}/details")
+    @GetMapping("/{id}")
     public ResponseEntity<SessionDetailsDTO> getSessionDetails(@PathVariable Long id) {
         SessionDetailsDTO session = trainingSessionService.getSessionDetails(id);
         return ResponseEntity.ok(session);
