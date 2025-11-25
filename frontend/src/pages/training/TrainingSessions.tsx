@@ -42,9 +42,16 @@ export default function TrainingSessions() {
 		try {
 			setLoading(true);
 			const data: TrainingSessionResponseDTO = await trainingSessionService.createTrainingSession(trainingSession);
-			setTrainingSessions((prevTrainingSessions) => [data, ...prevTrainingSessions]);
+			setTrainingSessions(prev => {
+				const updated = [data, ...prev];
+
+				if (updated.length > elementsPerPage) {
+					updated.pop();
+				}
+
+				return updated;
+			});
 			setTotalElements(prev => prev + 1);
-			if (trainingSessions.length > totalElements) trainingSessions.pop();
 		} catch (err) {
 			console.error(err);
 			setError("Failed to create training session");

@@ -42,9 +42,17 @@ export default function Exercises() {
 		try {
 			setLoading(true);
 			const data: ExerciseResponseDTO = await exerciseService.createExercise(exercise);
-			setExercises((prevExercises) => [data, ...prevExercises]);
+			setExercises(prev => {
+				const updated = [data, ...prev];
+
+				if (updated.length > elementsPerPage) {
+					updated.pop();
+				}
+
+				return updated;
+			});
+
 			setTotalElements(prev => prev + 1);
-			if (exercises.length > totalElements) exercises.pop();
 		} catch (err) {
 			console.error(err);
 			setError("Failed to create exercise");

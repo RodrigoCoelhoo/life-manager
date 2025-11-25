@@ -42,9 +42,16 @@ export default function TrainingPlans() {
 		try {
 			setLoading(true);
 			const data: TrainingPlanResponseDTO = await trainingPlanService.createTrainingPlan(trainingPlan);
-			setTrainingPlans((prevTrainingPlans) => [data, ...prevTrainingPlans]);
+			setTrainingPlans(prev => {
+				const updated = [data, ...prev];
+
+				if (updated.length > elementsPerPage) {
+					updated.pop();
+				}
+
+				return updated;
+			});
 			setTotalElements(prev => prev + 1);
-			if (trainingPlans.length > totalElements) trainingPlans.pop();
 		} catch (err) {
 			console.error(err);
 			setError("Failed to create training plan");
