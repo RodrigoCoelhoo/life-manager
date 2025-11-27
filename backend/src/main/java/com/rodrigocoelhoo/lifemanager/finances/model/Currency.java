@@ -43,7 +43,7 @@ public enum Currency {
     }
 
     public String format(BigDecimal amount) {
-        return symbol + amount.setScale(2, RoundingMode.HALF_UP).toPlainString();
+        return amount.setScale(2, RoundingMode.HALF_UP).toPlainString() + symbol;
     }
 
     public static EnumSet<Currency> all() {

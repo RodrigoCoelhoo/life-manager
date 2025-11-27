@@ -1,13 +1,27 @@
 import { api } from '../../api';
+import type { PageResponseDTO } from '../../api.dto';
 import type { WalletDTO, WalletResponseDTO, WalletUpdateDTO } from './wallet.dto';
 
 const BASE_URL = '/wallets';
 
 export const walletService = {
 
-	getAllWallets: async (): Promise<WalletResponseDTO[]> => {
+	getAllWallets: async (
+		page: number,
+		size: number,
+		name: string
+	): Promise<PageResponseDTO<WalletResponseDTO>> => {
 		try {
-			const { data } = await api.get<WalletResponseDTO[]>(BASE_URL);
+			const params = new URLSearchParams({
+				page: page.toString(),
+				size: size.toString(),
+			});
+
+			if (name && name.trim() !== "") {
+				params.append("name", name);
+			}
+
+			const { data } = await api.get<PageResponseDTO<WalletResponseDTO>>(`${BASE_URL}?${params.toString()}`);
 			return data;
 		} catch (error) {
 			console.error('Failed to fetch wallets:', error);

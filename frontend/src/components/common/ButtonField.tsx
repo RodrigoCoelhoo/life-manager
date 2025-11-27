@@ -34,11 +34,11 @@ export const ButtonField = forwardRef(({ value, onClick, placeholder, rules = []
 			<button
 				type="button"
 				onClick={onClick}
-				className={`form-input flex ${!!icon ? "justify-between" : "justify-center" } items-center w-full ${disabled ? "cursor-not-allowed" : "cursor-pointer"} ${error ? "border-red-500" : ""}`}
+				className={`form-input flex ${!!icon ? "justify-between" : "justify-center"} items-center w-full ${disabled ? "cursor-not-allowed" : "cursor-pointer"} ${error ? "border-red-500" : ""}`}
 				disabled={disabled}
 			>
 				<span className="truncate"> {value || placeholder} </span>
-				{!!icon ? icon : <></> }
+				{!!icon ? icon : <></>}
 			</button>
 			{error && <p className="text-red-500 text-sm mt-1">{error}</p>}
 		</div>

@@ -22,7 +22,7 @@ export default function ErrorMessage({
 				{title}
 			</h2>
 
-			<p className="text-muted-foreground mb-4">{message}</p>
+			<p className="text-textcolor mb-4">{message}</p>
 
 			{onRetry && (
 				<button

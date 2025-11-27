@@ -1,11 +1,16 @@
 package com.rodrigocoelhoo.lifemanager.finances.controller;
 
+import com.rodrigocoelhoo.lifemanager.finances.dto.PageResponseDTO;
 import com.rodrigocoelhoo.lifemanager.finances.dto.WalletDTO;
 import com.rodrigocoelhoo.lifemanager.finances.dto.WalletResponseDTO;
 import com.rodrigocoelhoo.lifemanager.finances.dto.WalletUpdateDTO;
 import com.rodrigocoelhoo.lifemanager.finances.model.WalletModel;
 import com.rodrigocoelhoo.lifemanager.finances.service.WalletService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,14 +30,18 @@ public class WalletController {
     }
 
     @GetMapping
-    public ResponseEntity<List<WalletResponseDTO>> getAllWallets() {
-        List<WalletModel> wallets = walletService.getAllWallets();
+    public ResponseEntity<PageResponseDTO<WalletResponseDTO>> getWallets(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(required = false) String name
+    ) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
 
-        List<WalletResponseDTO> response = wallets.stream()
-                .map(WalletResponseDTO::fromEntity)
-                .toList();
+        Page<WalletModel> wallets = walletService.getWallets(pageable, name);
 
-        return ResponseEntity.ok(response);
+        Page<WalletResponseDTO> response = wallets.map(WalletResponseDTO::fromEntity);
+
+        return ResponseEntity.ok(PageResponseDTO.fromPage(response));
     }
 
     @GetMapping("/{id}")

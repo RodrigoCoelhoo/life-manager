@@ -6,9 +6,17 @@ const BASE_URL = '/transactions';
 
 export const transactionService = {
 
-	getAllTransactions: async (): Promise<PageResponseDTO<TransactionResponseDTO>> => {
+	getTransactions: async (
+		page: number,
+		size: number
+	): Promise<PageResponseDTO<TransactionResponseDTO>> => {
 		try {
-			const { data } = await api.get<PageResponseDTO<TransactionResponseDTO>>(BASE_URL);
+			const params = new URLSearchParams({
+				page: page.toString(),
+				size: size.toString(),
+			});
+
+			const { data } = await api.get<PageResponseDTO<TransactionResponseDTO>>(`${BASE_URL}?${params.toString()}`);
 			return data;
 		} catch (error) {
 			console.error('Failed to fetch transactions:', error);

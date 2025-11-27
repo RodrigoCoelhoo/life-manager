@@ -24,3 +24,8 @@ export interface WalletUpdateDTO {
 	type: WalletType;
 	currency: string;
 }
+
+export interface WalletSimpleResponseDTO {
+	id: number;
+	name: string;
+}

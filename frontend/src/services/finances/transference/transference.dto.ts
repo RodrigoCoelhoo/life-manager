@@ -1,3 +1,5 @@
+import type { WalletSimpleResponseDTO } from "../wallet/wallet.dto";
+
 export interface TransferenceDTO {
 	fromWalletId: number;
 	toWalletId: number;
@@ -8,9 +10,9 @@ export interface TransferenceDTO {
 
 export interface TransferenceResponseDTO {
 	id: number;
-	fromWalletName: string;
+	fromWallet: WalletSimpleResponseDTO
 	fromAmount: string;
-	toWalletName: string;
+	toWallet: WalletSimpleResponseDTO
 	toAmount: string;
 	date: string;
 	description: string;

@@ -8,9 +8,9 @@ import java.time.LocalDate;
 
 public record TransferenceResponseDTO(
     Long id,
-    String fromWalletName,
+    WalletSimpleResponseDTO fromWallet,
     String fromAmount,
-    String toWalletName,
+    WalletSimpleResponseDTO toWallet,
     String toAmount,
     LocalDate date,
     String description
@@ -22,9 +22,9 @@ public record TransferenceResponseDTO(
 
         return new TransferenceResponseDTO(
                 model.getId(),
-                fromWallet.getName(),
+                WalletSimpleResponseDTO.fromEntity(fromWallet),
                 fromWallet.getCurrency().format(model.getAmount()),
-                toWallet.getName(),
+                WalletSimpleResponseDTO.fromEntity(toWallet),
                 toWallet.getCurrency().format(toAmount),
                 model.getDate(),
                 model.getDescription()

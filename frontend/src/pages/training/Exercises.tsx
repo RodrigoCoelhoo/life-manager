@@ -137,7 +137,6 @@ export default function Exercises() {
 						</div>
 
 						<span className="text-secondary"> {totalElements} {totalElements === 1 ? "exercise" : "exercises"} </span>
-
 					</div>
 				</div>
 

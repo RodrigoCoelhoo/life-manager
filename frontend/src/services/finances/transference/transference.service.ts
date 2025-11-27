@@ -4,11 +4,19 @@ import type { TransferenceDTO, TransferenceResponseDTO } from './transference.dt
 
 const BASE_URL = '/transferences';
 
-export const transactionService = {
+export const transferenceService = {
 
-	getAllTransferences: async (): Promise<PageResponseDTO<TransferenceResponseDTO>> => {
+	getAllTransferences: async (
+		page: number,
+		size: number
+	): Promise<PageResponseDTO<TransferenceResponseDTO>> => {
 		try {
-			const { data } = await api.get<PageResponseDTO<TransferenceResponseDTO>>(BASE_URL);
+			const params = new URLSearchParams({
+				page: page.toString(),
+				size: size.toString(),
+			});
+
+			const { data } = await api.get<PageResponseDTO<TransferenceResponseDTO>>(`${BASE_URL}?${params.toString()}`);
 			return data;
 		} catch (error) {
 			console.error('Failed to fetch transferences:', error);
@@ -26,7 +34,7 @@ export const transactionService = {
 		}
 	},
 
-	createTransaction: async (payload: TransferenceDTO): Promise<TransferenceResponseDTO> => {
+	createTransference: async (payload: TransferenceDTO): Promise<TransferenceResponseDTO> => {
 		try {
 			const { data } = await api.post(BASE_URL, payload);
 			return data;
@@ -36,7 +44,7 @@ export const transactionService = {
 		}
 	},
 
-	updateTransaction: async (
+	updateTransference: async (
 		id: number,
 		payload: TransferenceDTO
 	): Promise<TransferenceResponseDTO> => {
@@ -49,7 +57,7 @@ export const transactionService = {
 		}
 	},
 
-	deleteTransaction: async (id: number): Promise<void> => {
+	deleteTransference: async (id: number): Promise<void> => {
 		try {
 			const { data } = await api.delete(`${BASE_URL}/${id}`);
 			return data;

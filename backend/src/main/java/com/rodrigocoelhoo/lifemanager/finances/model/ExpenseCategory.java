@@ -9,6 +9,7 @@ public enum ExpenseCategory {
     SALARY(ExpenseType.INCOME),
     FREELANCE(ExpenseType.INCOME),
     SELL_INVESTMENT(ExpenseType.INCOME),
+    PASSIVE_INCOME(ExpenseType.INCOME),
 
     HOUSING(ExpenseType.EXPENSE),
     FOOD(ExpenseType.EXPENSE),

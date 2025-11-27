@@ -12,6 +12,8 @@ import com.rodrigocoelhoo.lifemanager.users.UserModel;
 import com.rodrigocoelhoo.lifemanager.users.UserService;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -31,9 +33,11 @@ public class WalletService {
         this.walletRepository = walletRepository;
     }
 
-    public List<WalletModel> getAllWallets() {
+    public Page<WalletModel> getWallets(Pageable pageable, String name) {
         UserModel user = userService.getLoggedInUser();
-        return walletRepository.findAllByUser(user);
+        if(name == null || name.isBlank())
+            return walletRepository.findAllByUser(user, pageable);
+        return walletRepository.findByUserAndNameContainingIgnoreCase(user, name, pageable);
     }
 
     public WalletModel getWallet(Long id) {
