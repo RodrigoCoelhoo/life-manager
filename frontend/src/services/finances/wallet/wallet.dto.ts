@@ -1,3 +1,5 @@
+import type { CurrencyCode } from "../currencies.type";
+
 export const WalletType = {
   BANK: "BANK",
   CASH: "CASH",
@@ -16,7 +18,7 @@ export interface WalletResponseDTO {
 	name: string;
 	type: WalletType;
 	balance: string;
-	currency: string;
+	currency: CurrencyCode;
 }
 
 export interface WalletUpdateDTO {

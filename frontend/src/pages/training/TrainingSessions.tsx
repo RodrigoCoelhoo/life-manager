@@ -97,7 +97,7 @@ export default function TrainingSessions() {
 		return (
 			<div className="flex justify-center items-center h-full">
 				<ErrorMessage
-					title="Failed to load exercises"
+					title="Failed to load training sessions"
 					message="There was a problem connecting to the server. Please try again."
 					onRetry={() => fetchTrainingSessions()}
 				/>

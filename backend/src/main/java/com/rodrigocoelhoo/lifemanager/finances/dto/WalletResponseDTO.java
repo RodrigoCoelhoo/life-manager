@@ -2,13 +2,11 @@ package com.rodrigocoelhoo.lifemanager.finances.dto;
 
 import com.rodrigocoelhoo.lifemanager.finances.model.WalletModel;
 
-import java.math.BigDecimal;
-
 public record WalletResponseDTO(
     Long id,
     String name,
     String type,
-    BigDecimal balance,
+    String balance,
     String currency
 ) {
     public static WalletResponseDTO fromEntity(WalletModel model) {
@@ -16,7 +14,7 @@ public record WalletResponseDTO(
                 model.getId(),
                 model.getName(),
                 model.getType().toString(),
-                model.getBalance(),
+                model.getCurrency().format(model.getBalance()),
                 model.getCurrency().toString()
         );
     }

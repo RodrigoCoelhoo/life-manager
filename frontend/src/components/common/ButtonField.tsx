@@ -30,14 +30,16 @@ export const ButtonField = forwardRef(({ value, onClick, placeholder, rules = []
 	}));
 
 	return (
-		<div className="flex flex-col w-full">
+		<div className="flex flex-col w-full font-extralight text-textcolor">
 			<button
 				type="button"
 				onClick={onClick}
 				className={`form-input flex ${!!icon ? "justify-between" : "justify-center"} items-center w-full ${disabled ? "cursor-not-allowed" : "cursor-pointer"} ${error ? "border-red-500" : ""}`}
 				disabled={disabled}
 			>
-				<span className="truncate"> {value || placeholder} </span>
+				<span className={`truncate ${value === "" ? "text-textcolor/80" : ""}`}>
+					{value || placeholder}
+				</span>
 				{!!icon ? icon : <></>}
 			</button>
 			{error && <p className="text-red-500 text-sm mt-1">{error}</p>}

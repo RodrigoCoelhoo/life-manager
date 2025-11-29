@@ -10,6 +10,7 @@ import { PencilSquareIcon } from "@heroicons/react/16/solid";
 import { Modal } from "../../components/common/Modal";
 import TransactionForm from "../../components/finances/TransactionForm";
 import toast from "react-hot-toast";
+import { formatBalance } from "../../services/finances/currencies.type";
 
 export default function Transactions() {
 	const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -147,11 +148,11 @@ export default function Transactions() {
 								<div className={`${rowStyle} py-1 px-2 font-extralight truncate hidden sm:block`}>
 									{item.description || "No description provided"}
 								</div>
-								<div className={`${rowStyle} flex flex-row py-1 px-2 font-extralight ${item.type === "EXPENSE" ? "text-[#F87171]" : "text-[#34D399]"}`}>
+								<div className={`${rowStyle} flex flex-row py-1 px-2 font-extralight ${item.type === "EXPENSE" ? "text-[#F87171]" : "text-[#34D399]"} whitespace-nowrap`}>
 									<span className="inline-block w-4 text-right">
 										{item.type === "EXPENSE" ? "-" : "+"}
 									</span>{" "}
-									{item.amount}
+									{formatBalance(item.amount)}
 								</div>
 								<button
 									className={`${rowStyle} py-1 px-2 font-extralight`}

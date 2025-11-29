@@ -10,6 +10,7 @@ import { Modal } from "../../components/common/Modal";
 import toast from "react-hot-toast";
 import type { TransferenceDTO, TransferenceResponseDTO } from "../../services/finances/transference/transference.dto";
 import TransferenceForm from "../../components/finances/TransferenceForm";
+import { formatBalance } from "../../services/finances/currencies.type";
 
 export default function Transferences() {
 	const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -144,9 +145,9 @@ export default function Transferences() {
 							<React.Fragment key={item.id}>
 								<div className={`${rowStyle} py-1 px-2 font-extralight whitespace-nowrap min-w-max`}>{item.date}</div>
 								<div className={`${rowStyle} py-1 px-2 font-extralight truncate`}>{item.fromWallet.name}</div>
-								<div className={`${rowStyle} py-1 px-2 font-extralight text-[#F87171]`}>-{item.fromAmount}</div>
+								<div className={`${rowStyle} py-1 px-2 font-extralight text-[#F87171]`}>-{formatBalance(item.fromAmount)}</div>
 								<div className={`${rowStyle} py-1 px-2 font-extralight truncate`}>{item.toWallet.name}</div>
-								<div className={`${rowStyle} py-1 px-2 font-extralight text-[#34D399]`}>+{item.toAmount}</div>
+								<div className={`${rowStyle} py-1 px-2 font-extralight text-[#34D399]`}>+{formatBalance(item.toAmount)}</div>
 								<div className={`${rowStyle} py-1 px-2 font-extralight truncate hidden sm:block`}>
 									{item.description || "No description provided"}
 								</div>

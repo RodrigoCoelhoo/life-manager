@@ -50,3 +50,11 @@ export const CurrencyData: Record<CurrencyCode, CurrencyInfo> = {
 	RUB: { name: "Russian Ruble",		symbol: "₽", 	flag: "🇷🇺" },
 	ZAR: { name: "South African Rand", 	symbol: "R", 	flag: "🇿🇦" },
 };
+
+
+
+export const formatBalance = (value: string) => {
+	const [int, dec] = value.split(".");
+	const spaced = int.replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+	return dec ? `${spaced}.${dec}` : spaced;
+};

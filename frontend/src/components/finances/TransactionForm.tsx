@@ -68,7 +68,7 @@ export default function TransactionForm({ transaction, onClose, onCreate, onUpda
 		}
 
 		setSubmitting(true);
-		if(transaction !== undefined) {
+		if (transaction !== undefined) {
 			handleUpdate();
 		} else {
 			handleCreate();
@@ -120,6 +120,7 @@ export default function TransactionForm({ transaction, onClose, onCreate, onUpda
 							value={wallet !== undefined ? wallet.name : ""}
 							onClick={() => setOpenWalletSearch(true)}
 							icon={<MagnifyingGlassIcon width={16} height={16} />}
+							placeholder="Select a wallet"
 							rules={[
 								(value: string) => (value.trim() !== "" ? true : "Please select a wallet")
 							]}

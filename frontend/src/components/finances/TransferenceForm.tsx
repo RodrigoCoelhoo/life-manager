@@ -143,6 +143,7 @@ export default function TransferenceForm({ transference, onClose, onCreate, onUp
 									setWalletTarget("from");
 									setOpenWalletSearch(true);
 								}}
+								placeholder="Select a wallet"
 								icon={<MagnifyingGlassIcon width={16} height={16} />}
 								rules={[
 									(value: string) => (value.trim() !== "" ? true : "Please select a wallet")
@@ -161,6 +162,7 @@ export default function TransferenceForm({ transference, onClose, onCreate, onUp
 									setWalletTarget("to");
 									setOpenWalletSearch(true);
 								}}
+								placeholder="Select a wallet"
 								icon={<MagnifyingGlassIcon width={16} height={16} />}
 								rules={[
 									(value: string) => (value.trim() !== "" ? true : "Please select a wallet")

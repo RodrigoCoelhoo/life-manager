@@ -11,15 +11,16 @@ interface NumericFieldProps {
 	onChange: (val: string) => void;
 	placeholder?: string;
 	rules?: Rule[];
+	formatter?: (val: string) => string;
+	disabled?: boolean;
 }
 
 export const NumericField = forwardRef(function NumericField(
-	{ value, onChange, rules = [], placeholder = "0.00" }: NumericFieldProps,
+	{ value, onChange, rules = [], placeholder = "0.00", formatter = (v) => (v), disabled }: NumericFieldProps,
 	ref
 ) {
 	const [error, setError] = useState<string | null>(null);
 
-	// ----- Validation -----
 	const validate = () => {
 		for (const rule of rules) {
 			const res = rule(value);
@@ -66,10 +67,10 @@ export const NumericField = forwardRef(function NumericField(
 		}
 	};
 
-	// ----- Inline rule validation -----
+
 	const runRules = (val: string) => {
 		for (const rule of rules) {
-			const res = rule(val);
+			const res = rule(val.trim());
 			if (res !== true) {
 				setError(res);
 				return;
@@ -82,11 +83,12 @@ export const NumericField = forwardRef(function NumericField(
 		<div className="flex flex-col w-full">
 			<input
 				type="text"
-				value={value}
+				value={formatter(value)}
 				placeholder={placeholder}
 				readOnly
 				onKeyDown={handleKeyDown}
-				className={`form-input w-full ${error ? "border-red-500" : ""} text-right`}
+				className={`form-input w-full ${error ? "border-red-500" : ""} text-right ${disabled ? "cursor-not-allowed" : "cursor-text"}`}
+				disabled={disabled}
 			/>
 
 			{error && (
