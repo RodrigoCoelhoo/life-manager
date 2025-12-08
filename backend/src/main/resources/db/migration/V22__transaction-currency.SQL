@@ -1,0 +1,5 @@
+ALTER TABLE tb_transactions
+ADD COLUMN currency VARCHAR(10) NOT NULL DEFAULT 'EUR';
+
+ALTER TABLE tb_transactions
+ALTER COLUMN currency DROP DEFAULT;

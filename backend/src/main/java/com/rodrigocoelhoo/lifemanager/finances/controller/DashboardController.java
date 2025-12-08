@@ -1,7 +1,9 @@
 package com.rodrigocoelhoo.lifemanager.finances.controller;
 
 import com.rodrigocoelhoo.lifemanager.finances.dto.DashboardOverviewDTO;
+import com.rodrigocoelhoo.lifemanager.finances.model.Currency;
 import com.rodrigocoelhoo.lifemanager.finances.service.DashboardService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,10 +18,11 @@ public class DashboardController {
         this.dashboardService = dashboardService;
     }
 
-    @GetMapping("/month-overview/{yearMonth}")
+    @GetMapping("/month-overview/{yearMonth}/{currency}")
     public ResponseEntity<DashboardOverviewDTO> getMonthOverview(
-            @PathVariable YearMonth yearMonth
-    ) {
-        return ResponseEntity.ok(dashboardService.getMonthOverview(yearMonth));
+            @PathVariable YearMonth yearMonth,
+            @PathVariable @Valid Currency currency
+            ) {
+        return ResponseEntity.ok(dashboardService.getMonthOverview(yearMonth, currency));
     }
 }

@@ -427,7 +427,7 @@ export const TrainingSessionForm = ({ trainingSessionId, onClose, onCreate, onDe
 													{isEditing && (
 														<button
 															type="button"
-															className="w-full text-xs bg-primary/20 hover:bg-primary/40 px-2 py-1 rounded-md"
+															className="w-full text-xs bg-primary/20 hover:bg-primary/40 px-2 py-1 rounded-md cursor-pointer"
 															onClick={() =>
 																setExercises(prev => {
 																	return prev.map((ex, i) => {

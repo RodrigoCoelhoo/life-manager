@@ -25,30 +25,29 @@ export type CurrencyCode = keyof typeof CurrencyCode;
 export interface CurrencyInfo {
 	name: string;
 	symbol: string;
-	flag: string;
 }
 
 export const CurrencyData: Record<CurrencyCode, CurrencyInfo> = {
-	EUR: { name: "Euro", 				symbol: "€", 	flag: "🇪🇺" },
-	USD: { name: "US Dollar", 			symbol: "$", 	flag: "🇺🇸" },
-	GBP: { name: "British Pound", 		symbol: "£", 	flag: "🇬🇧" },
-	BRL: { name: "Brazilian Real", 		symbol: "R$", 	flag: "🇧🇷" },
-	JPY: { name: "Japanese Yen", 		symbol: "¥", 	flag: "🇯🇵" },
-	AUD: { name: "Australian Dollar", 	symbol: "A$", 	flag: "🇦🇺" },
-	CAD: { name: "Canadian Dollar", 	symbol: "C$", 	flag: "🇨🇦" },
-	CHF: { name: "Swiss Franc", 		symbol: "CHF", 	flag: "🇨🇭" },
-	CNY: { name: "Chinese Yuan", 		symbol: "¥", 	flag: "🇨🇳" },
-	SEK: { name: "Swedish Krona", 		symbol: "kr", 	flag: "🇸🇪" },
-	NZD: { name: "New Zealand Dollar", 	symbol: "NZ$", 	flag: "🇳🇿" },
-	MXN: { name: "Mexican Peso", 		symbol: "$", 	flag: "🇲🇽" },
-	SGD: { name: "Singapore Dollar", 	symbol: "S$", 	flag: "🇸🇬" },
-	HKD: { name: "Hong Kong Dollar", 	symbol: "HK$", 	flag: "🇭🇰" },
-	NOK: { name: "Norwegian Krone", 	symbol: "kr", 	flag: "🇳🇴" },
-	KRW: { name: "South Korean Won", 	symbol: "₩", 	flag: "🇰🇷" },
-	TRY: { name: "Turkish Lira", 		symbol: "₺", 	flag: "🇹🇷" },
-	INR: { name: "Indian Rupee", 		symbol: "₹", 	flag: "🇮🇳" },
-	RUB: { name: "Russian Ruble",		symbol: "₽", 	flag: "🇷🇺" },
-	ZAR: { name: "South African Rand", 	symbol: "R", 	flag: "🇿🇦" },
+	EUR: { name: "Euro", 				symbol: "€"},
+	USD: { name: "US Dollar", 			symbol: "$"},
+	GBP: { name: "British Pound", 		symbol: "£"},
+	BRL: { name: "Brazilian Real", 		symbol: "R$"},
+	JPY: { name: "Japanese Yen", 		symbol: "¥"},
+	AUD: { name: "Australian Dollar", 	symbol: "A$"},
+	CAD: { name: "Canadian Dollar", 	symbol: "C$"},
+	CHF: { name: "Swiss Franc", 		symbol: "CHF"},
+	CNY: { name: "Chinese Yuan", 		symbol: "¥"},
+	SEK: { name: "Swedish Krona", 		symbol: "kr"},
+	NZD: { name: "New Zealand Dollar", 	symbol: "NZ$"},
+	MXN: { name: "Mexican Peso", 		symbol: "$"},
+	SGD: { name: "Singapore Dollar", 	symbol: "S$"},
+	HKD: { name: "Hong Kong Dollar", 	symbol: "HK$"},
+	NOK: { name: "Norwegian Krone", 	symbol: "kr"},
+	KRW: { name: "South Korean Won", 	symbol: "₩"},
+	TRY: { name: "Turkish Lira", 		symbol: "₺"},
+	INR: { name: "Indian Rupee", 		symbol: "₹"},
+	RUB: { name: "Russian Ruble",		symbol: "₽"},
+	ZAR: { name: "South African Rand", 	symbol: "R"},
 };
 
 

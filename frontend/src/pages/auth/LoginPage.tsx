@@ -9,9 +9,9 @@ export default function Login() {
 	const [username, setUsername] = useState<string>("");
 	const [password, setPassword] = useState<string>("");
 	const [error, setError] = useState<string | null>(null);
-	
-	const { login } = useAuth();
-	const navigate = useNavigate(); // for redirect after login
+
+	const navigate = useNavigate();
+	const { setAccessToken } = useAuth(); 
 
 	const submitForm = async (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
@@ -19,8 +19,8 @@ export default function Login() {
 
 		setSubmitting(true);
 		try {
-			const { token } = await authService.signin({ username, password });
-			login(token);
+			const { accessToken } = await authService.signin({ username, password });
+			setAccessToken(accessToken); 
 			navigate("/dashboard");
 		} catch (err: any) {
 			console.error(err);

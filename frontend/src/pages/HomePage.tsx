@@ -154,12 +154,12 @@ export default function HomePage() {
 							/>
 							<h3
 								className="text-textcolor flex justify-center font-bold text-3xl mx-16 pb-1 
-                border-b-8 border-secondary transition-colors duration-300 group-hover:border-primary"
+                border-b-8 border-secondary transition-colors duration-300 group-hover:border-primary gap-2"
 							>
 								React
 							</h3>
 							<p className="text-textcolor flex justify-center text-center text-xl my-5 mx-12">
-								JavaScript library for building user interfaces.
+								JavaScript library for building user interfaces. (TypeScript)
 							</p>
 						</a>
 

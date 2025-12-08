@@ -21,7 +21,7 @@ export default function TransactionForm({ wallet, onClose, onCreate, onUpdate, o
 	const [name, setName] = useState<string>(wallet?.name || "");
 	const [currency, setCurrency] = useState<CurrencyCode>(wallet?.currency || "EUR");
 	const [type, setType] = useState<WalletType>(wallet?.type || "BANK");
-	const [balance, setBalance] = useState<string>(wallet?.balance.slice(0, wallet?.balance.length - 1) || "0.00");
+	const [balance, setBalance] = useState<string>(wallet?.balance.replace(/\D+$/g, "") || "0.00");
 
 	const nameRef = useRef<any>(null);
 	const balanceRef = useRef<any>(null);
@@ -102,7 +102,7 @@ export default function TransactionForm({ wallet, onClose, onCreate, onUpdate, o
 						<label htmlFor="date" className="text-sm mb-1">
 							Category
 						</label>
-						<CurrencySelect value={currency} onChange={setCurrency} />
+						<CurrencySelect value={currency} onChange={setCurrency} disabled={!!wallet}/>
 					</div>
 
 					<div className="flex flex-row gap-2">

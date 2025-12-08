@@ -1,3 +1,5 @@
+import type { ExpenseCategory } from "../transaction/transaction.dto";
+
 export interface DashboardOverviewDTO {
   yearMonth: string;                     
   totalIncome: string;                   
@@ -8,6 +10,6 @@ export interface DashboardOverviewDTO {
 }
 
 export interface CategorySummaryDTO {
-  category: string;  
+  category: ExpenseCategory;  
   amount: string;    
 }

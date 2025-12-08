@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.time.temporal.ChronoUnit;
 
 @Service
 public class TokenService {
@@ -18,35 +19,62 @@ public class TokenService {
     @Value("${api.security.token.secret}")
     private String secret;
 
-    public String generateToken(UserModel user) {
-        try {
-            Algorithm algorithm = Algorithm.HMAC256(secret);
-            String token = JWT.create()
-                        .withIssuer("auth-api")
-                        .withSubject(user.getUsername())
-                        .withExpiresAt(generateExpirationDate())
-                        .sign(algorithm);
-            return token;
-        }
-        catch (JWTCreationException exception) {
-            throw new RuntimeException("Error while generating token", exception);
-        }
+    private Algorithm getAlgorithm() {
+        return Algorithm.HMAC256(secret);
     }
 
-    private Instant generateExpirationDate() {
-        return LocalDateTime.now().plusHours(2).toInstant(ZoneOffset.of("+01:00"));
-    }
+    // ------------------------ ACCESS TOKEN --------------------------------
 
-    public String validateToken(String token) {
+    public String generateAccessToken(UserModel user) {
         try {
-            Algorithm algorithm = Algorithm.HMAC256(secret);
-            return JWT.require(algorithm)
+            return JWT.create()
                     .withIssuer("auth-api")
+                    .withSubject(user.getUsername())
+                    .withClaim("type", "access")
+                    .withExpiresAt(Instant.now().plus(15, ChronoUnit.SECONDS))
+                    .sign(getAlgorithm());
+        } catch (JWTCreationException exception) {
+            throw new RuntimeException("Error while generating access token", exception);
+        }
+    }
+
+    public String validateAccessToken(String token) {
+        try {
+            return JWT.require(getAlgorithm())
+                    .withIssuer("auth-api")
+                    .withClaim("type", "access")
                     .build()
                     .verify(token)
                     .getSubject();
+        } catch (JWTVerificationException exception) {
+            return "";
         }
-        catch (JWTVerificationException exception) {
+    }
+
+    // ------------------------ REFRESH TOKEN --------------------------------
+
+    public String generateRefreshToken(UserModel user) {
+        try {
+            return JWT.create()
+                    .withIssuer("auth-api")
+                    .withSubject(user.getUsername())
+                    .withClaim("type", "refresh")
+                    .withExpiresAt(Instant.now().plus(30, ChronoUnit.DAYS))
+                    .sign(getAlgorithm());
+        } catch (JWTCreationException exception) {
+            throw new RuntimeException("Error while generating refresh token", exception);
+        }
+    }
+
+    public String validateRefreshToken(String token) {
+        try {
+            return JWT.require(getAlgorithm())
+                    .withIssuer("auth-api")
+                    .withClaim("type", "refresh")
+                    .build()
+                    .verify(token)
+                    .getSubject();
+        } catch (JWTVerificationException exception) {
             return "";
         }
     }

@@ -4,9 +4,10 @@ import { CurrencyCode, CurrencyData } from "../../services/finances/currencies.t
 interface CurrencySelectProps {
 	value: CurrencyCode;
 	onChange: (value: CurrencyCode) => void;
+	disabled: boolean;
 }
 
-export default function CurrencySelect({ value, onChange }: CurrencySelectProps) {
+export default function CurrencySelect({ value, onChange, disabled }: CurrencySelectProps) {
 	const [open, setOpen] = useState(false);
 
 	const toggle = () => setOpen((o) => !o);
@@ -17,12 +18,12 @@ export default function CurrencySelect({ value, onChange }: CurrencySelectProps)
 
 	return (
 		<div className="relative inline-block w-full form-input m-0 p-0">
-			{/* Button */}
 			<button
 				type="button"
 				value={value}
 				onClick={toggle}
-				className="w-full flex items-center justify-between transition p-2"
+				className={`w-full flex items-center justify-between transition p-2 ${disabled ? "cursor-not-allowed" : "cursor-pointer"}`}
+				disabled={disabled}
 			>
 				<div className="flex gap-2 items-center">
 					<span>
@@ -44,7 +45,6 @@ export default function CurrencySelect({ value, onChange }: CurrencySelectProps)
 				</svg>
 			</button>
 
-			{/* Dropdown */}
 			{open && (
 				<div className="absolute mt-1 w-full bg-foreground border border-secondary shadow-lg max-h-48 overflow-y-auto z-20">
 					{Object.entries(CurrencyData).map(([code, currency]) => (

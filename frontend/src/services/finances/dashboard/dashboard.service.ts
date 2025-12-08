@@ -7,7 +7,7 @@ export const dashboardService = {
 
 	getMonthOverview: async (yearMonth: string): Promise<DashboardOverviewDTO> => {
 		try {
-			const { data } = await api.get(`${BASE_URL}/${yearMonth}`);
+			const { data } = await api.get(`${BASE_URL}/month-overview/${yearMonth}/EUR`);
 			return data;
 		} catch(error) {
 			console.error('Failed to fetch monthly finances overview:', error);

@@ -39,6 +39,11 @@ public class UserService {
                 .orElseThrow(() -> new ResourceNotFound("User with ID '" + id + "' not found"));
     }
 
+    public UserModel getUser(String username) {
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFound("User with Username '" + username + "' not found"));
+    }
+
     public UserModel getLoggedInUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String username = auth.getName();

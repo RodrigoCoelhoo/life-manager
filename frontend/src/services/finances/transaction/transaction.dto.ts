@@ -23,6 +23,22 @@ export const ExpenseCategory = {
 } as const;
 export type ExpenseCategory = keyof typeof ExpenseCategory;
 
+export const CategoryColors: Record<ExpenseCategory, string> = {
+	SALARY: "#4d7eb3",
+	FREELANCE: "#6fb3d3",
+	SELL_INVESTMENT: "#2dffff",
+	PASSIVE_INCOME: "#ceffff",
+
+	HOUSING: "#6f5dc1",        // azul frio forte
+	FOOD: "#b38dd6",           // ciano frio vibrante
+	HEALTH: "#9b89d3",         // roxo frio intenso
+	ENTERTAINMENT: "#a855f7",  // turquesa frio
+	TRANSPORTATION: "#c4b7e5", // azul profundo frio
+	EDUCATION: "#b36cc4",      // índigo frio
+	BUY_INVESTMENT: "#A599F0", // azul piscina frio
+	OTHER: "#ffffff"           // cinza frio
+};
+
 export const ExpenseCategoryType: Record<ExpenseCategory, ExpenseType> = {
 	[ExpenseCategory.SALARY]: ExpenseType.INCOME,
 	[ExpenseCategory.FREELANCE]: ExpenseType.INCOME,

@@ -1,6 +1,7 @@
 package com.rodrigocoelhoo.lifemanager.finances.service;
 
 import com.rodrigocoelhoo.lifemanager.finances.dto.DashboardOverviewDTO;
+import com.rodrigocoelhoo.lifemanager.finances.model.Currency;
 import com.rodrigocoelhoo.lifemanager.finances.model.ExpenseCategory;
 import com.rodrigocoelhoo.lifemanager.finances.model.ExpenseType;
 import com.rodrigocoelhoo.lifemanager.finances.model.TransactionModel;
@@ -21,7 +22,7 @@ public class DashboardService {
         this.transactionService = transactionService;
     }
 
-    public DashboardOverviewDTO getMonthOverview(YearMonth yearMonth) {
+    public DashboardOverviewDTO getMonthOverview(YearMonth yearMonth, Currency currency) {
         LocalDate start = yearMonth.atDay(1);
         LocalDate end = yearMonth.atEndOfMonth();
 
@@ -35,27 +36,28 @@ public class DashboardService {
 
         for(TransactionModel transaction : transactions) {
             ExpenseCategory transactionCategory = transaction.getCategory();
+            BigDecimal amount = transaction.getCurrency().convertTo(transaction.getAmount(), currency);
 
             if (transactionCategory.getType().equals(ExpenseType.EXPENSE)) {
-                totalExpenses = totalExpenses.add(transaction.getAmount());
+                totalExpenses = totalExpenses.add(amount);
 
                 expenses.put(transactionCategory,
                     expenses.getOrDefault(transactionCategory, BigDecimal.ZERO)
-                            .add(transaction.getAmount())
+                            .add(amount)
                 );
             }
             else {
-                totalIncome = totalIncome.add(transaction.getAmount());
+                totalIncome = totalIncome.add(amount);
 
                 income.put(transactionCategory,
                         income.getOrDefault(transactionCategory, BigDecimal.ZERO)
-                                .add(transaction.getAmount())
+                                .add(amount)
                 );
             }
         }
 
         BigDecimal netBalance = totalIncome.subtract(totalExpenses);
 
-        return DashboardOverviewDTO.fromEntities(yearMonth, totalIncome, income, totalExpenses, expenses, netBalance);
+        return DashboardOverviewDTO.fromEntities(yearMonth, currency, totalIncome, income, totalExpenses, expenses, netBalance);
     }
 }

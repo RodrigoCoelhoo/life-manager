@@ -25,7 +25,7 @@ export default function TransactionForm({ transaction, onClose, onCreate, onUpda
 	const [submitting, setSubmitting] = useState<boolean>(false);
 	const [openWalletSearch, setOpenWalletSearch] = useState<boolean>(false);
 
-	const [date, setDate] = useState<string>(transaction?.date || "");
+	const [date, setDate] = useState<string>(transaction?.date || new Date().toISOString().slice(0, 10));
 	const [wallet, setWallet] = useState<WalletResponseDTO | undefined>(transaction?.wallet);
 	const [category, setCategory] = useState<ExpenseCategory>(transaction?.category || "SALARY");
 	const [description, setDescription] = useState<string>(transaction?.description || "");

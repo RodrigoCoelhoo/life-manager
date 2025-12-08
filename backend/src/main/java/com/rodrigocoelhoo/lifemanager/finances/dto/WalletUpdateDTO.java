@@ -10,9 +10,6 @@ public record WalletUpdateDTO(
 
         @NotBlank(message = "Wallet type must be provided")
         @Size(max = 15, message = "Name cannot exceed 15 characters")
-        String type,
-
-        @NotBlank(message = "Wallet currency must be provided")
-        String currency
+        String type
 ) {
 }

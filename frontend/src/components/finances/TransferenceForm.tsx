@@ -24,7 +24,7 @@ export default function TransferenceForm({ transference, onClose, onCreate, onUp
 	const [openWalletSearch, setOpenWalletSearch] = useState<boolean>(false);
 	const [walletTarget, setWalletTarget] = useState<"from" | "to">("from");
 
-	const [date, setDate] = useState<string>(transference?.date || "");
+	const [date, setDate] = useState<string>(transference?.date || new Date().toISOString().slice(0, 10));
 	const [description, setDescription] = useState<string>(transference?.description || "");
 	const [fromWallet, setFromWallet] = useState<WalletSimpleResponseDTO | undefined>(transference?.fromWallet);
 	const [toWallet, setToWallet] = useState<WalletSimpleResponseDTO | undefined>(transference?.toWallet);

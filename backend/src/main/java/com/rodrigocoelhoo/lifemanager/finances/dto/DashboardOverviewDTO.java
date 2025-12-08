@@ -1,5 +1,6 @@
 package com.rodrigocoelhoo.lifemanager.finances.dto;
 
+import com.rodrigocoelhoo.lifemanager.finances.model.Currency;
 import com.rodrigocoelhoo.lifemanager.finances.model.ExpenseCategory;
 
 import java.math.BigDecimal;
@@ -9,14 +10,15 @@ import java.util.Map;
 
 public record DashboardOverviewDTO(
     YearMonth yearMonth,
-    BigDecimal totalIncome,
+    String totalIncome,
     List<CategorySummaryDTO> incomeCategories,
-    BigDecimal totalExpenses,
+    String totalExpenses,
     List<CategorySummaryDTO> expenseCategories,
-    BigDecimal netBalance
+    String netBalance
 ) {
     public static DashboardOverviewDTO fromEntities(
             YearMonth yearMonth,
+            Currency currency,
             BigDecimal totalIncome,
             Map<ExpenseCategory, BigDecimal> incomeCategories,
             BigDecimal totalExpenses,
@@ -25,29 +27,29 @@ public record DashboardOverviewDTO(
     ) {
         return new DashboardOverviewDTO(
                 yearMonth,
-                totalIncome,
+                currency.format(totalIncome),
                 incomeCategories.entrySet().stream()
                         .sorted((o1, o2) -> o2.getValue().compareTo(o1.getValue()))
-                        .map(CategorySummaryDTO::fromEntity)
+                        .map(entry -> CategorySummaryDTO.fromEntity(entry, currency))
                         .toList(),
-                totalExpenses,
+                currency.format(totalExpenses),
                 expenseCategories.entrySet().stream()
                         .sorted((o1, o2) -> o2.getValue().compareTo(o1.getValue()))
-                        .map(CategorySummaryDTO::fromEntity)
+                        .map(entry -> CategorySummaryDTO.fromEntity(entry, currency))
                         .toList(),
-                netBalance
+                currency.format(netBalance)
         );
     }
 
 
     public record CategorySummaryDTO(
             String category,
-            BigDecimal amount
+            String amount
     ) {
-        public static CategorySummaryDTO fromEntity(Map.Entry<ExpenseCategory, BigDecimal> model) {
+        public static CategorySummaryDTO fromEntity(Map.Entry<ExpenseCategory, BigDecimal> model, Currency currency) {
             return new CategorySummaryDTO(
                     model.getKey().toString(),
-                    model.getValue()
+                    currency.format(model.getValue())
             );
         }
     }

@@ -27,18 +27,15 @@ public class TransactionService {
     private final UserService userService;
     private final TransactionRepository transactionRepository;
     private final WalletService walletService;
-    private final WalletRepository walletRepository;
 
     public TransactionService(
             UserService userService,
             TransactionRepository transactionRepository,
-            WalletService walletService,
-            WalletRepository walletRepository
+            WalletService walletService
     ) {
         this.userService = userService;
         this.transactionRepository = transactionRepository;
         this.walletService = walletService;
-        this.walletRepository = walletRepository;
     }
 
     public Page<TransactionModel> getAllTransactions(
@@ -77,42 +74,6 @@ public class TransactionService {
         }
     }
 
-    private void adjustWalletBalance(
-            WalletModel wallet,
-            BigDecimal oldAmount,
-            ExpenseType oldType,
-            BigDecimal newAmount,
-            ExpenseType newType
-    ) {
-        if(oldType != null && oldType.equals(newType) && oldAmount.compareTo(newAmount) == 0) return;
-
-        BigDecimal currentAmount = wallet.getBalance();
-
-        BigDecimal revertedAmount;
-        if(oldType != null) {
-            revertedAmount = oldType.equals(ExpenseType.EXPENSE) ?
-                    currentAmount.add(oldAmount):
-                    currentAmount.subtract(oldAmount);
-        } else {
-            revertedAmount = currentAmount;
-        }
-
-        BigDecimal balance;
-        if(newType != null) {
-            balance = newType.equals(ExpenseType.EXPENSE) ?
-                    revertedAmount.subtract(newAmount):
-                    revertedAmount.add(newAmount);
-        } else {
-            balance = revertedAmount;
-        }
-
-        if(balance.compareTo(BigDecimal.ZERO) < 0)
-            throw new BadRequestException("Wallet ID '" + wallet.getId() + "' doesn't have enough balance to complete the transaction.");
-
-        wallet.setBalance(balance);
-        walletRepository.save(wallet);
-    }
-
     @Transactional
     public TransactionModel createTransaction(
             @Valid TransactionDTO data
@@ -120,7 +81,13 @@ public class TransactionService {
         ExpenseCategory category = validateCategory(data.category());
         WalletModel wallet = walletService.getWallet(data.walletId());
 
-        adjustWalletBalance(wallet, BigDecimal.ZERO, null, data.amount(), category.getType());
+        BigDecimal newBalance = wallet.getBalance().add(
+                ExpenseType.normalize(category.getType(), data.amount())
+        );
+        if (newBalance.compareTo(BigDecimal.ZERO) < 0) {
+            throw new BadRequestException("Wallet ID '" + wallet.getId() + "' doesn't have enough balance.");
+        }
+        wallet.setBalance(newBalance);
 
         TransactionModel transaction = TransactionModel.builder()
                 .user(userService.getLoggedInUser())
@@ -130,6 +97,7 @@ public class TransactionService {
                 .description(data.description())
                 .date(data.date())
                 .category(category)
+                .currency(wallet.getCurrency())
                 .build();
 
         return transactionRepository.save(transaction);
@@ -141,18 +109,67 @@ public class TransactionService {
             @Valid TransactionDTO data
     ) {
         ExpenseCategory newCategory = validateCategory(data.category());
-        WalletModel wallet = walletService.getWallet(data.walletId());
+
+        WalletModel newWallet = walletService.getWallet(data.walletId());
         TransactionModel transaction = getTransaction(id);
+        WalletModel currentWallet = transaction.getWallet();
 
-        adjustWalletBalance(wallet, transaction.getAmount(), transaction.getType(), data.amount(), newCategory.getType());
+        adjustWalletBalance(currentWallet, newWallet, newCategory.getType(), data.amount(), transaction);
 
+        transaction.setWallet(newWallet);
         transaction.setAmount(data.amount());
         transaction.setDate(data.date());
         transaction.setDescription(data.description());
         transaction.setCategory(newCategory);
         transaction.setType(newCategory.getType());
+        transaction.setCurrency(newWallet.getCurrency());
 
         return transactionRepository.save(transaction);
+    }
+
+    private void adjustWalletBalance(
+            WalletModel currentWallet,
+            WalletModel newWallet,
+            ExpenseType newType,
+            BigDecimal newAmount,
+            TransactionModel transaction
+    ) {
+        if (currentWallet.getId().equals(newWallet.getId()) &&
+                transaction.getType().equals(newType) &&
+                transaction.getAmount().compareTo(newAmount) == 0) {
+            return;
+        }
+
+        BigDecimal currentAmount = transaction.getAmount();
+        ExpenseType currentType = transaction.getType();
+        BigDecimal oldDelta = ExpenseType.normalize(currentType, currentAmount);
+        BigDecimal newDelta = ExpenseType.normalize(newType, newAmount);
+
+        BigDecimal oldBalance = currentWallet.getBalance().subtract(oldDelta);
+
+        // SAME WALLET
+        if (currentWallet.getId().equals(newWallet.getId())) {
+            BigDecimal updated = oldBalance.add(newDelta);
+
+            if (updated.compareTo(BigDecimal.ZERO) < 0) {
+                throw new BadRequestException("Wallet ID '" + currentWallet.getId() + "' doesn't have enough balance.");
+            }
+
+            currentWallet.setBalance(updated);
+            return;
+        }
+
+        // DIFFERENT WALLETS
+        if (oldBalance.compareTo(BigDecimal.ZERO) < 0) {
+            throw new BadRequestException("Wallet ID '" + currentWallet.getId() + "' doesn't have enough balance.");
+        }
+        currentWallet.setBalance(oldBalance);
+
+        BigDecimal newBalance = newWallet.getBalance().add(newDelta);
+        if (newBalance.compareTo(BigDecimal.ZERO) < 0) {
+            throw new BadRequestException("Wallet ID '" + newWallet.getId() + "' doesn't have enough balance.");
+        }
+        newWallet.setBalance(newBalance);
     }
 
     @Transactional
@@ -160,7 +177,15 @@ public class TransactionService {
         TransactionModel transaction = getTransaction(id);
         WalletModel wallet = transaction.getWallet();
 
-        adjustWalletBalance(wallet, transaction.getAmount(), transaction.getType(), BigDecimal.ZERO, null);
+        BigDecimal currentAmount = transaction.getAmount();
+        ExpenseType currentType = transaction.getType();
+        BigDecimal delta = ExpenseType.normalize(currentType, currentAmount);
+
+        BigDecimal newBalance = wallet.getBalance().subtract(delta);
+        if (newBalance.compareTo(BigDecimal.ZERO) < 0) {
+            throw new BadRequestException("Cannot delete this transaction because it produces a negative balance.");
+        }
+        wallet.setBalance(newBalance);
 
         transactionRepository.delete(transaction);
     }

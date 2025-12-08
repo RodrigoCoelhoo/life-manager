@@ -1,5 +1,7 @@
-import { createContext, useContext, useState, type ReactNode, useEffect } from "react";
+import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import { jwtDecode } from "jwt-decode";
+import { registerLogout, setAccessToken as setApiToken } from "../services/api";
+import toast from "react-hot-toast";
 
 interface TokenPayload {
 	sub: string; // username
@@ -10,41 +12,64 @@ interface TokenPayload {
 interface AuthContextType {
 	isLoggedIn: boolean;
 	username: string | null;
-	login: (token: string) => void;
+	setAccessToken: (token: string) => void;
 	logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-	const [token, setToken] = useState<string | null>(() => localStorage.getItem("token"));
 	const [username, setUsername] = useState<string | null>(null);
 
 	useEffect(() => {
+		const token = localStorage.getItem('accessToken');
 		if (token) {
 			try {
 				const decoded = jwtDecode<TokenPayload>(token);
 				setUsername(decoded.sub);
+				setApiToken(token);
 			} catch {
-				setUsername(null);
+				setUsername("Error");
+			}
+		}
+	}, []);
+
+	const handleSetAccessToken = (token: string) => {
+		if (token) {
+			localStorage.setItem('accessToken', token);
+			setApiToken(token);
+			try {
+				const decoded = jwtDecode<TokenPayload>(token);
+				setUsername(decoded.sub);
+			} catch {
+				setUsername("Error");
 			}
 		} else {
+			localStorage.removeItem('accessToken');
+			setApiToken('');
 			setUsername(null);
 		}
-	}, [token]);
-
-	const login = (newToken: string) => {
-		localStorage.setItem("token", newToken);
-		setToken(newToken);
 	};
 
 	const logout = () => {
-		localStorage.removeItem("token");
-		setToken(null);
+		handleSetAccessToken('');
+		toast.error("Session Expired! Please sign in again.");
+		setTimeout(() => {
+			window.location.href = "/login";
+		}, 1500);
 	};
 
+	useEffect(() => {
+		registerLogout(logout);
+	}, [logout]);
+
 	return (
-		<AuthContext.Provider value={{ isLoggedIn: !!token, username, login, logout }}>
+		<AuthContext.Provider value={{
+			isLoggedIn: !!localStorage.getItem("accessToken"),
+			username,
+			setAccessToken: handleSetAccessToken,
+			logout,
+		}}>
 			{children}
 		</AuthContext.Provider>
 	);

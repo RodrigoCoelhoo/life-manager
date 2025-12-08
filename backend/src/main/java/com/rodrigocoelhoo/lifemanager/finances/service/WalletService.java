@@ -93,15 +93,9 @@ public class WalletService {
         WalletModel wallet = getWallet(id);
 
         WalletType type = validateWalletType(data.type());
-        Currency currency = validateWalletCurrency(data.currency());
-        BigDecimal balance = wallet.getCurrency().equals(currency) ?
-                wallet.getBalance() :
-                wallet.getCurrency().convertTo(wallet.getBalance(), currency);
 
         wallet.setName(data.name());
         wallet.setType(type);
-        wallet.setBalance(balance);
-        wallet.setCurrency(currency);
 
         return walletRepository.save(wallet);
     }
