@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { ExpenseCategory, ExpenseCategoryType } from "../../services/finances/transaction/transaction.dto";
 
-interface CurrencySelectProps {
+interface CategorySelectProps {
 	value: ExpenseCategory;
 	onChange: (value: ExpenseCategory) => void;
 }
 
-export default function CurrencySelect({ value, onChange }: CurrencySelectProps) {
+export default function CategorySelect({ value, onChange }: CategorySelectProps) {
 	const [open, setOpen] = useState(false);
 
 	const toggle = () => setOpen((o) => !o);

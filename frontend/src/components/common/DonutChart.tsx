@@ -10,7 +10,6 @@ interface DonutChartProps {
 export default function DonutChart({ categories = [] }: DonutChartProps) {
 	const [activeIndex, setActiveIndex] = useState<number | null>(null);
 
-	// Parse data
 	const data = categories.map((e) => {
 		const cleaned = e.amount
 			.replace(/[^\d.-]/g, "")

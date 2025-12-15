@@ -12,6 +12,10 @@ public record AutomaticTransactionDTO(
         @NotNull(message = "Wallet ID is required")
         Long walletId,
 
+        @NotBlank(message = "Name cannot be blank")
+        @Size(max = 50, message = "Name cannot exceed 50 characters")
+        String name,
+
         @NotNull(message = "Amount is required")
         @Positive(message = "Amount must be greater than zero")
         BigDecimal amount,

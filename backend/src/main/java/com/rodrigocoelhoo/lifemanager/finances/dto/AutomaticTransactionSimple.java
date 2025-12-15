@@ -5,32 +5,26 @@ import com.rodrigocoelhoo.lifemanager.finances.model.AutomaticTransactionModel;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-public record AutomaticTransactionResponseDTO(
-    Long id,
-    String walletName,
-    String name,
-    BigDecimal amount,
-    String category,
-    String type,
-    String recurrence,
-    short interval,
-    String description,
-    LocalDate nextTransactionDate
+public record AutomaticTransactionSimple(
+        Long id,
+        String walletName,
+        String name,
+        BigDecimal amount,
+        String category,
+        String type,
+        LocalDate nextTransactionDate
 
 ) {
-    public static AutomaticTransactionResponseDTO fromEntity(
+    public static AutomaticTransactionSimple fromEntity(
             AutomaticTransactionModel model
     ) {
-        return new AutomaticTransactionResponseDTO(
+        return new AutomaticTransactionSimple(
                 model.getId(),
                 model.getWallet().getName(),
                 model.getName(),
                 model.getAmount(),
                 model.getCategory().toString(),
                 model.getType().toString(),
-                model.getRecurrence().toString(),
-                model.getInterval(),
-                model.getDescription(),
                 model.getNextTransactionDate()
         );
     }

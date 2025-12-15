@@ -29,14 +29,14 @@ export const CategoryColors: Record<ExpenseCategory, string> = {
 	SELL_INVESTMENT: "#2dffff",
 	PASSIVE_INCOME: "#ceffff",
 
-	HOUSING: "#6f5dc1",        // azul frio forte
-	FOOD: "#b38dd6",           // ciano frio vibrante
-	HEALTH: "#9b89d3",         // roxo frio intenso
-	ENTERTAINMENT: "#a855f7",  // turquesa frio
-	TRANSPORTATION: "#c4b7e5", // azul profundo frio
-	EDUCATION: "#b36cc4",      // índigo frio
-	BUY_INVESTMENT: "#A599F0", // azul piscina frio
-	OTHER: "#ffffff"           // cinza frio
+	HOUSING: "#6f5dc1",        
+	FOOD: "#b38dd6",           
+	HEALTH: "#9b89d3",         
+	ENTERTAINMENT: "#a855f7",  
+	TRANSPORTATION: "#c4b7e5", 
+	EDUCATION: "#b36cc4",      
+	BUY_INVESTMENT: "#A599F0", 
+	OTHER: "#ffffff"           
 };
 
 export const ExpenseCategoryType: Record<ExpenseCategory, ExpenseType> = {

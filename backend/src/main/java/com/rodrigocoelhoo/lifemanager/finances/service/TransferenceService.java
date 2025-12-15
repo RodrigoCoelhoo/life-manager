@@ -16,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -53,7 +54,19 @@ public class TransferenceService {
                 .orElseThrow(() -> new ResourceNotFound("Transference with ID '"+ id + "' doesn't belong to the current user"));
     }
 
-    private void revertWalletBalance(WalletModel fromWallet, WalletModel toWallet, BigDecimal amount) {
+    public List<TransferenceModel> get5RecentTransferences(
+            LocalDate start,
+            LocalDate end
+    ) {
+        UserModel user = userService.getLoggedInUser();
+        return transferenceRepository.findTop5ByUserAndDateBetweenOrderByDateDescIdDesc(user, start, end);
+    }
+
+    private void revertWalletBalance(
+            WalletModel fromWallet,
+            WalletModel toWallet,
+            BigDecimal amount
+    ) {
         Currency fromWalletCurrency = fromWallet.getCurrency();
         Currency toWalletCurrency = toWallet.getCurrency();
 
@@ -70,7 +83,11 @@ public class TransferenceService {
         }
     }
 
-    private void adjustWalletBalance(WalletModel fromWallet, WalletModel toWallet, BigDecimal amount) {
+    private void adjustWalletBalance(
+            WalletModel fromWallet,
+            WalletModel toWallet,
+            BigDecimal amount
+    ) {
         Currency fromWalletCurrency = fromWallet.getCurrency();
         Currency toWalletCurrency = toWallet.getCurrency();
 

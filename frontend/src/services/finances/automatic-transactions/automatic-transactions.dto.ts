@@ -2,6 +2,7 @@ import type { ExpenseCategory, ExpenseType } from "../transaction/transaction.dt
 
 export interface AutomaticTransactionDTO {
 	walletId: number;
+	name: string;
 	amount: string;
 	category: ExpenseCategory;
 	recurrence: string;
@@ -13,6 +14,7 @@ export interface AutomaticTransactionDTO {
 export interface AutomaticTransactionResponseDTO {
 	id: number;
 	walletName: string;
+	name: string;
 	amount: string;
 	category: ExpenseCategory;
 	type: ExpenseType;
@@ -21,3 +23,12 @@ export interface AutomaticTransactionResponseDTO {
 	description: string;
 	nextTransactionDate: string;
 };
+
+export interface AutomaticTransactionSimple {
+	id: number;
+	walletName: string;
+	name: string;
+	amount: string;
+	category: ExpenseCategory;
+	type: ExpenseType;
+}

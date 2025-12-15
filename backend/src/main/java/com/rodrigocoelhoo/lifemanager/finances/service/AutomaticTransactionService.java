@@ -81,6 +81,7 @@ public class AutomaticTransactionService {
         AutomaticTransactionModel automaticTransaction = AutomaticTransactionModel.builder()
                 .user(user)
                 .wallet(wallet)
+                .name(data.name())
                 .amount(data.amount())
                 .category(category)
                 .type(category.getType())
@@ -105,6 +106,7 @@ public class AutomaticTransactionService {
         WalletModel wallet = walletService.getWallet(data.walletId());
 
         automaticTransaction.setWallet(wallet);
+        automaticTransaction.setName(data.name());
         automaticTransaction.setAmount(data.amount());
         automaticTransaction.setCategory(category);
         automaticTransaction.setType(category.getType());

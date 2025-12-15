@@ -54,7 +54,6 @@ export default function WalletCard({ onUpdate, onDelete, ...wallet }: WalletCard
 						</div>
 					</div>
 				</div>
-
 			</div>
 
 			<Modal isOpen={isOpen} onClose={() => setIsOpen(false)}>

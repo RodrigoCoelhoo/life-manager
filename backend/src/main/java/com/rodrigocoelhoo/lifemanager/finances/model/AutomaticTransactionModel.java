@@ -2,6 +2,7 @@ package com.rodrigocoelhoo.lifemanager.finances.model;
 
 import com.rodrigocoelhoo.lifemanager.users.UserModel;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
 import lombok.*;
 
@@ -29,6 +30,10 @@ public class AutomaticTransactionModel {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "wallet_id")
     private WalletModel wallet;
+
+    @NotBlank
+    @Column(length = 50, nullable = false)
+    private String name;
 
     @Positive
     @Column(precision = 18, scale = 2, nullable = false)

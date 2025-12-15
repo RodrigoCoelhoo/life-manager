@@ -100,7 +100,7 @@ export default function TransactionForm({ wallet, onClose, onCreate, onUpdate, o
 
 					<div className="flex flex-col">
 						<label htmlFor="date" className="text-sm mb-1">
-							Category
+							Currency
 						</label>
 						<CurrencySelect value={currency} onChange={setCurrency} disabled={!!wallet}/>
 					</div>

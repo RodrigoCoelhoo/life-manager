@@ -13,5 +13,5 @@ import java.util.Optional;
 public interface TransactionRepository extends JpaRepository<TransactionModel, Long> {
     Page<TransactionModel> findAllByUser(UserModel user, Pageable pageable);
     Optional<TransactionModel> findByUserAndId(UserModel user, Long id);
-    List<TransactionModel> findAllByUserAndDateBetween(UserModel user, LocalDate start, LocalDate end);
+    List<TransactionModel> findAllByUserAndDateBetweenOrderByDateDescIdDesc(UserModel user, LocalDate start, LocalDate end);
 }

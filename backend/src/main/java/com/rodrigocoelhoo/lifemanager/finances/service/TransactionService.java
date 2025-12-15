@@ -50,7 +50,7 @@ public class TransactionService {
             LocalDate end
     ) {
         UserModel user = userService.getLoggedInUser();
-        return transactionRepository.findAllByUserAndDateBetween(user, start, end);
+        return transactionRepository.findAllByUserAndDateBetweenOrderByDateDescIdDesc(user, start, end);
     }
 
     public TransactionModel getTransaction(

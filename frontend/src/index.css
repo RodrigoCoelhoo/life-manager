@@ -34,7 +34,7 @@
   }
 }
 
-input[type="date"], [type="time"] {
+input[type="date"], [type="time"], [type="month"] {
   color-scheme: dark;
 }
 

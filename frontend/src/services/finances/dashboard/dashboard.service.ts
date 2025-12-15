@@ -1,13 +1,13 @@
 import { api } from '../../api';
-import type { DashboardOverviewDTO } from './dashboard.dto';
+import type { MonthOverviewDTO } from './dashboard.dto';
 
 const BASE_URL = '/dashboard';
 
 export const dashboardService = {
 
-	getMonthOverview: async (yearMonth: string): Promise<DashboardOverviewDTO> => {
+	getMonthOverview: async (yearMonth: string, currency: string): Promise<MonthOverviewDTO> => {
 		try {
-			const { data } = await api.get(`${BASE_URL}/month-overview/${yearMonth}/EUR`);
+			const { data } = await api.get(`${BASE_URL}/month-overview/${yearMonth}/${currency}`);
 			return data;
 		} catch(error) {
 			console.error('Failed to fetch monthly finances overview:', error);

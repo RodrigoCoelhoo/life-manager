@@ -51,6 +51,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 		}
 	};
 
+	// Logout deve ser instantanio e sem toast, o toast e timeout devem ser colocados onde o logout de token expirado é usado
 	const logout = () => {
 		handleSetAccessToken('');
 		toast.error("Session Expired! Please sign in again.");

@@ -1,6 +1,6 @@
 package com.rodrigocoelhoo.lifemanager.finances.controller;
 
-import com.rodrigocoelhoo.lifemanager.finances.dto.DashboardOverviewDTO;
+import com.rodrigocoelhoo.lifemanager.finances.dto.MonthOverviewDTO;
 import com.rodrigocoelhoo.lifemanager.finances.model.Currency;
 import com.rodrigocoelhoo.lifemanager.finances.service.DashboardService;
 import jakarta.validation.Valid;
@@ -19,7 +19,7 @@ public class DashboardController {
     }
 
     @GetMapping("/month-overview/{yearMonth}/{currency}")
-    public ResponseEntity<DashboardOverviewDTO> getMonthOverview(
+    public ResponseEntity<MonthOverviewDTO> getMonthOverview(
             @PathVariable YearMonth yearMonth,
             @PathVariable @Valid Currency currency
             ) {

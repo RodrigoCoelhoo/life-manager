@@ -22,7 +22,7 @@ export default function CurrencySelect({ value, onChange, disabled }: CurrencySe
 				type="button"
 				value={value}
 				onClick={toggle}
-				className={`w-full flex items-center justify-between transition p-2 ${disabled ? "cursor-not-allowed" : "cursor-pointer"}`}
+				className={`w-full flex items-center gap-2 justify-between transition p-2 ${disabled ? "cursor-not-allowed" : "cursor-pointer"}`}
 				disabled={disabled}
 			>
 				<div className="flex gap-2 items-center">
