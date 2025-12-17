@@ -8,10 +8,11 @@ interface DateTimeFieldProps {
 	placeholder?: string;
 	rules?: Rule[];
 	disabled?: boolean;
+	minToday?: boolean;
 }
 
 export const DateTimeField = forwardRef(
-	({ value, onChange, type, placeholder, rules = [], disabled }: DateTimeFieldProps, ref) => {
+	({ value, onChange, type, placeholder, rules = [], disabled, minToday }: DateTimeFieldProps, ref) => {
 		const [error, setError] = useState<string | null>(null);
 
 		const validate = () => {
@@ -44,6 +45,8 @@ export const DateTimeField = forwardRef(
 			setError(null);
 		};
 
+		const today = new Date().toISOString().split("T")[0];
+
 		return (
 			<div className="flex flex-col w-full">
 				<input
@@ -51,6 +54,7 @@ export const DateTimeField = forwardRef(
 					value={value}
 					placeholder={placeholder}
 					onChange={handleChange}
+					min={type === "date" && minToday ? today : undefined}
 					className={`form-input w-full ${error ? "border-red-500" : ""} ${disabled ? "cursor-not-allowed" : "cursor-pointer"}`}
 					disabled={disabled}
 				/>

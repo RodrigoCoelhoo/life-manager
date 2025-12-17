@@ -8,7 +8,6 @@ public enum TransactionRecurrence {
     MONTHLY,
     YEARLY;
 
-
     public static EnumSet<TransactionRecurrence> all() {
         return EnumSet.allOf(TransactionRecurrence.class);
     }

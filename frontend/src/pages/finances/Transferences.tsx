@@ -35,7 +35,7 @@ export default function Transferences() {
 			setTotalElements(Number(data.totalElements));
 		} catch (err) {
 			console.error(err);
-			setError("Failed to fetch exercises");
+			setError("Failed to fetch transferences");
 		} finally {
 			setLoading(false);
 		}

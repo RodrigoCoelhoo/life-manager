@@ -9,7 +9,7 @@ public record AutomaticTransactionSimple(
         Long id,
         String walletName,
         String name,
-        BigDecimal amount,
+        String amount,
         String category,
         String type,
         LocalDate nextTransactionDate
@@ -22,7 +22,7 @@ public record AutomaticTransactionSimple(
                 model.getId(),
                 model.getWallet().getName(),
                 model.getName(),
-                model.getAmount(),
+                model.getWallet().getCurrency().format(model.getAmount()),
                 model.getCategory().toString(),
                 model.getType().toString(),
                 model.getNextTransactionDate()

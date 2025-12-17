@@ -143,14 +143,14 @@ export default function TransactionForm({ transaction, onClose, onCreate, onUpda
 
 					<div className="flex flex-row gap-2">
 
-						<div className="flex flex-col w-2/3">
+						<div className="flex flex-col w-3/5">
 							<label htmlFor="date" className="text-sm mb-1">
 								Category
 							</label>
 							<CategorySelect value={category} onChange={setCategory} />
 						</div>
 
-						<div className="flex flex-col w-1/3">
+						<div className="flex flex-col w-2/5">
 							<label htmlFor="date" className="text-sm mb-1">
 								Amount
 							</label>
@@ -188,7 +188,6 @@ export default function TransactionForm({ transaction, onClose, onCreate, onUpda
 					</div>
 				}
 			</div>
-
 
 			<Modal isOpen={openWalletSearch} onClose={() => setOpenWalletSearch(false)}>
 				<SearchList<WalletResponseDTO>

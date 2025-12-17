@@ -23,6 +23,7 @@ import Exercises from '../pages/training/Exercises';
 import TrainingPlans from '../pages/training/TrainingPlans';
 import TrainingSessions from '../pages/training/TrainingSessions';
 import Profile from '../pages/Profile';
+import Bills from '../pages/finances/Bills';
 
 const router = createBrowserRouter(
 	createRoutesFromElements(
@@ -41,6 +42,7 @@ const router = createBrowserRouter(
 				<Route path="/wallets" element={<Wallets />} />
 				<Route path="/transactions" element={<Transactions />} />
 				<Route path="/transferences" element={<Transferences />} />
+				<Route path='/bills' element={<Bills />} />
 				
 				<Route path="/ingredients" element={<Ingredients />} />
 				<Route path="/recipes" element={<Recipes />} />

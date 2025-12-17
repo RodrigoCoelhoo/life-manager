@@ -1,18 +1,18 @@
 package com.rodrigocoelhoo.lifemanager.finances.dto;
 
 import com.rodrigocoelhoo.lifemanager.finances.model.AutomaticTransactionModel;
+import com.rodrigocoelhoo.lifemanager.finances.model.TransactionRecurrence;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 
 public record AutomaticTransactionResponseDTO(
     Long id,
-    String walletName,
+    WalletSimpleResponseDTO wallet,
     String name,
-    BigDecimal amount,
+    String amount,
     String category,
     String type,
-    String recurrence,
+    TransactionRecurrence recurrence,
     short interval,
     String description,
     LocalDate nextTransactionDate
@@ -23,12 +23,12 @@ public record AutomaticTransactionResponseDTO(
     ) {
         return new AutomaticTransactionResponseDTO(
                 model.getId(),
-                model.getWallet().getName(),
+                WalletSimpleResponseDTO.fromEntity(model.getWallet()),
                 model.getName(),
-                model.getAmount(),
+                model.getWallet().getCurrency().format(model.getAmount()),
                 model.getCategory().toString(),
                 model.getType().toString(),
-                model.getRecurrence().toString(),
+                model.getRecurrence(),
                 model.getInterval(),
                 model.getDescription(),
                 model.getNextTransactionDate()

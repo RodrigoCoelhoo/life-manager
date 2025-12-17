@@ -1,4 +1,5 @@
 import type { ExpenseCategory, ExpenseType } from "../transaction/transaction.dto";
+import type { WalletSimpleResponseDTO } from "../wallet/wallet.dto";
 
 export interface AutomaticTransactionDTO {
 	walletId: number;
@@ -13,12 +14,12 @@ export interface AutomaticTransactionDTO {
 
 export interface AutomaticTransactionResponseDTO {
 	id: number;
-	walletName: string;
+	wallet: WalletSimpleResponseDTO;
 	name: string;
 	amount: string;
 	category: ExpenseCategory;
 	type: ExpenseType;
-	recurrence: string;
+	recurrence: TransactionRecurrence;
 	interval: number;
 	description: string;
 	nextTransactionDate: string;
@@ -31,4 +32,13 @@ export interface AutomaticTransactionSimple {
 	amount: string;
 	category: ExpenseCategory;
 	type: ExpenseType;
+	nextTransactionDate: string;
 }
+
+export const TransactionRecurrence = {
+	DAILY: "DAILY",
+	WEEKLY: "WEEKLY",
+	MONTHLY: "MONTHLY",
+	YEARLY: "YEARLY"
+} as const;
+export type TransactionRecurrence = keyof typeof TransactionRecurrence;

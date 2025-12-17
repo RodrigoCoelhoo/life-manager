@@ -4,11 +4,19 @@ import type { AutomaticTransactionDTO, AutomaticTransactionResponseDTO } from '.
 
 const BASE_URL = '/automatic-transactions';
 
-export const transactionService = {
+export const automaticTransactionService = {
 
-	getAllAutomaticTransactions: async (): Promise<PageResponseDTO<AutomaticTransactionResponseDTO>> => {
+	getAutomaticTransactions: async (
+		page: number,
+		size: number
+	): Promise<PageResponseDTO<AutomaticTransactionResponseDTO>> => {
 		try {
-			const { data } = await api.get<PageResponseDTO<AutomaticTransactionResponseDTO>>(BASE_URL);
+			const params = new URLSearchParams({
+				page: page.toString(),
+				size: size.toString(),
+			});
+
+			const { data } = await api.get<PageResponseDTO<AutomaticTransactionResponseDTO>>(`${BASE_URL}?${params.toString()}`);
 			return data;
 		} catch (error) {
 			console.error('Failed to fetch automatic transactions:', error);
@@ -48,4 +56,15 @@ export const transactionService = {
 			throw new Error(`Unable to delete automatic transaction with id ${id}:. Please try again.`);
 		}
 	},
+
+	triggerAutomaticTransaction: async (id: number): Promise<void> => {
+		try {
+			await api.post(`${BASE_URL}/${id}/trigger`);
+		} catch (error) {
+			console.error(`Failed to trigger automatic transaction with id ${id}:`, error);
+			throw new Error(
+				`Unable to trigger automatic transaction with id ${id}. Please try again.`
+			);
+		}
+	}
 }

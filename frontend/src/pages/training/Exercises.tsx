@@ -8,6 +8,7 @@ import ErrorMessage from "../../components/common/Error";
 import { Modal } from "../../components/common/Modal";
 import ExerciseForm from "../../components/training/ExerciseForm";
 import { Pagination } from "../../components/common/Pagination";
+import toast from "react-hot-toast";
 
 export default function Exercises() {
 	const [exercises, setExercises] = useState<ExerciseResponseDTO[]>([]);
@@ -55,7 +56,7 @@ export default function Exercises() {
 			setTotalElements(prev => prev + 1);
 		} catch (err) {
 			console.error(err);
-			setError("Failed to create exercise");
+			toast.error("Failed to create exercise");
 		} finally {
 			setLoading(false);
 		}
@@ -67,7 +68,7 @@ export default function Exercises() {
 			const updated = await exerciseService.updateExercise(id, updatedData);
 			setExercises(prev => prev.map(e => (e.id === id ? updated : e)));
 		} catch (err) {
-			setError("Failed to update exercise");
+			toast.error("Failed to update exercise");
 		} finally {
 			setLoading(false);
 		}
@@ -80,7 +81,7 @@ export default function Exercises() {
 			fetchExercises();
 			setTotalElements(prev => prev - 1);
 		} catch (err) {
-			setError("Failed to delete exercise");
+			toast.error("Failed to delete exercise");
 		} finally {
 			setLoading(false);
 		}

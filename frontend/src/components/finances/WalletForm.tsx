@@ -15,7 +15,7 @@ interface WalletFormProps {
 	onDelete?: (id: number) => Promise<void>;
 }
 
-export default function TransactionForm({ wallet, onClose, onCreate, onUpdate, onDelete }: WalletFormProps) {
+export default function WalletForm({ wallet, onClose, onCreate, onUpdate, onDelete }: WalletFormProps) {
 	const [submitting, setSubmitting] = useState<boolean>(false);
 
 	const [name, setName] = useState<string>(wallet?.name || "");

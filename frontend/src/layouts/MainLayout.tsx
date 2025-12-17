@@ -6,12 +6,12 @@ const MainLayout = () => {
 	return (
 		<div className="flex flex-col h-screen bg-background scrollbar-custom ">
 
-			<div className="lg:hidden">
+			<div className="xl:hidden">
 				<MobileHeader />
 			</div>
 
-			<div className="flex flex-1 overflow-hidden flex-col lg:flex-row">
-				<div className="hidden lg:block">
+			<div className="flex flex-1 overflow-hidden flex-col xl:flex-row">
+				<div className="hidden xl:block">
 					<Sidebar />
 				</div>
 

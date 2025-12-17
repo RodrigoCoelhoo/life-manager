@@ -8,8 +8,9 @@ import type { WalletDTO, WalletResponseDTO, WalletUpdateDTO } from "../../servic
 import { walletService } from "../../services/finances/wallet/wallet.service";
 import WalletCard from "../../components/finances/WalletCard";
 import WalletForm from "../../components/finances/WalletForm";
+import toast from "react-hot-toast";
 
-export default function Exercises() {
+export default function Wallets() {
 	const [wallets, setWallets] = useState<WalletResponseDTO[]>([]);
 	const [loading, setLoading] = useState<boolean>(true);
 	const [error, setError] = useState<string | null>(null);
@@ -32,7 +33,7 @@ export default function Exercises() {
 			setTotalElements(Number(data.totalElements));
 		} catch (err) {
 			console.error(err);
-			setError("Failed to fetch wallets");
+			toast.error("Failed to fetch wallets");
 		} finally {
 			setLoading(false);
 		}
@@ -55,7 +56,7 @@ export default function Exercises() {
 			setTotalElements(prev => prev + 1);
 		} catch (err) {
 			console.error(err);
-			setError("Failed to create wallet");
+			toast.error("Failed to create wallet");
 		} finally {
 			setLoading(false);
 		}
@@ -67,7 +68,7 @@ export default function Exercises() {
 			const updated = await walletService.updateWallet(id, updatedData);
 			setWallets(prev => prev.map(e => (e.id === id ? updated : e)));
 		} catch (err) {
-			setError("Failed to update wallet");
+			toast.error("Failed to update wallet");
 		} finally {
 			setLoading(false);
 		}
@@ -80,7 +81,7 @@ export default function Exercises() {
 			fetchWallets();
 			setTotalElements(prev => prev - 1);
 		} catch (err) {
-			setError("Failed to delete wallet");
+			toast.error("Failed to delete wallet");
 		} finally {
 			setLoading(false);
 		}

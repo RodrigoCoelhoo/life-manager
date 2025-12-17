@@ -12,6 +12,7 @@ import TransactionCard from "../../components/finances/TransactionCard";
 import { useMediaQuery } from "../../hooks/useMediaQuery";
 import TransferenceCard from "../../components/finances/TransferenceCard";
 import NetBalanceLineChart, { type TimeSeriesPoint } from "../../components/finances/NetBalanceLineChart";
+import BillDashboardCard from "../../components/finances/BillDashboardCard";
 
 export default function Dashboard() {
 	const [dashboardData, setDashboardData] = useState<MonthOverviewDTO>();
@@ -237,7 +238,7 @@ export default function Dashboard() {
 							{dashboardData?.automaticTransactions.length ?? 0 > 0 ? (
 								<div className="flex flex-col gap-3">
 									{dashboardData?.automaticTransactions.map((item) => (
-										<div></div>
+										<BillDashboardCard key={item.id} bill={item}/>
 									))}
 								</div>
 							) : (

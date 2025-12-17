@@ -21,15 +21,18 @@ public class DashboardService {
     private final TransactionService transactionService;
     private final WalletService walletService;
     private final TransferenceService transferenceService;
+    private final AutomaticTransactionService automaticTransactionService;
 
     public DashboardService(
             TransactionService transactionService,
             WalletService walletService,
-            TransferenceService transferenceService
+            TransferenceService transferenceService,
+            AutomaticTransactionService automaticTransactionService
     ) {
         this.transactionService = transactionService;
         this.walletService = walletService;
         this.transferenceService = transferenceService;
+        this.automaticTransactionService = automaticTransactionService;
     }
 
     public MonthOverviewDTO getMonthOverview(YearMonth yearMonth, Currency currency) {
@@ -79,7 +82,7 @@ public class DashboardService {
             Pageable pageable = PageRequest.of(0, 5, Sort.by("balance").descending());
             wallets = walletService.getWallets(pageable, "").stream().toList();
 
-            // Automatic transactions
+            automaticTransactions = automaticTransactionService.get5NextAutomaticTransaction();
 
             // NetBalance
             List<TransactionModel> pastMonthTransactions = transactionService.getTransactionsByRange(

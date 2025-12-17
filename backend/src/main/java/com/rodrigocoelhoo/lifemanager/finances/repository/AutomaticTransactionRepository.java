@@ -15,5 +15,6 @@ import java.util.Optional;
 public interface AutomaticTransactionRepository extends JpaRepository<AutomaticTransactionModel, Long> {
     Page<AutomaticTransactionModel> findAllByUser(UserModel user, Pageable pageable);
     Optional<AutomaticTransactionModel> findByUserAndId(UserModel user, Long id);
-    List<AutomaticTransactionModel> findByNextTransactionDate(LocalDate nextTransactionDate);
+    List<AutomaticTransactionModel> findByNextTransactionDateLessThanEqual(LocalDate nextTransactionDate);
+    List<AutomaticTransactionModel> findTop5ByUserOrderByNextTransactionDateAscIdDesc(UserModel user);
 }

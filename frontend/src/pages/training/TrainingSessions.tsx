@@ -8,6 +8,7 @@ import { Pagination } from '../../components/common/Pagination';
 import TrainingSessionCard from '../../components/training/TrainingSessionCard';
 import { Modal } from '../../components/common/Modal';
 import { TrainingSessionForm } from '../../components/training/TrainingSessionForm';
+import toast from 'react-hot-toast';
 
 export default function TrainingSessions() {
 	const [trainingSessions, setTrainingSessions] = useState<TrainingSessionResponseDTO[]>([]);
@@ -54,7 +55,7 @@ export default function TrainingSessions() {
 			setTotalElements(prev => prev + 1);
 		} catch (err) {
 			console.error(err);
-			setError("Failed to create training session");
+			toast.error("Failed to create training session");
 		} finally {
 			setLoading(false);
 		}
@@ -67,7 +68,7 @@ export default function TrainingSessions() {
 			setTrainingSessions(prev => prev.map(e => (e.id === id ? updated : e)));
 		} catch (err) {
 			console.error(err);
-			setError("Failed to update training session");
+			toast.error("Failed to update training session");
 		} finally {
 			setLoading(false);
 		}
@@ -80,7 +81,7 @@ export default function TrainingSessions() {
 			fetchTrainingSessions();
 			setTotalElements(prev => prev - 1);
 		} catch (err) {
-			setError("Failed to delete training session");
+			toast.error("Failed to delete training session");
 		} finally {
 			setLoading(false);
 		}

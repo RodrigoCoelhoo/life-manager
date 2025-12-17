@@ -34,9 +34,10 @@
   }
 }
 
-input[type="date"], [type="time"], [type="month"] {
+input[type="date"], [type="time"], [type="month"], [type="number"] {
   color-scheme: dark;
 }
+
 
 @layer utilities {
   @keyframes logo-spin {
@@ -76,7 +77,6 @@ input[type="date"], [type="time"], [type="month"] {
 
   @layer utilities {
 
-    /* Custom scrollbar */
     .scrollbar-custom::-webkit-scrollbar {
       width: 4px;
       height: 8px;
@@ -88,10 +88,9 @@ input[type="date"], [type="time"], [type="month"] {
 
     .scrollbar-custom::-webkit-scrollbar-thumb {
       background: theme('colors.primary');
-      border-radius: 9999px;
+      border-radius: 1px;
     }
 
-    /* Firefox support */
     .scrollbar-custom {
       scrollbar-color: theme('colors.primary') theme('colors.foreground');
       scrollbar-width: thin;

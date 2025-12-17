@@ -31,7 +31,7 @@ public class AutomaticTransactionController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size
     ) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by("nextTransactionDate").descending());
+        Pageable pageable = PageRequest.of(page, size, Sort.by("nextTransactionDate").ascending());
 
         Page<AutomaticTransactionModel> transactions = automaticTransactionService.getAllAutomaticTransactions(pageable);
         Page<AutomaticTransactionResponseDTO> response = transactions.map(AutomaticTransactionResponseDTO::fromEntity);
@@ -61,6 +61,12 @@ public class AutomaticTransactionController {
             @PathVariable Long id
     ) {
         automaticTransactionService.deleteAutomaticTransaction(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{id}/trigger")
+    public ResponseEntity<Void> triggerAutomaticTransaction(@PathVariable Long id) {
+        automaticTransactionService.processAutomaticTransaction(id);
         return ResponseEntity.noContent().build();
     }
 }

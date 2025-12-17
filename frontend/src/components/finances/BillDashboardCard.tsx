@@ -1,12 +1,13 @@
-import { CategoryColors, CategoryIconComponents, type TransactionResponseDTO } from "../../services/finances/transaction/transaction.dto";
+import { CategoryColors, CategoryIconComponents } from "../../services/finances/transaction/transaction.dto";
 import { formatBalance } from "../../services/finances/currencies.type";
+import type { AutomaticTransactionSimple } from "../../services/finances/automatic-transactions/automatic-transactions.dto";
 
-interface TransactionCardProps {
-	transaction: TransactionResponseDTO;
+interface BillCardProps {
+	bill: AutomaticTransactionSimple;
 }
 
-export default function TransactionCard({ transaction }: TransactionCardProps) {
-	const categoryColor = CategoryColors[transaction.category as keyof typeof CategoryColors] || "#cccccc";
+export default function BillDashboardCard({ bill }: BillCardProps) {
+	const categoryColor = CategoryColors[bill.category as keyof typeof CategoryColors] || "#cccccc";
 
 	function hexToRgba(hex: string, alpha: number) {
 		const r = parseInt(hex.slice(1, 3), 16);
@@ -15,7 +16,7 @@ export default function TransactionCard({ transaction }: TransactionCardProps) {
 		return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 	}
 
-	const IconComponent = CategoryIconComponents[transaction.category];
+	const IconComponent = CategoryIconComponents[bill.category];
 
 	return (
 		<div className="flex justify-between items-center h-13 bg-background/80 p-4 rounded-lg shadow-lg">
@@ -30,18 +31,18 @@ export default function TransactionCard({ transaction }: TransactionCardProps) {
 					/>
 				</div>
 				<div className="flex flex-col flex-1 min-w-0">
-					<span className="text-lg truncate">{transaction.category.replace(/_/g, " ")}</span>
+					<span className="text-lg truncate">{bill.name}</span>
 					<span className="text-xs text-gray-400 truncate">
-						{new Date(transaction.date).toLocaleDateString()}
+						{new Date(bill.nextTransactionDate).toLocaleDateString()}
 					</span>
 				</div>
 			</div>
 
 			<span
-				className={`${transaction.type === "EXPENSE" ? "text-[#F87171]" : "text-[#34D399]"} text-base md:text-sm xl:text-base`}
+				className={`${bill.type === "EXPENSE" ? "text-[#F87171]" : "text-[#34D399]"} text-base md:text-sm xl:text-base`}
 			>
-				{transaction.type === "EXPENSE" ? "- " : "+ "}
-				{formatBalance(transaction.amount)}
+				{bill.type === "EXPENSE" ? "- " : "+ "}
+				{formatBalance(bill.amount)}
 			</span>
 		</div>
 	);

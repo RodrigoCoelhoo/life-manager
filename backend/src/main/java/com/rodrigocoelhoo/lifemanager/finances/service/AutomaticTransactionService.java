@@ -49,6 +49,11 @@ public class AutomaticTransactionService {
         return automaticTransactionRepository.findAllByUser(user, pageable);
     }
 
+    public List<AutomaticTransactionModel> get5NextAutomaticTransaction() {
+        UserModel user = userService.getLoggedInUser();
+        return automaticTransactionRepository.findTop5ByUserOrderByNextTransactionDateAscIdDesc(user);
+    }
+
     private ExpenseCategory validateCategory(
             String category
     ) {
@@ -126,36 +131,43 @@ public class AutomaticTransactionService {
 
     public void processDailyAutomaticTransactions() {
         LocalDate today = LocalDate.now(ZoneOffset.UTC);
-        List<AutomaticTransactionModel> dueTransactions = automaticTransactionRepository.findByNextTransactionDate(today);
+        List<AutomaticTransactionModel> dueTransactions = automaticTransactionRepository.findByNextTransactionDateLessThanEqual(today);
 
         for (AutomaticTransactionModel autoTx : dueTransactions) {
-            try {
-                TransactionModel transaction = TransactionModel.builder()
-                        .user(autoTx.getUser())
-                        .wallet(autoTx.getWallet())
-                        .amount(autoTx.getAmount())
-                        .category(autoTx.getCategory())
-                        .type(autoTx.getType())
-                        .description(autoTx.getDescription())
-                        .date(today)
-                        .build();
-
-                transactionRepository.save(transaction);
-
-                LocalDate nextDate = calculateNextDate(
-                        autoTx.getNextTransactionDate(),
-                        autoTx.getRecurrence(),
-                        autoTx.getInterval()
-                );
-                autoTx.setNextTransactionDate(nextDate);
-                automaticTransactionRepository.save(autoTx);
-
-            } catch (Exception e) {
-                System.err.println("Failed to process automatic transaction " + autoTx.getId() + ": " + e.getMessage());
-            }
+            processAutomaticTransaction(autoTx);
         }
     }
 
+    public void processAutomaticTransaction(Long id) {
+        processAutomaticTransaction(getAutomaticTransaction(id));
+    }
+
+    public void processAutomaticTransaction(AutomaticTransactionModel autoTx) {
+        try {
+            TransactionModel transaction = TransactionModel.builder()
+                    .user(autoTx.getUser())
+                    .wallet(autoTx.getWallet())
+                    .amount(autoTx.getAmount())
+                    .category(autoTx.getCategory())
+                    .type(autoTx.getType())
+                    .description(autoTx.getDescription())
+                    .currency(autoTx.getWallet().getCurrency())
+                    .date(autoTx.getNextTransactionDate())
+                    .build();
+
+            transactionRepository.save(transaction);
+
+            LocalDate nextDate = calculateNextDate(
+                    autoTx.getNextTransactionDate(),
+                    autoTx.getRecurrence(),
+                    autoTx.getInterval()
+            );
+            autoTx.setNextTransactionDate(nextDate);
+            automaticTransactionRepository.save(autoTx);
+        } catch (Exception e) {
+            System.err.println("Failed to process automatic transaction " + autoTx.getId() + ": " + e.getMessage());
+        }
+    }
 
     private LocalDate calculateNextDate(LocalDate currentDate, TransactionRecurrence recurrence, int interval) {
         return switch (recurrence) {

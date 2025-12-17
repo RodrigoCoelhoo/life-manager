@@ -8,6 +8,7 @@ import { Modal } from "../../components/common/Modal";
 import { Pagination } from "../../components/common/Pagination";
 import type { TrainingPlanDTO, TrainingPlanResponseDTO, TrainingPlanUpdateDTO } from "../../services/training/training-plan/training-plan.dto";
 import TrainingPlanForm from "../../components/training/TrainingPlanForm";
+import toast from "react-hot-toast";
 
 export default function TrainingPlans() {
 	const [trainingPlans, setTrainingPlans] = useState<TrainingPlanResponseDTO[]>([]);
@@ -54,7 +55,7 @@ export default function TrainingPlans() {
 			setTotalElements(prev => prev + 1);
 		} catch (err) {
 			console.error(err);
-			setError("Failed to create training plan");
+			toast.error("Failed to create training plan");
 		} finally {
 			setLoading(false);
 		}
@@ -66,7 +67,7 @@ export default function TrainingPlans() {
 			const updated = await trainingPlanService.updateTrainingPlan(id, updatedData);
 			setTrainingPlans(prev => prev.map(e => (e.id === id ? updated : e)));
 		} catch (err) {
-			setError("Failed to update training plan");
+			toast.error("Failed to update training plan");
 		} finally {
 			setLoading(false);
 		}
@@ -79,7 +80,7 @@ export default function TrainingPlans() {
 			fetchTrainingPlans();
 			setTotalElements(prev => prev - 1);
 		} catch (err) {
-			setError("Failed to delete training plan");
+			toast.error("Failed to delete training plan");
 		} finally {
 			setLoading(false);
 		}
