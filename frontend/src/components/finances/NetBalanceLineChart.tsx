@@ -6,6 +6,7 @@ import {
 	Tooltip,
 	ResponsiveContainer,
 	Legend,
+	CartesianGrid,
 } from "recharts";
 import type { CurrencyCode } from "../../services/finances/currencies.type";
 
@@ -33,6 +34,7 @@ export default function NetBalanceLineChart({ data, tooltipFormatter, height = 3
 	return (
 		<ResponsiveContainer height={height}>
 			<LineChart data={sortedData} margin={{ left: 10, right: 20 }}>
+				<CartesianGrid stroke="#2b2b48" fill="#232538" />
 				<XAxis
 					dataKey="label"
 					tickFormatter={(label) => {

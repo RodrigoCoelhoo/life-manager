@@ -1,10 +1,8 @@
 import type { WalletResponseDTO } from "../wallet/wallet.dto";
-import type { ComponentType, JSX, ReactElement } from "react";
+import type { ComponentType } from "react";
 import type { IconBaseProps } from "react-icons";
 
 import {
-	FaMoneyBillWave,
-	FaCode,
 	FaChartLine,
 	FaCoins,
 	FaHome,
@@ -13,13 +11,11 @@ import {
 	FaFilm,
 	FaCar,
 	FaGraduationCap,
-	FaPiggyBank,
 	FaQuestionCircle,
 	FaDollarSign,
-	FaShoppingCart,
 	FaBriefcase
 } from "react-icons/fa";
-import { PiChartLineDown, PiChartLineDownBold } from "react-icons/pi";
+import { PiChartLineDownBold } from "react-icons/pi";
 
 export const ExpenseType = {
 	INCOME: "INCOME",

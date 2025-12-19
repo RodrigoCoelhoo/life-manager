@@ -46,29 +46,17 @@ public class IngredientBrandService {
                 );
     }
 
-    private void validateNutritionalData(List<NutritionalValueDTO> data) {
-        List<String> invalidTypes = data.stream()
-                .map(NutritionalValueDTO::type)
-                .filter(type -> {
-                    try {
-                        NutritionalTag.valueOf(type.toUpperCase());
-                        return false;
-                    } catch (IllegalArgumentException exception) {
-                        return true;
-                    }
-                })
-                .toList();
-
-        if(!invalidTypes.isEmpty()) {
-            throw new BadRequestException("Invalid nutritional types: " + String.join(", ", invalidTypes));
-        }
-    }
-
     @Transactional
     public IngredientBrandModel createIngredientBrand(Long ingredientId, IngredientBrandDTO data) {
         List<NutritionalValueDTO> nutrients = data.nutritionalValues();
 
-        validateNutritionalData(nutrients);
+        boolean hasCalories = nutrients.stream()
+                .anyMatch(n -> n.type().equals(NutritionalTag.CALORIES));
+
+        if (!hasCalories) {
+            NutritionalValueDTO calories = new NutritionalValueDTO(NutritionalTag.CALORIES, 0.0);
+            nutrients.add(calories);
+        }
 
         IngredientModel ingredient = ingredientService.getIngredient(ingredientId);
         IngredientBrandModel ingredientBrand = IngredientBrandModel.builder()
@@ -79,7 +67,7 @@ public class IngredientBrandService {
         List<NutritionalValueModel> nutritionalValueModels = nutrients.stream()
                 .map(nutrient -> NutritionalValueModel.builder()
                         .ingredientBrand(ingredientBrand)
-                        .tag(NutritionalTag.valueOf(nutrient.type().toUpperCase()))
+                        .tag(nutrient.type())
                         .per100units(nutrient.per100units())
                         .build())
                 .toList();
@@ -93,7 +81,13 @@ public class IngredientBrandService {
     public IngredientBrandModel updateIngredientBrand(Long ingredientId, Long brandId, IngredientBrandDTO data) {
         List<NutritionalValueDTO> nutrients = data.nutritionalValues();
 
-        validateNutritionalData(nutrients);
+        boolean hasCalories = nutrients.stream()
+                .anyMatch(n -> n.type().equals(NutritionalTag.CALORIES));
+
+        if (!hasCalories) {
+            NutritionalValueDTO calories = new NutritionalValueDTO(NutritionalTag.CALORIES, 0.0);
+            nutrients.add(calories);
+        }
 
         IngredientBrandModel ingredientBrand = getIngredientBrand(ingredientId, brandId);
         ingredientBrand.setName(data.name());
@@ -102,7 +96,7 @@ public class IngredientBrandService {
         nutrients.forEach(nutrient -> {
             NutritionalValueModel value = NutritionalValueModel.builder()
                     .ingredientBrand(ingredientBrand)
-                    .tag(NutritionalTag.valueOf(nutrient.type().toUpperCase()))
+                    .tag(nutrient.type())
                     .per100units(nutrient.per100units())
                     .build();
 

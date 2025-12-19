@@ -8,6 +8,8 @@ import com.rodrigocoelhoo.lifemanager.users.UserModel;
 import com.rodrigocoelhoo.lifemanager.users.UserService;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -27,9 +29,14 @@ public class IngredientService {
         this.userService = userService;
     }
 
-    public List<IngredientModel> getAllIngredients() {
+    public Page<IngredientModel> getAllIngredients(
+            Pageable pageable,
+            String name
+    ) {
         UserModel user = userService.getLoggedInUser();
-        return ingredientRepository.findAllByUser(user);
+        if(name == null || name.isBlank())
+            return ingredientRepository.findAllByUser(user, pageable);
+        return ingredientRepository.findByUserAndNameContainingIgnoreCase(user, name, pageable);
     }
 
     public IngredientModel getIngredient(Long id) {

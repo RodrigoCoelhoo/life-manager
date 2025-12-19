@@ -34,7 +34,7 @@
   }
 }
 
-input[type="date"], [type="time"], [type="month"], [type="number"] {
+input[type="date"], [type="time"], [type="month"], [type="number"], [type="checkbox"] {
   color-scheme: dark;
 }
 
