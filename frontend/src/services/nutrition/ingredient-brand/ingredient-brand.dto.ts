@@ -78,7 +78,3 @@ export const NutritionalTagUnit: Record<NutritionalTag, string> = {
 	VITAMIN_K: "µg",
 	VITAMIN_B12: "µg",
 };
-
-function getNutritionalUnit(tag: NutritionalTag): string {
-	return NutritionalTagUnit[tag];
-}

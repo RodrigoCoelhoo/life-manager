@@ -15,7 +15,7 @@ export default function TrainingPlanCard({ onUpdate, onDelete, ...trainingPlan }
 	return (
 		<>
 			<div
-				className="p-4 bg-foreground h-100 rounded-lg flex flex-col justify-between gap-2 shadow-md cursor-pointer hover:shadow-xl transition hover:scale-[1.02] hover:border hover:border-secondary"
+				className="p-4 bg-foreground rounded-lg flex flex-col justify-between gap-2 shadow-md cursor-pointer hover:shadow-xl transition hover:scale-[1.02] hover:border hover:border-secondary"
 				onClick={() => setIsOpen(true)}
 			>
 				<div>

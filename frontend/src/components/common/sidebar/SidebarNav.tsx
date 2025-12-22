@@ -38,7 +38,7 @@ export default function SidebarNav({ onNavigate }: { onNavigate?: () => void }) 
 				</button>
 
 				<nav className={`flex-col gap-2 overflow-hidden ${isFinancesActive ? "max-h-96 opacity-100" : "max-h-0 opacity-0"} transition-all`}>
-					<MobileOption to="/dashboard" onClick={closeOnMobile} />
+					<MobileOption to="/finances-dashboard" onClick={closeOnMobile} name="Dashboard"/>
 					<MobileOption to="/wallets" onClick={closeOnMobile} />
 					<MobileOption to="/transactions" onClick={closeOnMobile} />
 					<MobileOption to="/transferences" onClick={closeOnMobile} />
@@ -100,7 +100,8 @@ export default function SidebarNav({ onNavigate }: { onNavigate?: () => void }) 
 function MobileOption({
 	to,
 	onClick,
-}: { to: string; onClick: () => void }) {
+	name
+}: { to: string; onClick: () => void; name?: string }) {
 
 	const label = to.replace("/", "").replace("-", " ");
 
@@ -112,7 +113,7 @@ function MobileOption({
 				`menu-option ${isActive ? "bg-foreground border-l-5 border-primary font-normal text-secondary" : ""}`
 			}
 		>
-			{label.charAt(0).toUpperCase() + label.slice(1)}
+			{!name ? label.charAt(0).toUpperCase() + label.slice(1) : name}
 		</NavLink>
 	);
 }

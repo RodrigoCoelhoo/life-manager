@@ -10,6 +10,8 @@ import com.rodrigocoelhoo.lifemanager.users.UserModel;
 import com.rodrigocoelhoo.lifemanager.users.UserService;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -31,10 +33,25 @@ public class RecipeService {
         this.ingredientService = ingredientService;
     }
 
-    public List<RecipeModel> getAllRecipes() {
+    public Page<RecipeModel> getAllRecipes(Pageable pageable, String name) {
         UserModel user = userService.getLoggedInUser();
-        return recipeRepository.findAllByUser(user);
+        if(name == null || name.isBlank())
+            return recipeRepository.findAllByUser(user, pageable);
+        return recipeRepository.findByUserAndNameContainingIgnoreCase(user, name, pageable);
     }
+
+    public Page<RecipeModel> getAvailableRecipes(
+            List<Long> ingredientIds,
+            Pageable pageable
+    ) {
+        UserModel user = userService.getLoggedInUser();
+        if (ingredientIds == null || ingredientIds.isEmpty()) {
+            return recipeRepository.findAllByUser(user, pageable);
+        }
+
+        return recipeRepository.findAvailableRecipes(user, ingredientIds, pageable);
+    }
+
 
     public RecipeModel getRecipe(Long id) {
         UserModel user = userService.getLoggedInUser();

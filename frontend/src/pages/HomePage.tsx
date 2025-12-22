@@ -30,7 +30,7 @@ export default function HomePage() {
 
 						<div className="flex flex-row gap-4">
 							<Link
-								to={isLoggedIn ? "/dashboard" : "/signup"}
+								to={isLoggedIn ? "/finances-dashboard" : "/signup"}
 								className="bg-primary hover:bg-primary/80 text-white font-semibold px-8 py-3 rounded-lg shadow-lg transition-all hover:cursor-pointer"
 							>
 								Get Started

@@ -138,7 +138,9 @@ export default function IngredientBrandForm({
 		}
 	};
 
-	const nutritionalTags: NutritionalTag[] = Object.keys(NutritionalTag) as NutritionalTag[];
+	const nutritionalTags: NutritionalTag[] = Object.keys(NutritionalTag).filter(
+		value => value !== NutritionalTag.CALORIES
+	) as NutritionalTag[];
 
 	return (
 		<div className="bg-foreground rounded-xl shadow-lg p-12 max-h-[85vh] overflow-y-auto text-textcolor">

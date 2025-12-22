@@ -14,7 +14,7 @@ export default function ExerciseCard({ onUpdate, onDelete, ...exercise }: Exerci
 	return (
 		<>
 			<div
-				className="p-4 bg-foreground h-60 rounded-lg flex flex-col justify-between shadow-md cursor-pointer hover:shadow-xl transition hover:scale-[1.02] hover:border hover:border-secondary"
+				className="p-4 bg-foreground rounded-lg flex flex-col justify-between shadow-md cursor-pointer hover:shadow-xl transition hover:scale-[1.02] hover:border hover:border-secondary"
 				onClick={() => setIsOpen(true)}
 			>
 				<h2 className="text-xl font-bold">{exercise.name}</h2>

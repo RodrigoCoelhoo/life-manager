@@ -24,7 +24,7 @@ export default function TrainingSessionCard({ onUpdate, onDelete, ...trainingSes
 	return (
 		<>
 			<div
-				className="p-4 bg-foreground h-60 rounded-lg flex flex-col shadow-md cursor-pointer hover:shadow-xl transition hover:scale-[1.02] hover:border hover:border-secondary gap-3"
+				className="p-4 bg-foreground rounded-lg flex flex-col shadow-md cursor-pointer hover:shadow-xl transition hover:scale-[1.02] hover:border hover:border-secondary gap-3"
 				onClick={() => setIsOpen(true)}
 			>
 				<div className="flex justify-between">

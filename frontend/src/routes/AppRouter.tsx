@@ -38,7 +38,7 @@ const router = createBrowserRouter(
 			<Route path="/signup" element={<SignUp />} />
 
 			<Route element={<ProtectedRoute><MainLayout /></ProtectedRoute>}>
-				<Route path="/dashboard" element={<Dashboard />} />
+				<Route path="/finances-dashboard" element={<Dashboard />} />
 				<Route path="/wallets" element={<Wallets />} />
 				<Route path="/transactions" element={<Transactions />} />
 				<Route path="/transferences" element={<Transferences />} />
