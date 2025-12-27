@@ -55,7 +55,7 @@ export const DateTimeField = forwardRef(
 					placeholder={placeholder}
 					onChange={handleChange}
 					min={type === "date" && minToday ? today : undefined}
-					className={`form-input w-full ${error ? "border-red-500" : ""} ${disabled ? "cursor-not-allowed" : "cursor-pointer"}`}
+					className={`form-input w-full ${error ? "border-red-500" : ""} ${disabled ? "cursor-not-allowed opacity-60" : "cursor-pointer"}`}
 					disabled={disabled}
 				/>
 				{error && <p className="text-red-500 text-sm mt-1">{error}</p>}

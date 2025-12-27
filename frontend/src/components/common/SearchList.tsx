@@ -21,6 +21,9 @@ interface SearchListProps<T extends SearchItemProps> {
 	selectionMode?: SelectionMode;
 	selectedIds?: number[];
 	selectedItems?: T[];
+	label?: string;
+	description?: string;
+	onSelect?: (item: T) => void;
 	onChange?: (items: T[]) => void;
 
 	onClose?: () => void;
@@ -33,11 +36,14 @@ export const SearchList = <T extends SearchItemProps>({
 	selectedItems = [],
 	onChange,
 	onClose,
+	label,
+	onSelect,
+	description
 }: SearchListProps<T>) => {
 	const [search, setSearch] = useState("");
 	const [page, setPage] = useState(1);
 	const [totalPages, setTotalPages] = useState(1);
-	const [elementsPerPage] = useState(8);
+	const [elementsPerPage] = useState(5);
 	const [results, setResults] = useState<T[]>([]);
 	const [debouncedSearch, setDebouncedSearch] = useState(search);
 
@@ -71,12 +77,20 @@ export const SearchList = <T extends SearchItemProps>({
 		setSelected(prev => {
 			const next = new Map(prev);
 
+			if (selectionMode === "single") {
+				next.clear();
+				next.set(item.id, item);
+
+				onSelect?.(item);
+				onClose?.();
+
+				return next;
+			}
+
+			// MULTIPLE MODE
 			if (next.has(item.id)) {
 				next.delete(item.id);
 			} else {
-				if (selectionMode === "single") {
-					next.clear();
-				}
 				next.set(item.id, item);
 			}
 
@@ -84,6 +98,7 @@ export const SearchList = <T extends SearchItemProps>({
 			return next;
 		});
 	};
+
 
 	return (
 		<div
@@ -95,7 +110,7 @@ export const SearchList = <T extends SearchItemProps>({
 				max-h-[85vh]
 				overflow-y-auto
 				flex flex-col
-				gap-4
+				gap-2
 				text-textcolor
 				relative
 			"
@@ -106,6 +121,11 @@ export const SearchList = <T extends SearchItemProps>({
 			>
 				✕
 			</button>
+
+			<div className="w-90 sm:w-120 p-2">
+				{label && <h2 className="text-xl font-semibold ">{label}</h2>}
+				{description && <p className="text-gray-400 text-base">{description}</p>}
+			</div>
 
 			{selected.size > 0 && (
 				<div className="bg-background/40 p-2 rounded-lg flex flex-wrap gap-2 w-90 sm:w-120">
@@ -158,6 +178,8 @@ export const SearchList = <T extends SearchItemProps>({
 									p-2 flex justify-between items-center gap-2
 									text-left w-full cursor-pointer
 									${index % 2 === 0 ? "bg-gray-400/5" : "bg-background/50"}
+									${index === 0 ? "rounded-t-lg" : ""}
+									${index === results.length - 1 ? "rounded-b-lg" : ""}
 									${isSelected
 										? "bg-primary/30 ring-1 ring-primary"
 										: "hover:bg-primary/20"}

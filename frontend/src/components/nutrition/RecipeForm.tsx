@@ -121,7 +121,7 @@ export default function IngredientBrandForm({
 
 					<div className="flex flex-col gap-2 p-2 bg-background border rounded-lg border-primary mt-2">
 						<div
-							className={`grid grid-cols-[10fr_5fr_2fr_2fr] bg-background items-center`}
+							className={`grid grid-cols-[10fr_5fr_4fr_1fr] bg-background items-center`}
 						>
 							<div className="font-bold">Ingredient</div>
 							<div className="font-bold">Amount</div>

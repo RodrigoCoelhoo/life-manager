@@ -1,12 +1,16 @@
 package com.rodrigocoelhoo.lifemanager.nutrition.controller;
 
+import com.rodrigocoelhoo.lifemanager.finances.dto.PageResponseDTO;
 import com.rodrigocoelhoo.lifemanager.nutrition.dto.MealDTO;
 import com.rodrigocoelhoo.lifemanager.nutrition.dto.MealDetailsDTO;
-import com.rodrigocoelhoo.lifemanager.nutrition.dto.MealResponseDTO;
 import com.rodrigocoelhoo.lifemanager.nutrition.model.MealModel;
 import com.rodrigocoelhoo.lifemanager.nutrition.model.NutritionalTag;
 import com.rodrigocoelhoo.lifemanager.nutrition.service.MealService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,14 +31,16 @@ public class MealController {
     }
 
     @GetMapping
-    public ResponseEntity<List<MealResponseDTO>> getAllMeals() {
-        List<MealModel> meals = mealService.getAllMeals();
+    public ResponseEntity<PageResponseDTO<MealDetailsDTO>> getAllMeals(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size
+        ) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("date").descending());
+        Page<MealModel> meals = mealService.getAllMeals(pageable);
 
-        List<MealResponseDTO> response = meals.stream()
-                .map(MealResponseDTO::fromEntity)
-                .toList();
+        Page<MealDetailsDTO> response = meals.map(meal -> MealDetailsDTO.fromEntities(meal, mealService.getNutritionalLabel(meal)));
 
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(PageResponseDTO.fromPage(response));
     }
 
     @GetMapping("/{id}")
@@ -47,20 +53,22 @@ public class MealController {
     }
 
     @PostMapping
-    public ResponseEntity<MealResponseDTO> createMeal(
+    public ResponseEntity<MealDetailsDTO> createMeal(
             @RequestBody @Valid MealDTO data
     ) {
         MealModel meal = mealService.createMeal(data);
-        return ResponseEntity.status(HttpStatus.CREATED).body(MealResponseDTO.fromEntity(meal));
+        LinkedHashMap<NutritionalTag, Double> nutritionalLabel = mealService.getNutritionalLabel(meal);
+        return ResponseEntity.status(HttpStatus.CREATED).body(MealDetailsDTO.fromEntities(meal, nutritionalLabel));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<MealResponseDTO> updateMeal(
+    public ResponseEntity<MealDetailsDTO> updateMeal(
             @PathVariable Long id,
             @RequestBody @Valid MealDTO data
     ) {
         MealModel meal = mealService.updateMeal(id, data);
-        return ResponseEntity.ok(MealResponseDTO.fromEntity(meal));
+        LinkedHashMap<NutritionalTag, Double> nutritionalLabel = mealService.getNutritionalLabel(meal);
+        return ResponseEntity.ok(MealDetailsDTO.fromEntities(meal, nutritionalLabel));
     }
 
     @DeleteMapping("/{id}")

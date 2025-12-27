@@ -18,7 +18,7 @@ export default function TrainingSessionCard({ onUpdate, onDelete, ...trainingSes
 	const [isOpen, setIsOpen] = useState(false);
 
 	const date = dayjs.utc(trainingSession.date).tz("Europe/Lisbon");
-	const day = date.format("DD-MM-YYYY");
+	const day = date.format("DD/MM/YYYY");
 	const time = date.format("HH:mm");
 
 	return (

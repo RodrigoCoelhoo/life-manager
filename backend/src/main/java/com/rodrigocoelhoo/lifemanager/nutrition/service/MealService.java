@@ -11,6 +11,8 @@ import com.rodrigocoelhoo.lifemanager.users.UserModel;
 import com.rodrigocoelhoo.lifemanager.users.UserService;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -32,9 +34,9 @@ public class MealService {
         this.mealRepository = mealRepository;
     }
 
-    public List<MealModel> getAllMeals() {
+    public Page<MealModel> getAllMeals(Pageable pageable) {
         UserModel user = userService.getLoggedInUser();
-        return mealRepository.findAllByUser(user);
+        return mealRepository.findAllByUser(user, pageable);
     }
 
     public MealModel getMeal(Long id) {
@@ -141,6 +143,7 @@ public class MealService {
         MealModel meal = getMeal(id);
         meal.setDate(data.date());
 
+        meal.getIngredients().clear();
         populateMealIngredients(meal, data);
 
         return mealRepository.save(meal);

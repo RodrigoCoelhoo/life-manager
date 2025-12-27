@@ -1,6 +1,6 @@
 import { api } from '../../api';
 import type { PageResponseDTO } from '../../api.dto';
-import type { IngredientDetailsDTO, IngredientDTO } from './ingredient.dto';
+import type { IngredientDetailsDTO, IngredientDTO, IngredientResponseDTO } from './ingredient.dto';
 
 const BASE_URL = '/ingredients';
 
@@ -26,6 +26,21 @@ export const ingredientService = {
 		} catch (error) {
 			console.error('Failed to fetch ingredients:', error);
 			throw new Error('Unable to retrieve ingredients. Please try again.');
+		}
+	},
+
+	getIngredientsByIds: async (
+		ids: number[]
+	): Promise<IngredientResponseDTO[]> => {
+		try {
+			const params = new URLSearchParams();
+			ids.forEach(id => params.append("ids", id.toString()));
+
+			const { data } = await api.get<IngredientResponseDTO[]>(`${BASE_URL}/by-ids?${params.toString()}`);
+			return data;
+		} catch (error) {
+			console.error("Failed to fetch ingredients by ids:", error);
+			throw new Error("Unable to retrieve ingredients.");
 		}
 	},
 

@@ -142,7 +142,7 @@ export default function Transactions() {
 
 						return (
 							<React.Fragment key={item.id}>
-								<div className={`${rowStyle} py-1 px-2 font-extralight whitespace-nowrap min-w-max`}>{item.date}</div>
+								<div className={`${rowStyle} py-1 px-2 font-extralight whitespace-nowrap min-w-max`}>{new Date(item.date).toLocaleDateString()}</div>
 								<div className={`${rowStyle} py-1 px-2 font-extralight truncate`}>{item.wallet.name}</div>
 								<div className={`${rowStyle} py-1 px-2 font-extralight`}>{item.category}</div>
 								<div className={`${rowStyle} py-1 px-2 font-extralight truncate hidden sm:block`}>

@@ -72,8 +72,11 @@ public class IngredientService {
     }
 
     public List<IngredientModel> getIngredients(List<Long> ids) {
-        UserModel user = userService.getLoggedInUser();
+        if (ids == null || ids.isEmpty()) {
+            return List.of();
+        }
 
+        UserModel user = userService.getLoggedInUser();
         List<IngredientModel> ingredients = ingredientRepository.findAllByUserAndIdIn(user, ids);
 
         if(ingredients.size() != ids.size())

@@ -27,8 +27,11 @@ public class MealModel {
     @Column(nullable = false)
     private LocalDateTime date;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "meal_id")
+    @OneToMany(
+            mappedBy = "meal",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
     private List<MealIngredientModel> ingredients;
 }
 

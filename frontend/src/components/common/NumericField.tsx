@@ -53,14 +53,15 @@ export const NumericField = forwardRef(function NumericField(
 		if (e.key === "Backspace") {
 			e.preventDefault();
 
-			const digits = value.replace(/\D/g, "").slice(0, -1) || "0";
-			const num = Number(digits) / 100;
+			const rawDigits = value.replace(/\D/g, "").slice(0, -1);
+			const num = Math.max(Number(rawDigits || "0") / 100, 0);
 			const formatted = num.toFixed(2);
 
 			onChange(formatted);
 			runRules(formatted);
 			return;
 		}
+
 
 		if (!["Tab", "ArrowLeft", "ArrowRight"].includes(e.key)) {
 			e.preventDefault();
@@ -87,7 +88,7 @@ export const NumericField = forwardRef(function NumericField(
 				placeholder={placeholder}
 				readOnly
 				onKeyDown={handleKeyDown}
-				className={`form-input w-full ${error ? "border-red-500" : ""} text-right ${disabled ? "cursor-not-allowed" : "cursor-text"}`}
+				className={`form-input w-full ${error ? "border-red-500" : ""} text-right ${disabled ? "cursor-not-allowed opacity-60" : "cursor-text"}`}
 				disabled={disabled}
 			/>
 

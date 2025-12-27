@@ -155,7 +155,7 @@ export default function Recipes() {
 							onClick={() => setSelectedIngredientOpen(true)}
 						/>
 						{ingredients.length > 0 &&
-							<button className="rounded-3xl text-sm font-extralight cursor-pointer" onClick={() => setIngredients([])}>Clear filters</button>
+							<button className="rounded-3xl text-sm font-extralight cursor-pointer hidden sm:block" onClick={() => setIngredients([])}>Clear filters</button>
 						}
 					</div>
 
@@ -182,6 +182,10 @@ export default function Recipes() {
 						<span className="text-secondary"> {totalElements} {totalElements === 1 ? "recipe" : "recipes"} </span>
 					</div>
 				</div>
+
+				{ingredients.length > 0 &&
+					<button className="rounded-lg text-sm font-extralight cursor-pointer block sm:hidden bg-secondary/10 hover:bg-secondary/50 w-full p-2" onClick={() => setIngredients([])}>Clear filters</button>
+				}
 
 				{ingredients.length > 0 && (
 					<div className="flex flex-wrap gap-2 bg-background/40 p-2 rounded-lg">
@@ -250,6 +254,8 @@ export default function Recipes() {
 			<Modal isOpen={selectedIngredientOpen} onClose={() => setSelectedIngredientOpen(false)}>
 				<SearchList
 					selectionMode="multiple"
+					label="Available Ingredients"
+					description="Select the ingredients you currently have to find recipes you can make."
 					fetchItems={ingredientService.getIngredients}
 					selectedIds={ingredients.map(i => i.ingredient.id)}
 					selectedItems={ingredients.map(i => i.ingredient)}

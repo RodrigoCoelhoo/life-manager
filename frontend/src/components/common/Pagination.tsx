@@ -43,7 +43,7 @@ export function Pagination({ currentPage, totalPages, onPageChange }: Pagination
 					<button
 						key={i}
 						onClick={() => onPageChange(p as number)}
-						className={`px-3 py-1 rounded-lg drop-shadow-[0px_4px_6px_rgba(0,0,0,0.4)]
+						className={`cursor-pointer px-3 py-1 rounded-lg drop-shadow-[0px_4px_6px_rgba(0,0,0,0.4)]
               				${p === currentPage ? 
 								"bg-primary text-primary-foreground": 
 								"bg-foreground hover:bg-muted"

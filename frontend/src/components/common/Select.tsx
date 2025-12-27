@@ -8,7 +8,7 @@ interface BaseSelectProps<T> {
 
 interface SingleSelectProps<T> extends BaseSelectProps<T> {
 	multiple?: false;
-	value: T;
+	value?: T;
 	onChange: (value: T) => void;
 }
 
@@ -51,7 +51,7 @@ export function Select<T>(props: SelectProps<T>) {
 				? props.value.map(getLabel).join(", ")
 				: "Select...";
 		}
-		return getLabel(props.value);
+		return props.value ? getLabel(props.value) : "Select...";
 	};
 
 	return (

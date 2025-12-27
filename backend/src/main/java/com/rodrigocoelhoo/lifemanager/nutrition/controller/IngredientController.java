@@ -43,12 +43,13 @@ public class IngredientController {
         return ResponseEntity.ok(PageResponseDTO.fromPage(response));
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<?> getIngredientById(
-            @PathVariable Long id
+    @GetMapping("/by-ids")
+    public ResponseEntity<List<IngredientResponseDTO>> getIngredientsById(
+            @RequestParam List<Long> ids
     ) {
-        IngredientModel ingredientModel = ingredientService.getIngredient(id);
-        return ResponseEntity.ok().body(IngredientDetailsDTO.fromEntity(ingredientModel));
+        List<IngredientModel> ingredients = ingredientService.getIngredients(ids);
+        List<IngredientResponseDTO> response = ingredients.stream().map(IngredientResponseDTO::fromEntity).toList();
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping

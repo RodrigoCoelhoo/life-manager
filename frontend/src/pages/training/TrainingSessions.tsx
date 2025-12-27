@@ -87,8 +87,6 @@ export default function TrainingSessions() {
 		}
 	};
 
-
-
 	useEffect(() => {
 		fetchTrainingSessions();
 	}, [page, elementsPerPage]);
