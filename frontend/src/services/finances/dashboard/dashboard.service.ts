@@ -1,7 +1,7 @@
 import { api } from '../../api';
 import type { MonthOverviewDTO } from './dashboard.dto';
 
-const BASE_URL = '/dashboard';
+const BASE_URL = '/dashboard/finances';
 
 export const dashboardService = {
 

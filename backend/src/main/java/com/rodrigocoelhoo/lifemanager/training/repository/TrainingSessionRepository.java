@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -14,4 +15,5 @@ import java.util.Optional;
 public interface TrainingSessionRepository extends JpaRepository<TrainingSessionModel, Long> {
     Page<TrainingSessionModel> findAllByUser(UserModel user, Pageable pageable);
     Optional<TrainingSessionModel> findByIdAndUser(Long id, UserModel user);
+    List<TrainingSessionModel> findAllByUserAndDateBetweenOrderByDateDescIdDesc(UserModel user, LocalDateTime start, LocalDateTime end);
 }

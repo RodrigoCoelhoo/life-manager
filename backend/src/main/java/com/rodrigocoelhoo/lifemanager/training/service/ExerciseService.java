@@ -2,10 +2,13 @@ package com.rodrigocoelhoo.lifemanager.training.service;
 
 import com.rodrigocoelhoo.lifemanager.exceptions.ResourceNotFound;
 import com.rodrigocoelhoo.lifemanager.training.dto.exercisedto.ExerciseDTO;
+import com.rodrigocoelhoo.lifemanager.training.dto.exercisedto.ExerciseStats;
 import com.rodrigocoelhoo.lifemanager.training.dto.exercisedto.ExerciseUpdateDTO;
 import com.rodrigocoelhoo.lifemanager.training.model.ExerciseModel;
 import com.rodrigocoelhoo.lifemanager.training.model.ExerciseType;
+import com.rodrigocoelhoo.lifemanager.training.model.SessionExerciseModel;
 import com.rodrigocoelhoo.lifemanager.training.repository.ExerciseRepository;
+import com.rodrigocoelhoo.lifemanager.training.repository.SessionExerciseRepository;
 import com.rodrigocoelhoo.lifemanager.training.repository.TrainingPlanRepository;
 import com.rodrigocoelhoo.lifemanager.users.UserModel;
 import com.rodrigocoelhoo.lifemanager.users.UserService;
@@ -14,7 +17,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.YearMonth;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class ExerciseService {
@@ -22,15 +28,18 @@ public class ExerciseService {
     private final UserService userService;
     private final ExerciseRepository exerciseRepository;
     private final TrainingPlanRepository trainingPlanRepository;
+    private final SessionExerciseRepository sessionExerciseRepository;
 
     public ExerciseService(
             ExerciseRepository exerciseRepository,
             UserService userService,
-            TrainingPlanRepository trainingPlanRepository
+            TrainingPlanRepository trainingPlanRepository,
+            SessionExerciseRepository sessionExerciseRepository
     ) {
         this.exerciseRepository = exerciseRepository;
         this.userService = userService;
         this.trainingPlanRepository = trainingPlanRepository;
+        this.sessionExerciseRepository = sessionExerciseRepository;
     }
 
     public Page<ExerciseModel> getAllExercisesByUser(Pageable pageable, String name) {
@@ -91,5 +100,49 @@ public class ExerciseService {
                 .forEach(plan -> plan.getExercises().remove(exercise));
 
         exerciseRepository.delete(exercise);
+    }
+
+    public ExerciseStats getExerciseStats(Long exerciseId) {
+        ExerciseModel exercise = getExercise(exerciseId);
+        if(exercise.getType().equals(ExerciseType.TIME)) {
+            return null;
+        }
+
+        List<SessionExerciseModel> sessions = sessionExerciseRepository.findAllByExercise(exercise);
+
+        double volume = 0.0;
+        int reps = 0;
+        int sets = sessions.size();
+        double maxWeight = 0.0;
+        TrainingDashboardService.ExercisePR.RepSet bestRepSet = new TrainingDashboardService.ExercisePR.RepSet(0,0.0);
+        double e1rm = 0.0;
+
+        YearMonth cutoff = YearMonth.now().minusMonths(5);
+        YearMonth current = YearMonth.now();
+
+        Map<YearMonth, Double> monthlyMaxE1RM = new LinkedHashMap<>();
+
+        while (!cutoff.isAfter(current)) {
+            monthlyMaxE1RM.put(cutoff, 0.0);
+            cutoff = cutoff.plusMonths(1);
+        }
+
+        for(SessionExerciseModel session : sessions) {
+            reps += session.getReps();
+            volume += session.getWeight() * session.getReps();
+            maxWeight = Math.max(maxWeight, session.getWeight());
+            double setE1RM = session.getWeight() * (1 + session.getReps() / 30.0);
+            e1rm = Math.max(e1rm, setE1RM);
+
+            double currentBestRepSet = bestRepSet.reps() * bestRepSet.weight();
+            double sessionRepSet = session.getReps() * session.getWeight();
+            bestRepSet = currentBestRepSet > sessionRepSet ? bestRepSet : new TrainingDashboardService.ExercisePR.RepSet(session.getReps(), session.getWeight());
+
+            YearMonth setYearMonth = YearMonth.from(session.getSession().getDate());
+            if (!monthlyMaxE1RM.containsKey(setYearMonth)) continue;
+            monthlyMaxE1RM.merge(setYearMonth, setE1RM, Math::max);
+        }
+
+        return new ExerciseStats(exercise.getName(), volume, sets, reps, maxWeight, bestRepSet, e1rm, monthlyMaxE1RM);
     }
 }

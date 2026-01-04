@@ -1,7 +1,9 @@
 package com.rodrigocoelhoo.lifemanager.training.service;
 
 import com.rodrigocoelhoo.lifemanager.exceptions.ResourceNotFound;
+import com.rodrigocoelhoo.lifemanager.finances.model.TransactionModel;
 import com.rodrigocoelhoo.lifemanager.training.dto.exercisedto.ExerciseDetailsDTO;
+import com.rodrigocoelhoo.lifemanager.training.dto.exercisedto.ExerciseStats;
 import com.rodrigocoelhoo.lifemanager.training.dto.trainingsessiondto.*;
 import com.rodrigocoelhoo.lifemanager.training.mapper.SessionExerciseMapper;
 import com.rodrigocoelhoo.lifemanager.training.model.*;
@@ -13,6 +15,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -72,6 +76,14 @@ public class TrainingSessionService {
                 .toList();
 
         return SessionDetailsDTO.fromEntities(session, exerciseDetails);
+    }
+
+    public List<TrainingSessionModel> getSessionsByRange(
+            LocalDateTime start,
+            LocalDateTime end
+    ) {
+        UserModel user = userService.getLoggedInUser();
+        return trainingSessionRepository.findAllByUserAndDateBetweenOrderByDateDescIdDesc(user, start, end);
     }
 
     @Transactional

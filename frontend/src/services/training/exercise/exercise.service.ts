@@ -1,6 +1,6 @@
 import { api } from '../../api';
 import type { PageResponseDTO } from '../../api.dto';
-import type { ExerciseDTO, ExerciseResponseDTO, ExerciseUpdateDTO } from './exercise.dto';
+import type { ExerciseDTO, ExerciseResponseDTO, ExerciseStats, ExerciseUpdateDTO } from './exercise.dto';
 
 const BASE_URL = '/exercises';
 
@@ -36,6 +36,16 @@ export const exerciseService = {
 		} catch (error) {
 			console.error(`Failed to fetch exercise with id: ${id}`, error);
 			throw new Error(`Unable to retrieve exercise with id: ${id}. Please try again.`);
+		}
+	},
+
+	getExerciseStats: async (id: number): Promise<ExerciseStats> => {
+		try {
+			const { data } = await api.get<ExerciseStats>(`${BASE_URL}/${id}/stats`);
+			return data;
+		} catch (error) {
+			console.error(`Failed to fetch exercise stats with id: ${id}`, error);
+			throw new Error(`Unable to retrieve exercise stats with id: ${id}. Please try again.`);
 		}
 	},
 

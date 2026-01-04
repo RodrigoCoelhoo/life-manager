@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.YearMonth;
 @RestController
-@RequestMapping("/api/dashboard")
+@RequestMapping("/api/dashboard/finances")
 public class DashboardController {
 
     private final DashboardService dashboardService;

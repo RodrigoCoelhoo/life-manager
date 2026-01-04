@@ -20,14 +20,14 @@ export default function SidebarNav({ onNavigate }: { onNavigate?: () => void }) 
 	};
 
 	return (
-		<div className="flex-1 overflow-y-auto p-2 space-y-5 scrollbar-hide">
+		<div className="flex-1 overflow-y-auto p-2 space-y-2 scrollbar-hide">
 			<div>
 				<button
 					className={`w-full flex flex-row items-center mb-1 cursor-pointer ${isFinancesActive ? "border-b-4 border-background-accent" : "border-b-0 border-transparent"} hover:bg-background-accent hover:rounded-xl`}
 					onClick={toggleFinances}
 				>
 					<h2 className="menu-title w-full flex justify-between items-center">
-						<span className="flex items-center gap-4">
+						<span className="flex items-center gap-4 text-xl">
 							<GrMoney size={16} /> Finances
 						</span>
 						<IoIosArrowForward
@@ -52,7 +52,7 @@ export default function SidebarNav({ onNavigate }: { onNavigate?: () => void }) 
 					onClick={toggleNutrition}
 				>
 					<h2 className="menu-title w-full flex justify-between items-center">
-						<span className="flex items-center gap-4">
+						<span className="flex items-center gap-4 text-xl">
 							<GiHotMeal size={16} /> Nutrition
 						</span>
 						<IoIosArrowForward
@@ -63,6 +63,7 @@ export default function SidebarNav({ onNavigate }: { onNavigate?: () => void }) 
 				</button>
 
 				<nav className={`flex-col gap-2 overflow-hidden ${isNutritionActive ? "max-h-96 opacity-100" : "max-h-0 opacity-0"} transition-all`}>
+					<MobileOption to="/nutrition-dashboard" onClick={closeOnMobile} name="Dashboard"/>
 					<MobileOption to="/ingredients" onClick={closeOnMobile} />
 					<MobileOption to="/recipes" onClick={closeOnMobile} />
 					<MobileOption to="/meals" onClick={closeOnMobile} />
@@ -75,7 +76,7 @@ export default function SidebarNav({ onNavigate }: { onNavigate?: () => void }) 
 					onClick={toggleTraining}
 				>
 					<h2 className="menu-title w-full flex justify-between items-center">
-						<span className="flex items-center gap-4">
+						<span className="flex items-center gap-4 text-xl">
 							<GiWeightLiftingUp size={16} /> Training
 						</span>
 						<IoIosArrowForward
@@ -86,6 +87,7 @@ export default function SidebarNav({ onNavigate }: { onNavigate?: () => void }) 
 				</button>
 
 				<nav className={`flex-col gap-2 overflow-hidden ${isTrainingActive ? "max-h-96 opacity-100" : "max-h-0 opacity-0"} transition-all`}>
+					<MobileOption to="/training-dashboard" onClick={closeOnMobile} name="Dashboard"/>
 					<MobileOption to="/exercises" onClick={closeOnMobile} />
 					<MobileOption to="/training-plans" onClick={closeOnMobile} />
 					<MobileOption to="/training-sessions" onClick={closeOnMobile} />
@@ -110,7 +112,7 @@ function MobileOption({
 			to={to}
 			onClick={onClick}
 			className={({ isActive }) =>
-				`menu-option ${isActive ? "bg-foreground border-l-5 border-primary font-normal text-secondary" : ""}`
+				`menu-option text-base ${isActive ? "bg-foreground border-l-5 border-primary font-normal text-secondary" : ""}`
 			}
 		>
 			{!name ? label.charAt(0).toUpperCase() + label.slice(1) : name}

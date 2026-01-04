@@ -1,9 +1,12 @@
 package com.rodrigocoelhoo.lifemanager.training.controller;
 
 import com.rodrigocoelhoo.lifemanager.finances.dto.PageResponseDTO;
+import com.rodrigocoelhoo.lifemanager.training.dto.exercisedto.ExerciseResponseDTO;
+import com.rodrigocoelhoo.lifemanager.training.dto.exercisedto.ExerciseStats;
 import com.rodrigocoelhoo.lifemanager.training.dto.trainingsessiondto.SessionDetailsDTO;
 import com.rodrigocoelhoo.lifemanager.training.dto.trainingsessiondto.TrainingSessionDTO;
 import com.rodrigocoelhoo.lifemanager.training.dto.trainingsessiondto.TrainingSessionResponseDTO;
+import com.rodrigocoelhoo.lifemanager.training.model.ExerciseModel;
 import com.rodrigocoelhoo.lifemanager.training.model.TrainingSessionModel;
 import com.rodrigocoelhoo.lifemanager.training.service.TrainingSessionService;
 import jakarta.validation.Valid;

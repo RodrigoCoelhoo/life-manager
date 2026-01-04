@@ -1,3 +1,4 @@
+import type { RepSet } from "../dashboard/dashboard.dto";
 import type { SessionExerciseSetRepDTO, SessionExerciseTimeDTO } from "../training-session/training-session.dto";
 
 export const ExerciseType = {
@@ -42,4 +43,15 @@ export interface ExerciseUpdateDTO {
 	name: string;
 	description: string;
 	demoUrl: string;
+}
+
+export interface ExerciseStats {
+	name: string;
+	volume: number;
+	sets: number;
+	reps: number;
+	maxWeight: number;
+	bestRepSet: RepSet;
+	e1rm: number;
+	monthlyMaxE1RM: Record<string, number>;
 }

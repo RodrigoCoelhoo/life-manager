@@ -12,7 +12,6 @@ import SignUp from '../pages/auth/SignUpPage';
 import HomeLayout from '../layouts/HomeLayout';
 import MainLayout from '../layouts/MainLayout';
 import { ProtectedRoute } from './ProtectedRoute';
-import Dashboard from '../pages/finances/Dashboard';
 import Wallets from '../pages/finances/Wallets';
 import Transactions from '../pages/finances/Transactions';
 import Transferences from '../pages/finances/Transferences';
@@ -24,6 +23,9 @@ import TrainingPlans from '../pages/training/TrainingPlans';
 import TrainingSessions from '../pages/training/TrainingSessions';
 import Profile from '../pages/Profile';
 import Bills from '../pages/finances/Bills';
+import FinancesDashboard from '../pages/finances/Dashboard';
+import NutritionDashboard from '../pages/nutrition/Dashboard';
+import TrainingDashboard from '../pages/training/Dashboard';
 
 const router = createBrowserRouter(
 	createRoutesFromElements(
@@ -38,16 +40,18 @@ const router = createBrowserRouter(
 			<Route path="/signup" element={<SignUp />} />
 
 			<Route element={<ProtectedRoute><MainLayout /></ProtectedRoute>}>
-				<Route path="/finances-dashboard" element={<Dashboard />} />
+				<Route path="/finances-dashboard" element={<FinancesDashboard />} />
 				<Route path="/wallets" element={<Wallets />} />
 				<Route path="/transactions" element={<Transactions />} />
 				<Route path="/transferences" element={<Transferences />} />
 				<Route path='/bills' element={<Bills />} />
 				
+				<Route path="/nutrition-dashboard" element={<NutritionDashboard />} />
 				<Route path="/ingredients" element={<Ingredients />} />
 				<Route path="/recipes" element={<Recipes />} />
 				<Route path="/meals" element={<Meals />} />
 
+				<Route path="/training-dashboard" element={<TrainingDashboard />} />
 				<Route path="/exercises" element={<Exercises />} />
 				<Route path="/training-plans" element={<TrainingPlans />} />
 				<Route path="/training-sessions" element={<TrainingSessions />} />

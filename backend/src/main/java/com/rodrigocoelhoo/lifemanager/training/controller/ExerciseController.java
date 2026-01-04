@@ -4,6 +4,7 @@ import com.rodrigocoelhoo.lifemanager.finances.dto.PageResponseDTO;
 import com.rodrigocoelhoo.lifemanager.finances.dto.TransactionResponseDTO;
 import com.rodrigocoelhoo.lifemanager.training.dto.exercisedto.ExerciseDTO;
 import com.rodrigocoelhoo.lifemanager.training.dto.exercisedto.ExerciseResponseDTO;
+import com.rodrigocoelhoo.lifemanager.training.dto.exercisedto.ExerciseStats;
 import com.rodrigocoelhoo.lifemanager.training.dto.exercisedto.ExerciseUpdateDTO;
 import com.rodrigocoelhoo.lifemanager.training.model.ExerciseModel;
 import com.rodrigocoelhoo.lifemanager.training.service.ExerciseService;
@@ -50,6 +51,14 @@ public class ExerciseController {
     ) {
         ExerciseModel exercise = exerciseService.getExercise(exercise_id);
         return ResponseEntity.ok(ExerciseResponseDTO.fromEntity(exercise));
+    }
+
+    @GetMapping("/{exercise_id}/stats")
+    public ResponseEntity<ExerciseStats> getExerciseStats(
+            @PathVariable Long exercise_id
+    ) {
+        ExerciseStats stats = exerciseService.getExerciseStats(exercise_id);
+        return ResponseEntity.ok(stats);
     }
 
     @PostMapping

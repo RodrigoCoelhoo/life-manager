@@ -14,7 +14,7 @@ import TransferenceCard from "../../components/finances/TransferenceCard";
 import NetBalanceLineChart, { type TimeSeriesPoint } from "../../components/finances/NetBalanceLineChart";
 import BillDashboardCard from "../../components/finances/BillDashboardCard";
 
-export default function Dashboard() {
+export default function FinancesDashboard() {
 	const [dashboardData, setDashboardData] = useState<MonthOverviewDTO>();
 	const currentYearMonth = new Date().toISOString().slice(0, 7);
 	const [yearMonth, setYearMonth] = useState<string>(currentYearMonth);
