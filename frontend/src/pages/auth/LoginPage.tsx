@@ -21,7 +21,7 @@ export default function Login() {
 		try {
 			const { accessToken } = await authService.signin({ username, password });
 			setAccessToken(accessToken); 
-			navigate("/dashboard");
+			navigate("/finances-dashboard");
 		} catch (err: any) {
 			console.error(err);
 			setError("Invalid credentials");
