@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.security.core.GrantedAuthority;
@@ -17,6 +18,7 @@ import java.util.List;
 @Entity
 @Table(name = "tb_users")
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserModel implements UserDetails {

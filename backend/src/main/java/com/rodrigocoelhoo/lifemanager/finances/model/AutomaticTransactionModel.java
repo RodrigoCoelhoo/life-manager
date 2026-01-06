@@ -52,7 +52,7 @@ public class AutomaticTransactionModel {
     private TransactionRecurrence recurrence; // Daily, Weekly, Monthly
 
     @Positive
-    @Column(nullable = false)
+    @Column(nullable = false, name = "recurrence_interval")
     private short interval; // interval {recurrency}, Ex.: 2 Weekly -> every 2 weeks
 
     @Column(length = 512, nullable = false)

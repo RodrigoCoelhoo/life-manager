@@ -6,7 +6,7 @@ CREATE TABLE tb_automatic_transactions(
     type VARCHAR(10) NOT NULL,
     category VARCHAR(30) NOT NULL,
     recurrence VARCHAR(10) NOT NULL,
-    interval SMALLINT NOT NULL,
+    recurrence_interval SMALLINT NOT NULL,
     description VARCHAR(512) NOT NULL,
     next_transaction_date DATE NOT NULL,
 

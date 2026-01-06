@@ -8,7 +8,7 @@ import jakarta.validation.constraints.Size;
 import java.util.List;
 
 public record IngredientBrandDTO(
-        @NotBlank(message = "Exercise name cannot be blank")
+        @NotBlank(message = "Brand name cannot be blank")
         @Size(max = 50, message = "Name cannot exceed 50 characters")
         String name,
 
