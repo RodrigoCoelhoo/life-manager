@@ -27,7 +27,6 @@ public class TrainingDashboardService {
 
         List<TrainingSessionModel> sessions = trainingSessionService.getSessionsByRange(start, end);
 
-        int totalSessions = sessions.size();
         List<LocalDate> dates = new ArrayList<>();
         double volume = 0.0;
         int timeSecs = 0;
