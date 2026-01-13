@@ -26,6 +26,7 @@ import Bills from '../pages/finances/Bills';
 import FinancesDashboard from '../pages/finances/Dashboard';
 import NutritionDashboard from '../pages/nutrition/Dashboard';
 import TrainingDashboard from '../pages/training/Dashboard';
+import ChangePassword from '../pages/auth/ChangePassword';
 
 const router = createBrowserRouter(
 	createRoutesFromElements(
@@ -38,6 +39,7 @@ const router = createBrowserRouter(
 
 			<Route path="/login" element={<Login />} />
 			<Route path="/signup" element={<SignUp />} />
+			<Route path="/change-password" element={<ProtectedRoute><ChangePassword /></ProtectedRoute>} />
 
 			<Route element={<ProtectedRoute><MainLayout /></ProtectedRoute>}>
 				<Route path="/finances-dashboard" element={<FinancesDashboard />} />
@@ -45,7 +47,7 @@ const router = createBrowserRouter(
 				<Route path="/transactions" element={<Transactions />} />
 				<Route path="/transferences" element={<Transferences />} />
 				<Route path='/bills' element={<Bills />} />
-				
+
 				<Route path="/nutrition-dashboard" element={<NutritionDashboard />} />
 				<Route path="/ingredients" element={<Ingredients />} />
 				<Route path="/recipes" element={<Recipes />} />

@@ -89,13 +89,10 @@ export default function Recipes() {
 
 	const updateRecipe = async (id: number, updatedData: RecipeDTO) => {
 		try {
-			setLoading(true);
 			const updated = await recipeService.updateRecipe(id, updatedData);
 			setRecipes(prev => prev.map(e => (e.id === id ? updated : e)));
 		} catch (err) {
 			toast.error("Failed to update recipe");
-		} finally {
-			setLoading(false);
 		}
 	};
 

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import type { TransactionDTO, TransactionResponseDTO } from "../../services/finances/transaction/transaction.dto";
+import type { ExpenseCategory, TransactionDTO, TransactionResponseDTO } from "../../services/finances/transaction/transaction.dto";
 import Loading from "../../components/common/Loading";
 import ErrorMessage from "../../components/common/Error";
 import type { PageResponseDTO } from "../../services/api.dto";
@@ -11,6 +11,16 @@ import { Modal } from "../../components/common/Modal";
 import TransactionForm from "../../components/finances/TransactionForm";
 import toast from "react-hot-toast";
 import { formatBalance } from "../../services/finances/currencies.type";
+import { IoMdOptions } from "react-icons/io";
+import type { WalletResponseDTO } from "../../services/finances/wallet/wallet.dto";
+import TransactionFilter from "../../components/finances/TransactionFilter";
+
+export interface TransactionFilters {
+	category?: ExpenseCategory;
+	wallet?: WalletResponseDTO;
+	startDate?: string;
+	endDate?: string;
+}
 
 export default function Transactions() {
 	const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -22,14 +32,16 @@ export default function Transactions() {
 	const [page, setPage] = useState<number>(1);
 	const [totalPages, setTotalPages] = useState<number>(1);
 	const [totalElements, setTotalElements] = useState<number>(1);
-	const elementsPerPage = 24;
+	const elementsPerPage = 20;
+
+	const [filterOpen, setFilterOpen] = useState<boolean>(false);
+	const [filters, setFilters] = useState<TransactionFilters>({});
 
 	const fetchTransactions = async () => {
 		try {
 			setError(null);
 			setLoading(true);
-			const data: PageResponseDTO<TransactionResponseDTO> = await transactionService.getTransactions(page - 1, elementsPerPage);
-
+			const data: PageResponseDTO<TransactionResponseDTO> = await transactionService.getTransactions(page - 1, elementsPerPage, filters);
 			setTransactions(data.content);
 			setTotalPages(data.totalPages);
 			setTotalElements(Number(data.totalElements));
@@ -94,7 +106,12 @@ export default function Transactions() {
 
 	useEffect(() => {
 		fetchTransactions();
-	}, [page]);
+	}, [page, filters]);
+
+	const applyFilters = (newFilters: TransactionFilters) => {
+		setPage(1);
+		setFilters(newFilters);
+	};
 
 	if (loading) return <Loading />;
 	if (error) {
@@ -111,19 +128,57 @@ export default function Transactions() {
 
 	return (
 		<>
-			<div className="w-full p-2 sm:p-6 text-textcolor flex flex-col gap-4">
+			<div className="w-full p-2 sm:p-6 text-textcolor flex flex-col gap-1">
 
-				<div className="flex items-end justify-between gap-4 px-2">
-					<button
-						className="bg-primary w-fit p-2 px-4 rounded-xl cursor-pointer hover:bg-primary/80 font-semibold"
-						onClick={() => setIsOpen(true)}
-					>
-						Create +
-					</button>
+				<div className="flex flex-col gap-2 p-2">
+					<div className="flex items-center justify-between gap-4">
+						<div className="flex flex-row gap-2 items-center justify-center">
+							<button
+								className="bg-primary w-fit p-2 px-4 rounded-xl cursor-pointer hover:bg-primary/80 font-semibold"
+								onClick={() => setIsOpen(true)}
+							>
+								Create +
+							</button>
 
-					<h1 className="text-3xl text-red-400">Filters missing, by Wallet, by Date between and Category</h1>
+							<IoMdOptions
+								className="bg-primary hover:bg-primary/80 cursor-pointer p-2 rounded-lg"
+								size={38}
+								onClick={() => setFilterOpen(true)}
+							/>
+						</div>
 
-					<span className="text-secondary"> {totalElements} {totalElements === 1 ? "transaction" : "transactions"} </span>
+						<span className="text-secondary"> {totalElements} {totalElements === 1 ? "transaction" : "transactions"} </span>
+					</div>
+
+					<div className="flex flex-row flex-wrap gap-4 text-textcolor text-sm font-extralight">
+						{(filters.startDate || filters.endDate) && 
+							<div className="py-1 px-4 bg-textcolor/5 rounded-2xl">
+								{(filters.startDate && filters.endDate) ? 
+									
+									<div className="flex flex-row gap-1 flex-nowrap">
+										<span className="font-semibold">From:</span> {filters.startDate || "?"} 
+										<span className="font-semibold">To:</span> {filters.endDate || "?"}
+									</div>
+									:
+									filters.startDate ? 
+									<div><span className="font-semibold">From:</span> {filters.startDate || "?"}</div> : 
+									<div><span className="font-semibold">To:</span> {filters.endDate || "?"}</div>
+								}
+							</div>
+						}
+						
+						{filters.wallet && 
+							<div className="py-1 px-4 bg-textcolor/5 rounded-2xl">
+								<span className="font-semibold">Wallet:</span> {filters.wallet.name}
+							</div>
+						}
+
+						{filters.category && 
+							<div className="py-1 px-4 bg-textcolor/5 rounded-2xl">
+								<span className="font-semibold">Category:</span> {filters.category}
+							</div>
+						}
+					</div>
 				</div>
 
 				<div className="h-full p-2 w-full text-textcolor text-sm rounded-t-lg grid grid-cols-[4fr_10fr_7fr_7fr_3fr] sm:grid-cols-[4fr_10fr_7fr_20fr_7fr_3fr] drop-shadow-[0px_4px_6px_rgba(0,0,0,0.2)]">
@@ -192,6 +247,14 @@ export default function Transactions() {
 					onCreate={createTransaction}
 					onDelete={deleteTransaction}
 					onUpdate={updateTransaction}
+				/>
+			</Modal>
+
+			<Modal isOpen={filterOpen} onClose={() => setFilterOpen(false)}>
+				<TransactionFilter
+					filters={filters}
+					onApplyFilters={applyFilters}
+					onClose={() => setFilterOpen(false)}
 				/>
 			</Modal>
 		</>

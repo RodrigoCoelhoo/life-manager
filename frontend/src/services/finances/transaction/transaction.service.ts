@@ -1,3 +1,4 @@
+import type { TransactionFilters } from '../../../pages/finances/Transactions';
 import { api } from '../../api';
 import type { PageResponseDTO } from '../../api.dto';
 import type { TransactionDTO, TransactionResponseDTO } from './transaction.dto';
@@ -8,13 +9,19 @@ export const transactionService = {
 
 	getTransactions: async (
 		page: number,
-		size: number
+		size: number,
+		filters: TransactionFilters
 	): Promise<PageResponseDTO<TransactionResponseDTO>> => {
 		try {
 			const params = new URLSearchParams({
 				page: page.toString(),
 				size: size.toString(),
 			});
+
+			if (filters.category) params.append("category", filters.category);
+			if (filters.wallet) params.append("walletId", filters.wallet.id.toString());
+			if (filters.startDate) params.append("startDate", filters.startDate);
+			if (filters.endDate) params.append("endDate", filters.endDate);
 
 			const { data } = await api.get<PageResponseDTO<TransactionResponseDTO>>(`${BASE_URL}?${params.toString()}`);
 			return data;

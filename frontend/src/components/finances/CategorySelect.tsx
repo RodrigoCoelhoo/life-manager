@@ -2,11 +2,12 @@ import { useState } from "react";
 import { ExpenseCategory, ExpenseCategoryType } from "../../services/finances/transaction/transaction.dto";
 
 interface CategorySelectProps {
-	value: ExpenseCategory;
+	value?: ExpenseCategory;
+	allOption?: boolean;
 	onChange: (value: ExpenseCategory) => void;
 }
 
-export default function CategorySelect({ value, onChange }: CategorySelectProps) {
+export default function CategorySelect({ value, allOption, onChange }: CategorySelectProps) {
 	const [open, setOpen] = useState(false);
 
 	const toggle = () => setOpen((o) => !o);
@@ -22,14 +23,14 @@ export default function CategorySelect({ value, onChange }: CategorySelectProps)
 				type="button"
 				value={value}
 				onClick={toggle}
-				className="w-full flex items-center justify-between transition p-2"
+				className="w-full flex items-center justify-between transition p-2 cursor-pointer"
 			>
 				<div className="flex gap-2 items-center justify-between">
 					<span>
-						{value}
+						{value ?? "ALL CATEGORIES"}
 					</span>
 					<span className="text-gray-500">
-						{ ExpenseCategoryType[value] }
+						{ExpenseCategoryType[value]}
 					</span>
 				</div>
 
@@ -46,6 +47,17 @@ export default function CategorySelect({ value, onChange }: CategorySelectProps)
 			{/* Dropdown */}
 			{open && (
 				<div className="absolute mt-1 w-full bg-foreground border border-primary rounded-lg shadow-lg max-h-48 overflow-y-auto z-20">
+
+					{allOption === true && <div
+						onClick={() => {
+							onChange(undefined);
+							setOpen(false);
+						}}
+						className="flex items-center px-3 py-2 cursor-pointer hover:bg-background text-sm opacity-70"
+					>
+						ALL CATEGORIES
+					</div>}
+
 					{Object.entries(ExpenseCategory).map(([key, value]) => (
 						<div
 							key={key}
@@ -53,11 +65,14 @@ export default function CategorySelect({ value, onChange }: CategorySelectProps)
 							className="flex items-center px-3 py-2 cursor-pointer hover:bg-background text-sm gap-2"
 						>
 							<span className="font-extralight">{value}</span>
-							<span className="ml-auto opacity-70">{ExpenseCategoryType[value]}</span>
+							<span className="ml-auto opacity-70">
+								{ExpenseCategoryType[value]}
+							</span>
 						</div>
 					))}
 				</div>
 			)}
+
 		</div>
 	);
 }

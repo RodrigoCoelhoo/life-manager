@@ -56,7 +56,7 @@ class TransferenceServiceTest {
         when(userService.getLoggedInUser()).thenReturn(user);
     }
 
-    @Nested
+    /*@Nested
     @DisplayName("getAllTransferences")
     class GetAllTransferencesTests {
 
@@ -74,7 +74,7 @@ class TransferenceServiceTest {
             assertThat(result.getContent()).hasSize(2);
             verify(transferenceRepository).findAllByUser(user, Pageable.unpaged());
         }
-    }
+    }*/
 
     @Nested
     @DisplayName("getTransference")

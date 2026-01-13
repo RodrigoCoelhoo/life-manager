@@ -10,9 +10,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
 
 @RestController
 @RequestMapping("/api/transferences")
@@ -29,11 +32,33 @@ public class TransferenceController {
     @GetMapping
     public ResponseEntity<PageResponseDTO<TransferenceResponseDTO>> getAllTransferences(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size
-    ) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by("date").descending());
+            @RequestParam(defaultValue = "20") int size,
 
-        Page<TransferenceModel> transferences = transferenceService.getAllTransferences(pageable);
+            @RequestParam(required = false) Long senderId,
+            @RequestParam(required = false) Long receiverId,
+
+            @RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            LocalDate startDate,
+
+            @RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            LocalDate endDate
+    ) {
+        Pageable pageable = PageRequest.of(
+                page,
+                size,
+                Sort.by("date").descending()
+        );
+
+        Page<TransferenceModel> transferences = transferenceService.getAllTransferences(
+                pageable,
+                senderId,
+                receiverId,
+                startDate,
+                endDate
+        );
+
         Page<TransferenceResponseDTO> response = transferences.map(TransferenceResponseDTO::fromEntity);
 
         return ResponseEntity.ok(PageResponseDTO.fromPage(response));

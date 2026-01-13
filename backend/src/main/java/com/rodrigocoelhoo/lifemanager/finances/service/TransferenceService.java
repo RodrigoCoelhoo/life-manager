@@ -8,11 +8,13 @@ import com.rodrigocoelhoo.lifemanager.finances.model.TransferenceModel;
 import com.rodrigocoelhoo.lifemanager.finances.model.WalletModel;
 import com.rodrigocoelhoo.lifemanager.finances.repository.TransferenceRepository;
 import com.rodrigocoelhoo.lifemanager.finances.repository.WalletRepository;
+import com.rodrigocoelhoo.lifemanager.finances.specification.TransferenceSpecification;
 import com.rodrigocoelhoo.lifemanager.users.UserModel;
 import com.rodrigocoelhoo.lifemanager.users.UserService;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -43,9 +45,25 @@ public class TransferenceService {
     }
 
 
-    public Page<TransferenceModel> getAllTransferences(Pageable pageable) {
+    public Page<TransferenceModel> getAllTransferences(
+            Pageable pageable,
+            Long sender,
+            Long receiver,
+            LocalDate startDate,
+            LocalDate endDate
+    ) {
         UserModel user = userService.getLoggedInUser();
-        return transferenceRepository.findAllByUser(user, pageable);
+
+        Specification<TransferenceModel> spec =
+                TransferenceSpecification.withFilters(
+                        user,
+                        sender,
+                        receiver,
+                        startDate,
+                        endDate
+                );
+
+        return transferenceRepository.findAll(spec, pageable);
     }
 
     public TransferenceModel getTransference(Long id) {

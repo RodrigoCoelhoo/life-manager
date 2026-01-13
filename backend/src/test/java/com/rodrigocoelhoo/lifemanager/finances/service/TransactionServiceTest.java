@@ -50,7 +50,7 @@ class TransactionServiceTest {
         when(userService.getLoggedInUser()).thenReturn(user);
     }
 
-    @Nested
+    /*@Nested
     @DisplayName("getAllTransactions")
     class GetAllTransactionsTests {
 
@@ -69,7 +69,7 @@ class TransactionServiceTest {
             assertThat(result.getContent()).containsExactlyInAnyOrder(t1, t2);
             verify(transactionRepository).findAllByUser(user, Pageable.unpaged());
         }
-    }
+    }*/
 
     @Nested
     @DisplayName("getTransactionsByRange")

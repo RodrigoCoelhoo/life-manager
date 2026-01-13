@@ -81,7 +81,7 @@ export default function HomePage() {
 				{/* Hero Section */}
 				<section
 					ref={heroRef}
-					className={`bg-background text-textcolor flex flex-col items-center justify-between xl:flex-row overflow-hidden pb-32 transition-all duration-700 ${isHeroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+					className={`bg-background py-20 text-textcolor flex flex-col items-center justify-between xl:flex-row overflow-hidden pb-32 transition-all duration-700 ${isHeroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
 						}`}
 				>
 					<div className="bg-background flex flex-col items-center xl:items-start text-center xl:text-left w-3/5 mt-25 mb-25 px-8 sm:px-16 md:px-24 lg:px-32 xl:px-48">

@@ -1,3 +1,4 @@
+import type { TransferenceFilters } from '../../../pages/finances/Transferences';
 import { api } from '../../api';
 import type { PageResponseDTO } from '../../api.dto';
 import type { TransferenceDTO, TransferenceResponseDTO } from './transference.dto';
@@ -7,14 +8,20 @@ const BASE_URL = '/transferences';
 export const transferenceService = {
 
 	getAllTransferences: async (
-		page: number,
-		size: number
+		page: number, 
+		size: number, 
+		filters: TransferenceFilters
 	): Promise<PageResponseDTO<TransferenceResponseDTO>> => {
 		try {
 			const params = new URLSearchParams({
 				page: page.toString(),
 				size: size.toString(),
 			});
+
+			if (filters.sender) params.append("senderId", filters.sender.id.toString());
+			if (filters.receiver) params.append("receiverId", filters.receiver.id.toString());
+			if (filters.startDate) params.append("startDate", filters.startDate);
+			if (filters.endDate) params.append("endDate", filters.endDate);
 
 			const { data } = await api.get<PageResponseDTO<TransferenceResponseDTO>>(`${BASE_URL}?${params.toString()}`);
 			return data;

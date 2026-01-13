@@ -11,7 +11,7 @@ import { WeekView } from '../../components/nutrition/WeekView';
 export default function NutritionDashboard() {
 	const [weekOverview, setWeekOverview] = useState<WeekOverviewDTO>();
 	const currentDate = new Date().toISOString().split('T')[0];
-	const [date, setDate] = useState<string>("2025-12-25");
+	const [date, setDate] = useState<string>(currentDate);
 	const [loading, setLoading] = useState<boolean>(false);
 	const [error, setError] = useState<string | null>(null);
 

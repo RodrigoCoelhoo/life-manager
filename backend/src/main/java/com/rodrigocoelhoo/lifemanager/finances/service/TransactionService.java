@@ -8,13 +8,14 @@ import com.rodrigocoelhoo.lifemanager.finances.model.ExpenseType;
 import com.rodrigocoelhoo.lifemanager.finances.model.TransactionModel;
 import com.rodrigocoelhoo.lifemanager.finances.model.WalletModel;
 import com.rodrigocoelhoo.lifemanager.finances.repository.TransactionRepository;
-import com.rodrigocoelhoo.lifemanager.finances.repository.WalletRepository;
+import com.rodrigocoelhoo.lifemanager.finances.specification.TransactionSpecification;
 import com.rodrigocoelhoo.lifemanager.users.UserModel;
 import com.rodrigocoelhoo.lifemanager.users.UserService;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -39,10 +40,24 @@ public class TransactionService {
     }
 
     public Page<TransactionModel> getAllTransactions(
-            Pageable pageable
+            Pageable pageable,
+            Long walletId,
+            ExpenseCategory category,
+            LocalDate startDate,
+            LocalDate endDate
     ) {
         UserModel user = userService.getLoggedInUser();
-        return transactionRepository.findAllByUser(user, pageable);
+
+        Specification<TransactionModel> spec =
+                TransactionSpecification.withFilters(
+                        user,
+                        walletId,
+                        category,
+                        startDate,
+                        endDate
+                );
+
+        return transactionRepository.findAll(spec, pageable);
     }
 
     public List<TransactionModel> getTransactionsByRange(
