@@ -9,6 +9,7 @@ import { Modal } from "../../components/common/Modal";
 import ExerciseForm from "../../components/training/ExerciseForm";
 import { Pagination } from "../../components/common/Pagination";
 import toast from "react-hot-toast";
+import { LuDumbbell } from "react-icons/lu";
 
 export default function Exercises() {
 	const [exercises, setExercises] = useState<ExerciseResponseDTO[]>([]);
@@ -142,16 +143,34 @@ export default function Exercises() {
 				</div>
 
 				<div className="flex flex-col gap-2">
-					<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-						{exercises.map((exercise) => (
-							<ExerciseCard
-								key={exercise.id}
-								{...exercise}
-								onUpdate={updateExercise}
-								onDelete={deleteExercise}
-							/>
-						))}
-					</div>
+					{exercises.length === 0 ? (
+						<div className="flex items-center justify-center min-h-[70vh]">
+							<div className="flex flex-col items-center justify-center rounded-2xl p-8 text-center">
+								<div className="mb-4 text-primary/70">
+									<LuDumbbell size={32} />
+								</div>
+
+								<p className="text-xl font-medium text-textcolor mb-2">
+									No exercises yet
+								</p>
+
+								<p className="text-sm text-textcolor/60 max-w-md">
+									Create your first exercise to start tracking your performance
+								</p>
+							</div>
+						</div>
+					) : (
+						<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+							{exercises.map((exercise) => (
+								<ExerciseCard
+									key={exercise.id}
+									{...exercise}
+									onUpdate={updateExercise}
+									onDelete={deleteExercise}
+								/>
+							))}
+						</div>
+					)}
 				</div>
 
 				<div className="mb-4">

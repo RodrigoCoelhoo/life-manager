@@ -202,7 +202,7 @@ export default function IngredientBrandForm({
 							className="form-submit bg-red-500 w-full hover:bg-red-600"
 							onClick={handleDelete}
 						>
-							Delete Ingredient Brand
+							Delete Recipe
 						</button>
 					</div>
 				)}

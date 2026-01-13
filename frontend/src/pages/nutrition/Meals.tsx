@@ -9,6 +9,7 @@ import { mealService } from '../../services/nutrition/meal/meal.service';
 import type { MealDetailsDTO, MealDTO } from '../../services/nutrition/meal/meal.dto';
 import MealCard from '../../components/nutrition/MealCard';
 import { MealForm } from '../../components/nutrition/MealForm';
+import { GiForkKnifeSpoon } from 'react-icons/gi';
 
 export default function Meals() {
 	const [meals, setMeals] = useState<MealDetailsDTO[]>([]);
@@ -141,16 +142,34 @@ export default function Meals() {
 				</div>
 
 				<div className="flex flex-col gap-2">
-					<div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-6">
-						{meals.map((meal) => (
-							<MealCard 
-								key={meal.meal.id}
-								{...meal}
-								onUpdate={updateMeal}
-								onDelete={deleteMeal}
-							/>
-						))}
-					</div>
+					{meals.length === 0 ? (
+						<div className="flex items-center justify-center min-h-[70vh]">
+							<div className="flex flex-col items-center justify-center rounded-2xl p-8 text-center">
+								<div className="mb-4 text-primary/70">
+									<GiForkKnifeSpoon size={32} />
+								</div>
+
+								<p className="text-xl font-medium text-textcolor mb-2">
+									No meals yet
+								</p>
+
+								<p className="text-sm text-textcolor/60 max-w-md">
+									Create your first meal to start tracking your macros
+								</p>
+							</div>
+						</div>
+					) : (
+						<div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-6">
+							{meals.map((meal) => (
+								<MealCard
+									key={meal.meal.id}
+									{...meal}
+									onUpdate={updateMeal}
+									onDelete={deleteMeal}
+								/>
+							))}
+						</div>
+					)}
 				</div>
 
 				<div className="mb-4">

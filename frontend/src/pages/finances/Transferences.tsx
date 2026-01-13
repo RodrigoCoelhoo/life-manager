@@ -14,6 +14,7 @@ import { formatBalance } from "../../services/finances/currencies.type";
 import type { WalletResponseDTO } from "../../services/finances/wallet/wallet.dto";
 import TransferenceFilter from "../../components/finances/TransferenceFilter";
 import { IoMdOptions } from "react-icons/io";
+import { BiTransferAlt } from "react-icons/bi";
 
 export interface TransferenceFilters {
 	sender?: WalletResponseDTO;
@@ -130,7 +131,7 @@ export default function Transferences() {
 
 	return (
 		<>
-			<div className="w-full p-2 sm:p-6 text-textcolor flex flex-col gap-4">
+			<div className="w-full p-2 sm:p-6 text-textcolor flex flex-col gap-4 min-h-screen">
 
 				<div className="flex flex-col gap-2 p-2">
 					<div className="flex items-center justify-between gap-4">
@@ -183,44 +184,65 @@ export default function Transferences() {
 					</div>
 				</div>
 
-				<div className="h-full p-2 w-full text-textcolor text-sm rounded-t-lg grid grid-cols-[4fr_6fr_5fr_6fr_5fr_4fr] sm:grid-cols-[4fr_6fr_5fr_6fr_5fr_10fr_4fr] drop-shadow-[0px_4px_6px_rgba(0,0,0,0.2)]">
-
-					{/* Header */}
-					<div className="font-semibold bg-primary py-2 px-2 rounded-tl-lg">Date</div>
-					<div className="font-semibold bg-primary py-2 px-2 wrap-break-words">Sender</div>
-					<div className="font-semibold bg-primary py-2 px-2">Amount</div>
-					<div className="font-semibold bg-primary py-2 px-2 wrap-break-words">Receiver</div>
-					<div className="font-semibold bg-primary py-2 px-2">Amount</div>
-					<div className="font-semibold bg-primary py-2 px-2 hidden sm:block">Description</div>
-					<div className="font-semibold bg-primary py-2 px-2 rounded-tr-lg truncate text-center"></div>
-
-					{/* Rows */}
-					{transferences.map((item, index) => {
-						const rowStyle = index % 2 === 0 ? "bg-foreground/90" : "bg-foreground/70";
-
-						return (
-							<React.Fragment key={item.id}>
-								<div className={`${rowStyle} py-1 px-2 font-extralight whitespace-nowrap min-w-max`}>{new Date(item.date).toLocaleDateString()}</div>
-								<div className={`${rowStyle} py-1 px-2 font-extralight truncate`}>{item.fromWallet.name}</div>
-								<div className={`${rowStyle} py-1 px-2 font-extralight text-[#F87171]`}>-{formatBalance(item.fromAmount)}</div>
-								<div className={`${rowStyle} py-1 px-2 font-extralight truncate`}>{item.toWallet.name}</div>
-								<div className={`${rowStyle} py-1 px-2 font-extralight text-[#34D399]`}>+{formatBalance(item.toAmount)}</div>
-								<div className={`${rowStyle} py-1 px-2 font-extralight truncate hidden sm:block`}>
-									{item.description || "No description provided"}
+				<div className="flex flex-col gap-2">
+					{transferences.length === 0 ? (
+						<div className="flex items-center justify-center min-h-[70vh]">
+							<div className="flex flex-col items-center justify-center rounded-2xl p-8 text-center">
+								<div className="mb-4 text-primary/70">
+									<BiTransferAlt size={48} />
 								</div>
-								<button
-									className={`${rowStyle} py-1 px-2 font-extralight`}
-									onClick={() => {
-										setActiveTransference(item);
-										setIsOpen(true);
-									}}
-								>
-									<PencilSquareIcon className="h-5 w-5 hover:rounded-full hover:bg-gray-400/30 p-0.5 cursor-pointer" />
-								</button>
-							</React.Fragment>
-						);
-					})}
+
+								<p className="text-xl font-medium text-textcolor mb-2">
+									No transferences yet
+								</p>
+
+								<p className="text-sm text-textcolor/60 max-w-md">
+									Create your first transference to start tracking your finances
+								</p>
+							</div>
+						</div>
+					) : (
+						<div className="h-full p-2 w-full text-textcolor text-sm rounded-t-lg grid grid-cols-[4fr_6fr_5fr_6fr_5fr_4fr] sm:grid-cols-[4fr_6fr_5fr_6fr_5fr_10fr_4fr] drop-shadow-[0px_4px_6px_rgba(0,0,0,0.2)]">
+
+							{/* Header */}
+							<div className="font-semibold bg-primary py-2 px-2 rounded-tl-lg">Date</div>
+							<div className="font-semibold bg-primary py-2 px-2 wrap-break-words">Sender</div>
+							<div className="font-semibold bg-primary py-2 px-2">Amount</div>
+							<div className="font-semibold bg-primary py-2 px-2 wrap-break-words">Receiver</div>
+							<div className="font-semibold bg-primary py-2 px-2">Amount</div>
+							<div className="font-semibold bg-primary py-2 px-2 hidden sm:block">Description</div>
+							<div className="font-semibold bg-primary py-2 px-2 rounded-tr-lg truncate text-center"></div>
+
+							{/* Rows */}
+							{transferences.map((item, index) => {
+								const rowStyle = index % 2 === 0 ? "bg-foreground/90" : "bg-foreground/70";
+
+								return (
+									<React.Fragment key={item.id}>
+										<div className={`${rowStyle} py-1 px-2 font-extralight whitespace-nowrap min-w-max`}>{new Date(item.date).toLocaleDateString()}</div>
+										<div className={`${rowStyle} py-1 px-2 font-extralight truncate`}>{item.fromWallet.name}</div>
+										<div className={`${rowStyle} py-1 px-2 font-extralight text-[#F87171]`}>-{formatBalance(item.fromAmount)}</div>
+										<div className={`${rowStyle} py-1 px-2 font-extralight truncate`}>{item.toWallet.name}</div>
+										<div className={`${rowStyle} py-1 px-2 font-extralight text-[#34D399]`}>+{formatBalance(item.toAmount)}</div>
+										<div className={`${rowStyle} py-1 px-2 font-extralight truncate hidden sm:block`}>
+											{item.description || "No description provided"}
+										</div>
+										<button
+											className={`${rowStyle} py-1 px-2 font-extralight`}
+											onClick={() => {
+												setActiveTransference(item);
+												setIsOpen(true);
+											}}
+										>
+											<PencilSquareIcon className="h-5 w-5 hover:rounded-full hover:bg-gray-400/30 p-0.5 cursor-pointer" />
+										</button>
+									</React.Fragment>
+								);
+							})}
+						</div>
+					)}
 				</div>
+
 
 				<div className="mb-4">
 					<Pagination

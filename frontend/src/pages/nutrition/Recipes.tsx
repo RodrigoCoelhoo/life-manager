@@ -13,6 +13,7 @@ import RecipeCard from "../../components/nutrition/RecipeCard";
 import RecipeForm from "../../components/nutrition/RecipeForm";
 import { SearchList } from "../../components/common/SearchList";
 import { ingredientService } from "../../services/nutrition/ingredient/ingredient.service";
+import { FaBookOpen } from "react-icons/fa";
 
 export default function Recipes() {
 	const [recipes, setRecipes] = useState<RecipeDetailsDTO[]>([]);
@@ -220,16 +221,33 @@ export default function Recipes() {
 				}
 
 				<div className="flex flex-col gap-2">
-					<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-						{recipes.map((recipe) => (
-							<RecipeCard
-								key={recipe.id}
-								{...recipe}
-								onUpdate={updateRecipe}
-								onDelete={deleteRecipe}
-							/>
-						))}
-					</div>
+					{recipes.length === 0 ? (
+						<div className="flex items-center justify-center min-h-[70vh]">
+							<div className="flex flex-col items-center justify-center rounded-2xl p-8 text-center">
+								<div className="mb-4 text-primary/70">
+									<FaBookOpen size={32} />
+								</div>
+
+								<p className="text-xl font-medium text-textcolor mb-2">
+									No recipes yet
+								</p>
+
+								<p className="text-sm text-textcolor/60 max-w-md">
+									Create your first recipe to automatize the creation of your meals
+								</p>
+							</div>
+						</div>
+					) : (
+						<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+							{recipes.map((recipe) => (
+								<RecipeCard
+									key={recipe.id}
+									{...recipe}
+									onUpdate={updateRecipe}
+									onDelete={deleteRecipe}
+								/>
+							))}
+						</div>)}
 				</div>
 
 				<div className="mb-4">

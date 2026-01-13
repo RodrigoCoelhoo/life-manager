@@ -14,6 +14,7 @@ import { formatBalance } from "../../services/finances/currencies.type";
 import { IoMdOptions } from "react-icons/io";
 import type { WalletResponseDTO } from "../../services/finances/wallet/wallet.dto";
 import TransactionFilter from "../../components/finances/TransactionFilter";
+import { FaMoneyBillWave } from "react-icons/fa6";
 
 export interface TransactionFilters {
 	category?: ExpenseCategory;
@@ -128,7 +129,7 @@ export default function Transactions() {
 
 	return (
 		<>
-			<div className="w-full p-2 sm:p-6 text-textcolor flex flex-col gap-1">
+			<div className="w-full p-2 sm:p-6 text-textcolor flex flex-col gap-1 min-h-screen">
 
 				<div className="flex flex-col gap-2 p-2">
 					<div className="flex items-center justify-between gap-4">
@@ -151,29 +152,29 @@ export default function Transactions() {
 					</div>
 
 					<div className="flex flex-row flex-wrap gap-4 text-textcolor text-sm font-extralight">
-						{(filters.startDate || filters.endDate) && 
+						{(filters.startDate || filters.endDate) &&
 							<div className="py-1 px-4 bg-textcolor/5 rounded-2xl">
-								{(filters.startDate && filters.endDate) ? 
-									
+								{(filters.startDate && filters.endDate) ?
+
 									<div className="flex flex-row gap-1 flex-nowrap">
-										<span className="font-semibold">From:</span> {filters.startDate || "?"} 
+										<span className="font-semibold">From:</span> {filters.startDate || "?"}
 										<span className="font-semibold">To:</span> {filters.endDate || "?"}
 									</div>
 									:
-									filters.startDate ? 
-									<div><span className="font-semibold">From:</span> {filters.startDate || "?"}</div> : 
-									<div><span className="font-semibold">To:</span> {filters.endDate || "?"}</div>
+									filters.startDate ?
+										<div><span className="font-semibold">From:</span> {filters.startDate || "?"}</div> :
+										<div><span className="font-semibold">To:</span> {filters.endDate || "?"}</div>
 								}
 							</div>
 						}
-						
-						{filters.wallet && 
+
+						{filters.wallet &&
 							<div className="py-1 px-4 bg-textcolor/5 rounded-2xl">
 								<span className="font-semibold">Wallet:</span> {filters.wallet.name}
 							</div>
 						}
 
-						{filters.category && 
+						{filters.category &&
 							<div className="py-1 px-4 bg-textcolor/5 rounded-2xl">
 								<span className="font-semibold">Category:</span> {filters.category}
 							</div>
@@ -181,47 +182,61 @@ export default function Transactions() {
 					</div>
 				</div>
 
-				<div className="h-full p-2 w-full text-textcolor text-sm rounded-t-lg grid grid-cols-[4fr_10fr_7fr_7fr_3fr] sm:grid-cols-[4fr_10fr_7fr_20fr_7fr_3fr] drop-shadow-[0px_4px_6px_rgba(0,0,0,0.2)]">
+				{transactions.length === 0 ? (
+					<div className="flex flex-col items-center justify-center rounded-2xl py-20 flex-1 min-h-[70vh]">
+						<div className="mb-3 text-primary/70">
+							<FaMoneyBillWave size={32}/>
+						</div>
 
-					{/* Header */}
-					<div className="font-semibold bg-primary py-2 px-2 rounded-tl-lg">Date</div>
-					<div className="font-semibold bg-primary py-2 px-2 wrap-break-words">Wallet</div>
-					<div className="font-semibold bg-primary py-2 px-2">Category</div>
-					<div className="font-semibold bg-primary py-2 px-2 hidden sm:block">Description</div>
-					<div className="font-semibold bg-primary py-2 px-2">Amount</div>
-					<div className="font-semibold bg-primary py-2 px-2 rounded-tr-lg truncate text-center"></div>
+						<p className="text-lg font-medium text-textcolor">
+							No transactions yet
+						</p>
 
-					{/* Rows */}
-					{transactions.map((item, index) => {
-						const rowStyle = index % 2 === 0 ? "bg-foreground/90" : "bg-foreground/70";
+						<p className="text-sm text-textcolor/60 mt-1 mb-4">
+							Create your first transaction to start tracking your finances
+						</p>
+					</div>
+				) : (
+					<div className="h-full p-2 w-full text-textcolor text-sm rounded-t-lg grid grid-cols-[4fr_10fr_7fr_7fr_3fr] sm:grid-cols-[4fr_10fr_7fr_20fr_7fr_3fr] drop-shadow-[0px_4px_6px_rgba(0,0,0,0.2)]">
 
-						return (
-							<React.Fragment key={item.id}>
-								<div className={`${rowStyle} py-1 px-2 font-extralight whitespace-nowrap min-w-max`}>{new Date(item.date).toLocaleDateString()}</div>
-								<div className={`${rowStyle} py-1 px-2 font-extralight truncate`}>{item.wallet.name}</div>
-								<div className={`${rowStyle} py-1 px-2 font-extralight`}>{item.category}</div>
-								<div className={`${rowStyle} py-1 px-2 font-extralight truncate hidden sm:block`}>
-									{item.description || "No description provided"}
-								</div>
-								<div className={`${rowStyle} flex flex-row py-1 px-2 font-extralight ${item.type === "EXPENSE" ? "text-[#F87171]" : "text-[#34D399]"} whitespace-nowrap`}>
-									<span className="inline-block w-4 text-right">
-										{item.type === "EXPENSE" ? "-" : "+"}
-									</span>{" "}
-									{formatBalance(item.amount)}
-								</div>
-								<button
-									className={`${rowStyle} py-1 px-2 font-extralight`}
-									onClick={() => {
-										setActiveTransaction(item);
-										setIsOpen(true);
-									}}
-								>
-									<PencilSquareIcon className="h-5 w-5 hover:rounded-full hover:bg-gray-400/30 p-0.5 cursor-pointer" />
-								</button>
-							</React.Fragment>
-						);
-					})}
-				</div>
+						<div className="font-semibold bg-primary py-2 px-2 rounded-tl-lg">Date</div>
+						<div className="font-semibold bg-primary py-2 px-2 wrap-break-words">Wallet</div>
+						<div className="font-semibold bg-primary py-2 px-2">Category</div>
+						<div className="font-semibold bg-primary py-2 px-2 hidden sm:block">Description</div>
+						<div className="font-semibold bg-primary py-2 px-2">Amount</div>
+						<div className="font-semibold bg-primary py-2 px-2 rounded-tr-lg truncate text-center"></div>
+
+						{transactions.map((item, index) => {
+							const rowStyle = index % 2 === 0 ? "bg-foreground/90" : "bg-foreground/70";
+
+							return (
+								<React.Fragment key={item.id}>
+									<div className={`${rowStyle} py-1 px-2 font-extralight whitespace-nowrap min-w-max`}>{new Date(item.date).toLocaleDateString()}</div>
+									<div className={`${rowStyle} py-1 px-2 font-extralight truncate`}>{item.wallet.name}</div>
+									<div className={`${rowStyle} py-1 px-2 font-extralight`}>{item.category}</div>
+									<div className={`${rowStyle} py-1 px-2 font-extralight truncate hidden sm:block`}>
+										{item.description || "No description provided"}
+									</div>
+									<div className={`${rowStyle} flex flex-row py-1 px-2 font-extralight ${item.type === "EXPENSE" ? "text-[#F87171]" : "text-[#34D399]"} whitespace-nowrap`}>
+										<span className="inline-block w-4 text-right">
+											{item.type === "EXPENSE" ? "-" : "+"}
+										</span>{" "}
+										{formatBalance(item.amount)}
+									</div>
+									<button
+										className={`${rowStyle} py-1 px-2 font-extralight`}
+										onClick={() => {
+											setActiveTransaction(item);
+											setIsOpen(true);
+										}}
+									>
+										<PencilSquareIcon className="h-5 w-5 hover:rounded-full hover:bg-gray-400/30 p-0.5 cursor-pointer" />
+									</button>
+								</React.Fragment>
+							);
+						})}
+					</div>
+				)}
 
 				<div className="mb-4">
 					<Pagination

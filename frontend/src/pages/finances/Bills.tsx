@@ -9,6 +9,7 @@ import type { AutomaticTransactionDTO, AutomaticTransactionResponseDTO } from ".
 import BillForm from "../../components/finances/BillForm";
 import BillCard from "../../components/finances/BillCard";
 import { FaCircleInfo } from "react-icons/fa6";
+import { RiBillLine } from "react-icons/ri";
 
 export default function Bills() {
 	const [bills, setBills] = useState<AutomaticTransactionResponseDTO[]>([]);
@@ -163,17 +164,35 @@ export default function Bills() {
 				</div>
 
 				<div className="flex flex-col gap-2">
-					<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-						{bills.map((bill) => (
-							<BillCard
-								key={bill.id}
-								{...bill}
-								onUpdate={updateBill}
-								onDelete={deleteBill}
-								onTrigger={triggerBill}
-							/>
-						))}
-					</div>
+					{bills.length === 0 ? (
+						<div className="flex items-center justify-center min-h-[70vh]">
+							<div className="flex flex-col items-center justify-center rounded-2xl p-8 text-center">
+								<div className="mb-4 text-primary/70">
+									<RiBillLine size={48} />
+								</div>
+
+								<p className="text-xl font-medium text-textcolor mb-2">
+									No bills yet
+								</p>
+
+								<p className="text-sm text-textcolor/60 max-w-md">
+									Create your first bill to automatize your transactions
+								</p>
+							</div>
+						</div>
+					) : (
+						<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+							{bills.map((bill) => (
+								<BillCard
+									key={bill.id}
+									{...bill}
+									onUpdate={updateBill}
+									onDelete={deleteBill}
+									onTrigger={triggerBill}
+								/>
+							))}
+						</div>
+					)}
 				</div>
 
 				<div className="mb-4">

@@ -9,6 +9,7 @@ import { walletService } from "../../services/finances/wallet/wallet.service";
 import WalletCard from "../../components/finances/WalletCard";
 import WalletForm from "../../components/finances/WalletForm";
 import toast from "react-hot-toast";
+import { LuWallet } from "react-icons/lu";
 
 export default function Wallets() {
 	const [wallets, setWallets] = useState<WalletResponseDTO[]>([]);
@@ -107,7 +108,7 @@ export default function Wallets() {
 
 	return (
 		<>
-			<div className="w-full p-6 text-textcolor flex flex-col gap-4">
+			<div className="w-full p-6 text-textcolor flex flex-col gap-4 min-h-screen">
 
 				<div className="flex items-center justify-between gap-4">
 					<button
@@ -142,17 +143,36 @@ export default function Wallets() {
 				</div>
 
 				<div className="flex flex-col gap-2">
-					<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-						{wallets.map((wallet) => (
-							<WalletCard
-								key={wallet.id}
-								{...wallet}
-								onUpdate={updateWallet}
-								onDelete={deleteWallet}
-							/>
-						))}
-					</div>
+					{wallets.length === 0 ? (
+						<div className="flex items-center justify-center min-h-[70vh]">
+							<div className="flex flex-col items-center justify-center rounded-2xl p-8 text-center">
+								<div className="mb-4 text-primary/70">
+									<LuWallet size={48} />
+								</div>
+
+								<p className="text-xl font-medium text-textcolor mb-2">
+									No wallets yet
+								</p>
+
+								<p className="text-sm text-textcolor/60 max-w-md">
+									Create your first wallet to start tracking finances
+								</p>
+							</div>
+						</div>
+					) : (
+						<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+							{wallets.map((wallet) => (
+								<WalletCard
+									key={wallet.id}
+									{...wallet}
+									onUpdate={updateWallet}
+									onDelete={deleteWallet}
+								/>
+							))}
+						</div>
+					)}
 				</div>
+
 
 				<div className="mb-4">
 					<Pagination

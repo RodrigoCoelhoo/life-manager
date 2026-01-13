@@ -9,6 +9,7 @@ import { Pagination } from "../../components/common/Pagination";
 import type { TrainingPlanDTO, TrainingPlanResponseDTO, TrainingPlanUpdateDTO } from "../../services/training/training-plan/training-plan.dto";
 import TrainingPlanForm from "../../components/training/TrainingPlanForm";
 import toast from "react-hot-toast";
+import { FaClipboardList } from "react-icons/fa";
 
 export default function TrainingPlans() {
 	const [trainingPlans, setTrainingPlans] = useState<TrainingPlanResponseDTO[]>([]);
@@ -141,16 +142,34 @@ export default function TrainingPlans() {
 				</div>
 
 				<div className="flex flex-col gap-2">
-					<div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-6">
-						{trainingPlans.map((trainingPlan) => (
-							<TrainingPlanCard
-								key={trainingPlan.id}
-								{...trainingPlan}
-								onUpdate={updateTrainingPlan}
-								onDelete={deleteTrainingPlan}
-							/>
-						))}
-					</div>
+					{trainingPlans.length === 0 ? (
+						<div className="flex items-center justify-center min-h-[70vh]">
+							<div className="flex flex-col items-center justify-center rounded-2xl p-8 text-center">
+								<div className="mb-4 text-primary/70">
+									<FaClipboardList size={32} />
+								</div>
+
+								<p className="text-xl font-medium text-textcolor mb-2">
+									No training plans yet
+								</p>
+
+								<p className="text-sm text-textcolor/60 max-w-md">
+									Create your first training plan to automatize the creation of sessions
+								</p>
+							</div>
+						</div>
+					) : (
+						<div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-6">
+							{trainingPlans.map((trainingPlan) => (
+								<TrainingPlanCard
+									key={trainingPlan.id}
+									{...trainingPlan}
+									onUpdate={updateTrainingPlan}
+									onDelete={deleteTrainingPlan}
+								/>
+							))}
+						</div>
+					)}
 				</div>
 
 				<div className="mb-4">

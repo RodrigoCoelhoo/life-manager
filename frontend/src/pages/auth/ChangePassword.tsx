@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import { InputField } from "../../components/common/InputField";
 import { passwordRules } from "../../rules/rules";
 import { IoMdArrowRoundBack } from "react-icons/io";
@@ -20,8 +20,6 @@ export default function ChangePassword() {
 	const newPasswordRef = useRef<any>(null);
 	const confirmNewPasswordRef = useRef<any>(null);
 	const passwordConfirmationRef = useRef<any>(null);
-
-	const navigate = useNavigate();
 
 	const submitForm = async (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
