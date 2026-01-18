@@ -43,4 +43,5 @@ public class SessionExerciseModel {
 
     @UpdateTimestamp
     private LocalDateTime updatedAt;
+
 }

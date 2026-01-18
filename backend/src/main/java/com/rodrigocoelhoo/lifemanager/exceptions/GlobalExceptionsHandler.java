@@ -1,5 +1,7 @@
 package com.rodrigocoelhoo.lifemanager.exceptions;
 
+import org.springframework.data.redis.RedisConnectionFailureException;
+import org.springframework.data.redis.serializer.SerializationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -90,5 +92,26 @@ public class GlobalExceptionsHandler {
         Map<String, Object> body = globalExceptionHeader(HttpStatus.UNAUTHORIZED, "Unauthorized");
         body.put("message", ex.getMessage());
         return new ResponseEntity<>(body, HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(RedisConnectionFailureException.class)
+    public ResponseEntity<String> handleRedisConnection(RedisConnectionFailureException ex) {
+        // Log full stack trace
+        ex.printStackTrace();
+
+        // Return details in response for debugging (temporary only)
+        String message = "Redis connection failed! Details: " + ex.getMessage();
+        return new ResponseEntity<>(message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+
+    @ExceptionHandler(SerializationException.class)
+    public ResponseEntity<String> handleRedisConnection(SerializationException ex) {
+        // Log full stack trace
+        ex.printStackTrace();
+
+        // Return details in response for debugging (temporary only)
+        String message = "Serialization failed! Details: " + ex.getMessage();
+        return new ResponseEntity<>(message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

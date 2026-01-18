@@ -1,12 +1,15 @@
 package com.rodrigocoelhoo.lifemanager.training.service;
 
+import com.rodrigocoelhoo.lifemanager.config.RedisCacheService;
 import com.rodrigocoelhoo.lifemanager.training.dto.MonthOverviewDTO;
 import com.rodrigocoelhoo.lifemanager.training.model.ExerciseModel;
 import com.rodrigocoelhoo.lifemanager.training.model.ExerciseType;
 import com.rodrigocoelhoo.lifemanager.training.model.SessionExerciseModel;
 import com.rodrigocoelhoo.lifemanager.training.model.TrainingSessionModel;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
@@ -17,10 +20,19 @@ public class TrainingDashboardService {
 
     private final TrainingSessionService trainingSessionService;
 
-    public TrainingDashboardService(TrainingSessionService trainingSessionService) {
+    public TrainingDashboardService(
+            TrainingSessionService trainingSessionService
+    ) {
         this.trainingSessionService = trainingSessionService;
     }
 
+    private static final String CACHE_DASHBOARD = "financesDashboard";
+
+    @Cacheable(
+            value = CACHE_DASHBOARD,
+            key = "T(com.rodrigocoelhoo.lifemanager.config.RedisCacheService).getCurrentUsername() + " +
+                    "'::month:' + #date"
+    )
     public MonthOverviewDTO getMonthOverview(YearMonth date) {
         LocalDateTime start = date.atDay(1).atTime(0, 0, 0);
         LocalDateTime end   = date.atEndOfMonth().atTime(23, 59, 59);
@@ -95,8 +107,8 @@ public class TrainingDashboardService {
             double maxWeight,
             RepSet bestRepSet,
             double bestE1RM
-    ) {
-        public record RepSet(int reps, double weight) {}
+    ) implements Serializable {
+        public record RepSet(int reps, double weight) implements Serializable {}
     }
 
 }

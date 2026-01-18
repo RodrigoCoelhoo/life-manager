@@ -472,7 +472,7 @@ export const TrainingSessionForm = ({ trainingSessionId, onClose, onCreate, onDe
 								className="form-submit bg-red-500 w-full hover:bg-red-600"
 								onClick={handleDelete}
 							>
-								Delete Training Plan
+								Delete Training Session
 							</button>
 						</div>
 					}

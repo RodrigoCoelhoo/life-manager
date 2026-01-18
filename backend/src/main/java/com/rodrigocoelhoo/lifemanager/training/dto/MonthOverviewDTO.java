@@ -2,6 +2,7 @@ package com.rodrigocoelhoo.lifemanager.training.dto;
 
 import com.rodrigocoelhoo.lifemanager.training.service.TrainingDashboardService;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
@@ -12,7 +13,7 @@ public record MonthOverviewDTO(
         Integer timeSecs,
         Double distance,
         List<ExercisePRDTO> exercisePRS
-    ) {
+    ) implements Serializable {
     public static MonthOverviewDTO fromEntities(
             List<LocalDate> dates,
             double volume,
@@ -40,5 +41,5 @@ public record MonthOverviewDTO(
             double bestE1RM,
             double maxWeight,
             TrainingDashboardService.ExercisePR.RepSet bestVolumeSet
-    ) { }
+    ) implements Serializable { }
 }

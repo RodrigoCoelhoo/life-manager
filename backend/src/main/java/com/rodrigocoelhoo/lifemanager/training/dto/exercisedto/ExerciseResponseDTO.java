@@ -2,6 +2,7 @@ package com.rodrigocoelhoo.lifemanager.training.dto.exercisedto;
 
 import com.rodrigocoelhoo.lifemanager.training.model.ExerciseModel;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 public record ExerciseResponseDTO(
@@ -12,7 +13,7 @@ public record ExerciseResponseDTO(
         String demoUrl,
         LocalDateTime createdAt,
         LocalDateTime updatedAt
-) {
+) implements Serializable {
     public static ExerciseResponseDTO fromEntity(ExerciseModel model) {
         return new ExerciseResponseDTO(
                 model.getId(),

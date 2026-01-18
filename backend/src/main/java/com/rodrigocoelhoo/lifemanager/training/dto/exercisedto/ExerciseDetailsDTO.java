@@ -3,6 +3,7 @@ package com.rodrigocoelhoo.lifemanager.training.dto.exercisedto;
 import com.rodrigocoelhoo.lifemanager.training.dto.trainingsessiondto.SessionExerciseBaseDTO;
 import com.rodrigocoelhoo.lifemanager.training.model.ExerciseModel;
 
+import java.io.Serializable;
 import java.util.List;
 
 public record ExerciseDetailsDTO(
@@ -11,7 +12,7 @@ public record ExerciseDetailsDTO(
         String type,
         String demoUrl,
         List<SessionExerciseBaseDTO> sets
-) {
+) implements Serializable {
     public static ExerciseDetailsDTO fromEntity(ExerciseModel exercise, List<SessionExerciseBaseDTO> sets) {
         return new ExerciseDetailsDTO(
                 exercise.getId(),

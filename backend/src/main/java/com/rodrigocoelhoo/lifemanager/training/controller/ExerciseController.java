@@ -38,11 +38,8 @@ public class ExerciseController {
             @RequestParam(required = false) String name
     ) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("updatedAt").descending());
-        Page<ExerciseModel> exercises = exerciseService.getAllExercisesByUser(pageable, name);
 
-        Page<ExerciseResponseDTO> response = exercises.map(ExerciseResponseDTO::fromEntity);
-
-        return ResponseEntity.ok(PageResponseDTO.fromPage(response));
+        return ResponseEntity.ok(PageResponseDTO.fromPage(exerciseService.getAllExercisesByUser(pageable, name)));
     }
 
     @GetMapping("/{exercise_id}")

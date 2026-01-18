@@ -3,6 +3,7 @@ package com.rodrigocoelhoo.lifemanager.training.dto.trainingplandto;
 import com.rodrigocoelhoo.lifemanager.training.dto.exercisedto.ExerciseSimpleDTO;
 import com.rodrigocoelhoo.lifemanager.training.model.TrainingPlanModel;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -13,7 +14,7 @@ public record TrainingPlanResponseDTO(
         List<ExerciseSimpleDTO> exercises,
         LocalDateTime createdAt,
         LocalDateTime updatedAt
-) {
+) implements Serializable {
 
     public static TrainingPlanResponseDTO fromEntity(TrainingPlanModel trainingPlanModel) {
         return new TrainingPlanResponseDTO(

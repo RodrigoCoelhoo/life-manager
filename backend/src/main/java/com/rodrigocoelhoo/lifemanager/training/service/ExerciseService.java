@@ -1,7 +1,10 @@
 package com.rodrigocoelhoo.lifemanager.training.service;
 
+import com.rodrigocoelhoo.lifemanager.config.CachedPage;
+import com.rodrigocoelhoo.lifemanager.config.RedisCacheService;
 import com.rodrigocoelhoo.lifemanager.exceptions.ResourceNotFound;
 import com.rodrigocoelhoo.lifemanager.training.dto.exercisedto.ExerciseDTO;
+import com.rodrigocoelhoo.lifemanager.training.dto.exercisedto.ExerciseResponseDTO;
 import com.rodrigocoelhoo.lifemanager.training.dto.exercisedto.ExerciseStats;
 import com.rodrigocoelhoo.lifemanager.training.dto.exercisedto.ExerciseUpdateDTO;
 import com.rodrigocoelhoo.lifemanager.training.model.ExerciseModel;
@@ -13,6 +16,7 @@ import com.rodrigocoelhoo.lifemanager.training.repository.TrainingPlanRepository
 import com.rodrigocoelhoo.lifemanager.users.UserModel;
 import com.rodrigocoelhoo.lifemanager.users.UserService;
 import jakarta.transaction.Transactional;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -29,24 +33,35 @@ public class ExerciseService {
     private final ExerciseRepository exerciseRepository;
     private final TrainingPlanRepository trainingPlanRepository;
     private final SessionExerciseRepository sessionExerciseRepository;
+    private final RedisCacheService redisCacheService;
+
+    private static final String CACHE_LIST = "exercises";
+    private static final String CACHE_STATS = "exerciseStats";
 
     public ExerciseService(
             ExerciseRepository exerciseRepository,
             UserService userService,
             TrainingPlanRepository trainingPlanRepository,
-            SessionExerciseRepository sessionExerciseRepository
+            SessionExerciseRepository sessionExerciseRepository,
+            RedisCacheService redisCacheService
     ) {
         this.exerciseRepository = exerciseRepository;
         this.userService = userService;
         this.trainingPlanRepository = trainingPlanRepository;
         this.sessionExerciseRepository = sessionExerciseRepository;
+        this.redisCacheService = redisCacheService;
     }
 
-    public Page<ExerciseModel> getAllExercisesByUser(Pageable pageable, String name) {
+    @Cacheable(value = CACHE_LIST, keyGenerator = "userAwareKeyGenerator")
+    public Page<ExerciseResponseDTO> getAllExercisesByUser(Pageable pageable, String name) {
         UserModel user = userService.getLoggedInUser();
+        Page<ExerciseModel> page;
         if(name == null || name.isBlank())
-            return exerciseRepository.findAllByUser(user, pageable);
-        return exerciseRepository.findByUserAndNameContainingIgnoreCase(user, name, pageable);
+            page = exerciseRepository.findAllByUser(user, pageable);
+        else
+            page = exerciseRepository.findByUserAndNameContainingIgnoreCase(user, name, pageable);
+
+        return page.map(ExerciseResponseDTO::fromEntity);
     }
 
     public List<ExerciseModel> getExercisesForUser(List<Long> ids) {
@@ -65,6 +80,7 @@ public class ExerciseService {
                 .orElseThrow(() -> new ResourceNotFound("Exercise with ID '" + exercise_id + "' does not belong to the current user"));
     }
 
+
     @Transactional
     public ExerciseModel create(ExerciseDTO data) {
         UserModel user = userService.getLoggedInUser();
@@ -78,7 +94,11 @@ public class ExerciseService {
                 .demoUrl(data.demoUrl())
                 .build();
 
-        return exerciseRepository.save(exercise);
+        ExerciseModel saved = exerciseRepository.save(exercise);
+
+        redisCacheService.evictUserCache(CACHE_LIST);
+
+        return saved;
     }
 
     @Transactional
@@ -89,7 +109,11 @@ public class ExerciseService {
         exercise.setDescription(data.description());
         exercise.setDemoUrl(data.demoUrl());
 
-        return exerciseRepository.save(exercise);
+        ExerciseModel saved = exerciseRepository.save(exercise);
+
+        redisCacheService.evictUserCache(CACHE_LIST);
+
+        return saved;
     }
 
     @Transactional
@@ -100,8 +124,19 @@ public class ExerciseService {
                 .forEach(plan -> plan.getExercises().remove(exercise));
 
         exerciseRepository.delete(exercise);
+        redisCacheService.evictUserCache(CACHE_LIST);
+        redisCacheService.evictUserCache("trainingPlans");
+        redisCacheService.evictUserCache("trainingSessions");
+        redisCacheService.evictUserCache("trainingSession");
+        redisCacheService.evictUserCache("trainingDashboard");
+        redisCacheService.evictUserCacheSpecific(CACHE_STATS, "exercise:" + exerciseId);
     }
 
+    @Cacheable(
+            value = CACHE_STATS,
+            key = "T(com.rodrigocoelhoo.lifemanager.config.RedisCacheService).getCurrentUsername() + " +
+                    "'::exercise:' + #exerciseId"
+    )
     public ExerciseStats getExerciseStats(Long exerciseId) {
         ExerciseModel exercise = getExercise(exerciseId);
         if(exercise.getType().equals(ExerciseType.TIME)) {

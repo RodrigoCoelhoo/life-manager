@@ -114,7 +114,7 @@ export default function TrainingPlanForm({ onClose, trainingPlan, onCreate, onUp
 								ref={nameRef}
 								value={name}
 								onChange={setName}
-								placeholder="Exercise name"
+								placeholder="Training plan name"
 								rules={nameRules()}
 							/>
 						</div>
@@ -127,7 +127,7 @@ export default function TrainingPlanForm({ onClose, trainingPlan, onCreate, onUp
 								ref={descriptionRef}
 								value={description}
 								onChange={setDescription}
-								placeholder="Exercise description"
+								placeholder="Training plan description"
 								rules={descriptionRules()}
 								multiline={true}
 							/>

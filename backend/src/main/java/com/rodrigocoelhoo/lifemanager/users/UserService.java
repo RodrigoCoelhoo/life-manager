@@ -8,6 +8,7 @@ import com.rodrigocoelhoo.lifemanager.users.dto.UpdatePasswordDTO;
 import com.rodrigocoelhoo.lifemanager.users.dto.UserDTO;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -105,6 +106,8 @@ public class UserService {
                 .orElseThrow(() -> new ResourceNotFound("User with ID '" + id + "' not found"));
     }
 
+
+    @Cacheable(value = "user-by-username", key = "#username")
     public UserModel getUser(String username) {
         return userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFound("User with Username '" + username + "' not found"));
@@ -113,7 +116,6 @@ public class UserService {
     public UserModel getLoggedInUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String username = auth.getName();
-        return userRepository.findByUsername(username)
-                .orElseThrow(() -> new ResourceNotFound("User not found"));
+        return getUser(username);
     }
 }

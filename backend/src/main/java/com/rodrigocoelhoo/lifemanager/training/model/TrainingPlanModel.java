@@ -1,5 +1,6 @@
 package com.rodrigocoelhoo.lifemanager.training.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.rodrigocoelhoo.lifemanager.users.UserModel;
 import jakarta.persistence.*;
 import lombok.*;

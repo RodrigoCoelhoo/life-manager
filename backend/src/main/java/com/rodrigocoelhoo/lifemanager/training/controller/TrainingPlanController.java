@@ -37,12 +37,7 @@ public class TrainingPlanController {
             @RequestParam(defaultValue = "20") int size
     ) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("updatedAt").descending());
-
-        Page<TrainingPlanModel> plans = trainingPlanService.getAllTrainingPlansByUser(pageable);
-
-        Page<TrainingPlanResponseDTO> response = plans.map(TrainingPlanResponseDTO::fromEntity);
-
-        return ResponseEntity.ok(PageResponseDTO.fromPage(response));
+        return ResponseEntity.ok(PageResponseDTO.fromPage(trainingPlanService.getAllTrainingPlansByUser(pageable)));
     }
 
     @GetMapping("/{id}")

@@ -1,9 +1,8 @@
 package com.rodrigocoelhoo.lifemanager.training.service;
 
+import com.rodrigocoelhoo.lifemanager.config.RedisCacheService;
 import com.rodrigocoelhoo.lifemanager.exceptions.ResourceNotFound;
-import com.rodrigocoelhoo.lifemanager.finances.model.TransactionModel;
 import com.rodrigocoelhoo.lifemanager.training.dto.exercisedto.ExerciseDetailsDTO;
-import com.rodrigocoelhoo.lifemanager.training.dto.exercisedto.ExerciseStats;
 import com.rodrigocoelhoo.lifemanager.training.dto.trainingsessiondto.*;
 import com.rodrigocoelhoo.lifemanager.training.mapper.SessionExerciseMapper;
 import com.rodrigocoelhoo.lifemanager.training.model.*;
@@ -11,12 +10,13 @@ import com.rodrigocoelhoo.lifemanager.training.repository.TrainingSessionReposit
 import com.rodrigocoelhoo.lifemanager.users.UserModel;
 import com.rodrigocoelhoo.lifemanager.users.UserService;
 import jakarta.transaction.Transactional;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -30,40 +30,58 @@ public class TrainingSessionService {
     private final UserService userService;
     private final ExerciseService exerciseService;
     private final SessionExerciseMapper mapper;
+    private final RedisCacheService redisCacheService;
+
+    private static final String CACHE_LIST = "trainingSessions";
+    private static final String CACHE_SINGLE = "trainingSession";
 
     public TrainingSessionService(
             TrainingSessionRepository trainingSessionRepository,
             UserService userService,
             ExerciseService exerciseService,
-            SessionExerciseMapper mapper
+            SessionExerciseMapper mapper,
+            RedisCacheService redisCacheService
     ) {
         this.trainingSessionRepository = trainingSessionRepository;
         this.userService = userService;
         this.exerciseService = exerciseService;
         this.mapper = mapper;
+        this.redisCacheService = redisCacheService;
     }
 
-    public Page<TrainingSessionModel> getAllSessions(Pageable pageable) {
+    @Cacheable(value = CACHE_LIST, keyGenerator = "userAwareKeyGenerator")
+    public Page<TrainingSessionResponseDTO> getAllSessions(Pageable pageable) {
         UserModel user = userService.getLoggedInUser();
-        return trainingSessionRepository.findAllByUser(user, pageable);
+        Page<TrainingSessionModel> page = trainingSessionRepository.findAllByUser(user, pageable);
+        return page.map(TrainingSessionResponseDTO::fromEntity);
     }
 
+    @Cacheable(
+            value = CACHE_SINGLE,
+            key = "T(com.rodrigocoelhoo.lifemanager.config.RedisCacheService).getCurrentUsername() + " +
+                    "'::session:' + #id"
+    )
     public TrainingSessionModel getSession(Long id) {
         UserModel user = userService.getLoggedInUser();
         return trainingSessionRepository.findByIdAndUser(id, user)
                 .orElseThrow(() -> new ResourceNotFound("Session with ID '" + id + "' does not belong to the current user"));
     }
 
+    @Cacheable(
+            value = CACHE_SINGLE,
+            key = "T(com.rodrigocoelhoo.lifemanager.config.RedisCacheService).getCurrentUsername() + " +
+                    "'::session:' + #id + ':details'"
+    )
     public SessionDetailsDTO getSessionDetails(Long id) {
         TrainingSessionModel session = getSession(id);
         List<SessionExerciseModel> sessionExercises = session.getExercises();
 
         Map<ExerciseModel, List<SessionExerciseModel>> grouped = sessionExercises.stream()
-                        .collect(Collectors.groupingBy(
-                                SessionExerciseModel::getExercise,
-                                LinkedHashMap::new,
-                                Collectors.toList()
-                        ));
+                .collect(Collectors.groupingBy(
+                        SessionExerciseModel::getExercise,
+                        LinkedHashMap::new,
+                        Collectors.toList()
+                ));
 
         List<ExerciseDetailsDTO> exerciseDetails = grouped.keySet().stream()
                 .map(exercise -> {
@@ -96,7 +114,14 @@ public class TrainingSessionService {
                 .build();
 
         applySessionData(session, data);
-        return trainingSessionRepository.save(session);
+        TrainingSessionModel saved = trainingSessionRepository.save(session);
+
+        YearMonth date = YearMonth.from(saved.getDate());
+
+        redisCacheService.evictUserCache(CACHE_LIST);
+        redisCacheService.evictUserCacheSpecific("trainingDashboard", "month:" + date);
+
+        return saved;
     }
 
 
@@ -107,7 +132,16 @@ public class TrainingSessionService {
     ) {
         TrainingSessionModel session = getSession(id);
         applySessionData(session, data);
-        return trainingSessionRepository.save(session);
+        TrainingSessionModel saved = trainingSessionRepository.save(session);
+
+        YearMonth date = YearMonth.from(saved.getDate());
+
+        redisCacheService.evictUserCache(CACHE_LIST);
+        redisCacheService.evictUserCacheSpecific(CACHE_SINGLE, "session:" + id);
+        redisCacheService.evictUserCacheSpecific(CACHE_SINGLE, "session:" + id + ":details");
+        redisCacheService.evictUserCacheSpecific("trainingDashboard", "month:" + date);
+
+        return saved;
     }
 
 
@@ -115,6 +149,13 @@ public class TrainingSessionService {
     public void deleteSession(Long id) {
         TrainingSessionModel session = getSession(id);
         trainingSessionRepository.delete(session);
+
+        YearMonth date = YearMonth.from(session.getDate());
+
+        redisCacheService.evictUserCache(CACHE_LIST);
+        redisCacheService.evictUserCacheSpecific(CACHE_SINGLE, "session:" + id);
+        redisCacheService.evictUserCacheSpecific(CACHE_SINGLE, "session:" + id + ":details");
+        redisCacheService.evictUserCacheSpecific("trainingDashboard", "month:" + date);
     }
 
     private void applySessionData(TrainingSessionModel session, TrainingSessionDTO data) {

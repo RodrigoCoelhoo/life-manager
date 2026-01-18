@@ -37,11 +37,7 @@ public class TrainingSessionController {
             @RequestParam(defaultValue = "20") int size
     ) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("date").descending());
-        Page<TrainingSessionModel> sessions = trainingSessionService.getAllSessions(pageable);
-
-        Page<TrainingSessionResponseDTO> response = sessions.map(TrainingSessionResponseDTO::fromEntity);
-
-        return ResponseEntity.ok(PageResponseDTO.fromPage(response));
+        return ResponseEntity.ok(PageResponseDTO.fromPage(trainingSessionService.getAllSessions(pageable)));
     }
 
     @GetMapping("/{id}")
