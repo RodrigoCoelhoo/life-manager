@@ -35,10 +35,7 @@ public class RecipeController {
             @RequestParam(required = false) String name
     ) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
-        Page<RecipeModel> recipes = recipeService.getAllRecipes(pageable, name);
-        Page<RecipeDetailsDTO> response = recipes.map(RecipeDetailsDTO::fromEntity);
-
-        return ResponseEntity.ok(PageResponseDTO.fromPage(response));
+        return ResponseEntity.ok(PageResponseDTO.fromPage(recipeService.getAllRecipes(pageable, name)));
     }
 
     @GetMapping("/available")
@@ -48,9 +45,8 @@ public class RecipeController {
             @RequestParam(defaultValue = "20") int size
     ) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
-        Page<RecipeModel> recipes = recipeService.getAvailableRecipes(ingredientIds, pageable);
 
-        return ResponseEntity.ok(PageResponseDTO.fromPage(recipes.map(RecipeDetailsDTO::fromEntity)));
+        return ResponseEntity.ok(PageResponseDTO.fromPage(recipeService.getAvailableRecipes(ingredientIds, pageable)));
     }
 
 

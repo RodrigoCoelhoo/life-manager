@@ -4,6 +4,7 @@ import com.rodrigocoelhoo.lifemanager.nutrition.model.MealModel;
 import com.rodrigocoelhoo.lifemanager.users.UserModel;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -13,7 +14,10 @@ import java.util.Optional;
 
 @Repository
 public interface MealRepository extends JpaRepository<MealModel, Long> {
+    @EntityGraph(attributePaths = {"ingredients", "ingredients.ingredient", "ingredients.brand", "ingredients.brand.nutritionalValues"})
     Page<MealModel> findAllByUser(UserModel user, Pageable pageable);
     Optional<MealModel> findByUserAndId(UserModel user, Long id);
+
+    @EntityGraph(attributePaths = {"ingredients", "ingredients.ingredient", "ingredients.brand", "ingredients.brand.nutritionalValues"})
     List<MealModel> findAllByUserAndDateBetweenOrderByDateDescIdDesc(UserModel user, LocalDateTime start, LocalDateTime end);
 }

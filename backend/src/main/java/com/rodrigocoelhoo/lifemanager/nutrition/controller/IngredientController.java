@@ -7,7 +7,6 @@ import com.rodrigocoelhoo.lifemanager.nutrition.dto.IngredientResponseDTO;
 import com.rodrigocoelhoo.lifemanager.nutrition.model.IngredientModel;
 import com.rodrigocoelhoo.lifemanager.nutrition.service.IngredientService;
 import jakarta.validation.Valid;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -37,10 +36,7 @@ public class IngredientController {
     ) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
 
-        Page<IngredientModel> ingredients = ingredientService.getAllIngredients(pageable, name);
-        Page<IngredientDetailsDTO> response = ingredients.map(IngredientDetailsDTO::fromEntity);
-
-        return ResponseEntity.ok(PageResponseDTO.fromPage(response));
+        return ResponseEntity.ok(PageResponseDTO.fromPage(ingredientService.getAllIngredients(pageable, name)));
     }
 
     @GetMapping("/by-ids")

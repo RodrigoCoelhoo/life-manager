@@ -26,7 +26,7 @@ public class TrainingDashboardService {
         this.trainingSessionService = trainingSessionService;
     }
 
-    private static final String CACHE_DASHBOARD = "financesDashboard";
+    private static final String CACHE_DASHBOARD = "trainingDashboard";
 
     @Cacheable(
             value = CACHE_DASHBOARD,

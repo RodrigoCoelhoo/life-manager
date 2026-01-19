@@ -1,8 +1,10 @@
 package com.rodrigocoelhoo.lifemanager.nutrition.service;
 
+import com.rodrigocoelhoo.lifemanager.config.RedisCacheService;
 import com.rodrigocoelhoo.lifemanager.exceptions.BadRequestException;
 import com.rodrigocoelhoo.lifemanager.exceptions.ResourceNotFound;
 import com.rodrigocoelhoo.lifemanager.nutrition.dto.MealDTO;
+import com.rodrigocoelhoo.lifemanager.nutrition.dto.MealDetailsDTO;
 import com.rodrigocoelhoo.lifemanager.nutrition.dto.MealIngredientDTO;
 
 import com.rodrigocoelhoo.lifemanager.nutrition.model.*;
@@ -11,10 +13,14 @@ import com.rodrigocoelhoo.lifemanager.users.UserModel;
 import com.rodrigocoelhoo.lifemanager.users.UserService;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
@@ -23,26 +29,43 @@ public class MealService {
     private final IngredientService ingredientService;
     private final UserService userService;
     private final MealRepository mealRepository;
+    private final RedisCacheService redisCacheService;
+
+    private static final String CACHE_LIST = "meals";
 
     public MealService(
             IngredientService ingredientService,
             UserService userService,
-            MealRepository mealRepository
+            MealRepository mealRepository,
+            RedisCacheService redisCacheService
     ) {
         this.ingredientService = ingredientService;
         this.userService = userService;
         this.mealRepository = mealRepository;
+        this.redisCacheService = redisCacheService;
     }
 
-    public Page<MealModel> getAllMeals(Pageable pageable) {
+
+    @Cacheable(value = CACHE_LIST, keyGenerator = "userAwareKeyGenerator")
+    public Page<MealDetailsDTO> getAllMeals(Pageable pageable) {
         UserModel user = userService.getLoggedInUser();
-        return mealRepository.findAllByUser(user, pageable);
+        return mealRepository.findAllByUser(user, pageable).map(
+                meal -> MealDetailsDTO.fromEntities(meal, getNutritionalLabel(meal))
+        );
     }
 
     public MealModel getMeal(Long id) {
         UserModel user = userService.getLoggedInUser();
         return mealRepository.findByUserAndId(user, id)
                 .orElseThrow(() -> new ResourceNotFound("Meal with ID '" + id + "' doesn't belong to the current user"));
+    }
+
+    public List<MealModel> getMealsByRange(
+            LocalDateTime start,
+            LocalDateTime end
+    ) {
+        UserModel user = userService.getLoggedInUser();
+        return mealRepository.findAllByUserAndDateBetweenOrderByDateDescIdDesc(user, start, end);
     }
 
     private Map<Long, IngredientBrandModel> mapIngredientsBrand(
@@ -128,12 +151,19 @@ public class MealService {
         MealModel meal = MealModel.builder()
                 .user(user)
                 .date(data.date())
-                .ingredients(new ArrayList<>())
+                .ingredients(new HashSet<>())
                 .build();
 
         populateMealIngredients(meal, data);
 
-        return mealRepository.save(meal);
+        MealModel saved = mealRepository.save(meal);
+
+        LocalDate date = meal.getDate().toLocalDate().with(DayOfWeek.MONDAY);
+
+        redisCacheService.evictUserCache(CACHE_LIST);
+        redisCacheService.evictUserCacheSpecific("nutritionDashboard", "week:" + date);
+
+        return saved;
     }
 
     @Transactional
@@ -142,24 +172,33 @@ public class MealService {
 
         MealModel meal = getMeal(id);
         meal.setDate(data.date());
-
         meal.getIngredients().clear();
         populateMealIngredients(meal, data);
 
-        return mealRepository.save(meal);
+        MealModel saved = mealRepository.save(meal);
+
+        LocalDate date = meal.getDate().toLocalDate().with(DayOfWeek.MONDAY);
+        redisCacheService.evictUserCache(CACHE_LIST);
+        redisCacheService.evictUserCacheSpecific("nutritionDashboard", "week:" + date);
+
+        return saved;
     }
 
     @Transactional
     public void deleteMeal(Long id) {
         MealModel meal = getMeal(id);
         mealRepository.delete(meal);
+
+        LocalDate date = meal.getDate().toLocalDate().with(DayOfWeek.MONDAY);
+        redisCacheService.evictUserCache(CACHE_LIST);
+        redisCacheService.evictUserCacheSpecific("nutritionDashboard", "week:" + date);
     }
 
     public LinkedHashMap<NutritionalTag, Double> getNutritionalLabel(MealModel meal) {
         Map<NutritionalTag, Double> temp = new HashMap<>();
 
         for (MealIngredientModel ingredient : meal.getIngredients()) {
-            List<NutritionalValueModel> nutritionalValues = ingredient.getBrand().getNutritionalValues();
+            Set<NutritionalValueModel> nutritionalValues = ingredient.getBrand().getNutritionalValues();
 
             addNutrients(temp, nutritionalValues, ingredient.getAmount(), ingredient.getUnit());
         }
@@ -174,7 +213,7 @@ public class MealService {
         return orderedResult;
     }
 
-    private void addNutrients(Map<NutritionalTag, Double> result, List<NutritionalValueModel> nutritionalValues, Double amount, Unit unit) {
+    private void addNutrients(Map<NutritionalTag, Double> result, Set<NutritionalValueModel> nutritionalValues, Double amount, Unit unit) {
         double ingredientAmountInGramsOrMl = convertToBaseUnit(amount, unit);
 
         for (NutritionalValueModel nutrient : nutritionalValues) {

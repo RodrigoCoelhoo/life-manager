@@ -1,5 +1,6 @@
 package com.rodrigocoelhoo.lifemanager.nutrition.service;
 
+import com.rodrigocoelhoo.lifemanager.config.RedisCacheService;
 import com.rodrigocoelhoo.lifemanager.exceptions.BadRequestException;
 import com.rodrigocoelhoo.lifemanager.exceptions.ResourceNotFound;
 import com.rodrigocoelhoo.lifemanager.nutrition.dto.IngredientBrandDTO;
@@ -13,29 +14,34 @@ import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class IngredientBrandService {
 
     private final IngredientService ingredientService;
     private final IngredientBrandRepository ingredientBrandRepository;
+    private final RedisCacheService redisCacheService;
 
     public IngredientBrandService(
             IngredientService ingredientService,
-            IngredientBrandRepository ingredientBrandRepository
+            IngredientBrandRepository ingredientBrandRepository,
+            RedisCacheService redisCacheService
     ) {
         this.ingredientService = ingredientService;
         this.ingredientBrandRepository = ingredientBrandRepository;
+        this.redisCacheService = redisCacheService;
     }
 
-    public List<IngredientBrandModel> getAllIngredientBrands(Long ingredientId) {
+    public Set<IngredientBrandModel> getAllIngredientBrands(Long ingredientId) {
         return ingredientService.getIngredient(ingredientId).getBrands();
     }
 
     public IngredientBrandModel getIngredientBrand(Long ingredientId, Long brandId) {
         IngredientModel ingredient = ingredientService.getIngredient(ingredientId);
 
-        List<IngredientBrandModel> brands = ingredient.getBrands();
+        Set<IngredientBrandModel> brands = ingredient.getBrands();
 
         return brands.stream()
                 .filter(b -> b.getId().equals(brandId))
@@ -64,19 +70,20 @@ public class IngredientBrandService {
                 .name(data.name())
                 .build();
 
-        List<NutritionalValueModel> nutritionalValueModels = nutrients.stream()
+        Set<NutritionalValueModel> nutritionalValueModels = nutrients.stream()
                 .map(nutrient -> NutritionalValueModel.builder()
                         .ingredientBrand(ingredientBrand)
                         .tag(nutrient.type())
                         .per100units(nutrient.per100units())
                         .build())
-                .toList();
+                .collect(Collectors.toSet());
         ingredientBrand.setNutritionalValues(nutritionalValueModels);
 
-        return ingredientBrandRepository.save(ingredientBrand);
+        IngredientBrandModel saved = ingredientBrandRepository.save(ingredientBrand);
+        redisCacheService.evictUserCache("ingredients");
+        return saved;
     }
 
-    // @Transactional -> if error -> rollback every change
     @Transactional
     public IngredientBrandModel updateIngredientBrand(Long ingredientId, Long brandId, IngredientBrandDTO data) {
         List<NutritionalValueDTO> nutrients = data.nutritionalValues();
@@ -103,12 +110,22 @@ public class IngredientBrandService {
             ingredientBrand.getNutritionalValues().add(value);
         });
 
-        return ingredientBrandRepository.save(ingredientBrand);
+        IngredientBrandModel saved = ingredientBrandRepository.save(ingredientBrand);
+        redisCacheService.evictUserCache("ingredients");
+        redisCacheService.evictUserCache("recipes");
+        redisCacheService.evictUserCache("meals");
+        redisCacheService.evictUserCache("nutritionDashboard");
+        return saved;
     }
 
     @Transactional
     public void deleteIngredientBrand(Long ingredientId, Long brandId) {
         IngredientBrandModel ingredientBrand = getIngredientBrand(ingredientId, brandId);
         ingredientBrandRepository.delete(ingredientBrand);
+
+        redisCacheService.evictUserCache("ingredients");
+        redisCacheService.evictUserCache("recipes");
+        redisCacheService.evictUserCache("meals");
+        redisCacheService.evictUserCache("nutritionDashboard");
     }
 }

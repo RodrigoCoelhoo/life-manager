@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/ingredients/{ingredientId}/brands")
@@ -27,7 +28,7 @@ public class IngredientBrandController {
     public ResponseEntity<List<IngredientBrandDetailsResponseDTO>> getAllIngredientBrands(
             @PathVariable Long ingredientId
     ) {
-        List<IngredientBrandModel> brands = ingredientBrandService.getAllIngredientBrands(ingredientId);
+        Set<IngredientBrandModel> brands = ingredientBrandService.getAllIngredientBrands(ingredientId);
 
         List<IngredientBrandDetailsResponseDTO> response = brands.stream()
                 .map(IngredientBrandDetailsResponseDTO::fromEntity)

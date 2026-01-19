@@ -7,9 +7,7 @@ import com.rodrigocoelhoo.lifemanager.nutrition.model.MealIngredientModel;
 import com.rodrigocoelhoo.lifemanager.nutrition.model.MealModel;
 import com.rodrigocoelhoo.lifemanager.nutrition.model.NutritionalTag;
 import com.rodrigocoelhoo.lifemanager.nutrition.model.NutritionalValueModel;
-import com.rodrigocoelhoo.lifemanager.nutrition.repository.MealRepository;
-import com.rodrigocoelhoo.lifemanager.users.UserModel;
-import com.rodrigocoelhoo.lifemanager.users.UserService;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.time.DayOfWeek;
@@ -20,24 +18,25 @@ import java.util.*;
 @Service
 public class NutritionDashboardService {
 
-    private final MealRepository mealRepository;
-    private final UserService userService;
+    private final MealService mealService;
 
     public NutritionDashboardService(
-            MealRepository mealRepository,
-            UserService userService
+            MealService mealService1
     ) {
-        this.mealRepository = mealRepository;
-        this.userService = userService;
+        this.mealService = mealService1;
     }
+    private static final String CACHE_DASHBOARD = "nutritionDashboard";
 
+    @Cacheable(
+            value = CACHE_DASHBOARD,
+            key = "T(com.rodrigocoelhoo.lifemanager.config.RedisCacheService).getCurrentUsername() + " +
+                    "'::week:' + T(com.rodrigocoelhoo.lifemanager.nutrition.service.NutritionDashboardService).getWeekStart(#date)"
+    )
     public WeekOverviewDTO getWeekOverview(LocalDate date) {
-        UserModel user = userService.getLoggedInUser();
-
         LocalDateTime start = date.with(DayOfWeek.MONDAY).atTime(0,0,0);
         LocalDateTime end = start.plusDays(6).toLocalDate().atTime(23,59,59);
 
-        List<MealModel> meals = mealRepository.findAllByUserAndDateBetweenOrderByDateDescIdDesc(user, start, end);
+        List<MealModel> meals = mealService.getMealsByRange(start, end);
         LinkedHashMap<LocalDate, List<MealModel>> week = populateMap(meals, start.toLocalDate(), end.toLocalDate());
 
         List<DayDTO> days = new ArrayList<>();
@@ -84,7 +83,7 @@ public class NutritionDashboardService {
         for (MealModel meal : mealModels) {
             for (MealIngredientModel ingredient : meal.getIngredients())
             {
-                List<NutritionalValueModel> nutrients = ingredient.getBrand().getNutritionalValues();
+                Set<NutritionalValueModel> nutrients = ingredient.getBrand().getNutritionalValues();
 
                 for (NutritionalValueModel nutrient : nutrients) {
                     totalDayNutrients.merge(
@@ -127,5 +126,9 @@ public class NutritionDashboardService {
                 .mapToDouble(NutritionalLabelEntrieDTO::amount)
                 .findFirst()
                 .orElse(0.0);
+    }
+
+    public static LocalDate getWeekStart(LocalDate date) {
+        return date.with(java.time.DayOfWeek.MONDAY);
     }
 }

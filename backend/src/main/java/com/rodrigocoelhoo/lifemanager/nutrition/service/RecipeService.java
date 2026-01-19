@@ -1,8 +1,10 @@
 package com.rodrigocoelhoo.lifemanager.nutrition.service;
 
+import com.rodrigocoelhoo.lifemanager.config.RedisCacheService;
 import com.rodrigocoelhoo.lifemanager.exceptions.BadRequestException;
 import com.rodrigocoelhoo.lifemanager.exceptions.ResourceNotFound;
 import com.rodrigocoelhoo.lifemanager.nutrition.dto.RecipeDTO;
+import com.rodrigocoelhoo.lifemanager.nutrition.dto.RecipeDetailsDTO;
 import com.rodrigocoelhoo.lifemanager.nutrition.dto.RecipeIngredientDTO;
 import com.rodrigocoelhoo.lifemanager.nutrition.model.*;
 import com.rodrigocoelhoo.lifemanager.nutrition.repository.RecipeRepository;
@@ -10,6 +12,7 @@ import com.rodrigocoelhoo.lifemanager.users.UserModel;
 import com.rodrigocoelhoo.lifemanager.users.UserService;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -22,34 +25,48 @@ public class RecipeService {
     private final UserService userService;
     private final RecipeRepository recipeRepository;
     private final IngredientService ingredientService;
+    private final RedisCacheService redisCacheService;
+
+    private static final String CACHE_LIST = "recipes";
 
     public RecipeService(
             UserService userService,
             RecipeRepository recipeRepository,
-            IngredientService ingredientService
+            IngredientService ingredientService,
+            RedisCacheService redisCacheService
     ) {
         this.userService = userService;
         this.recipeRepository = recipeRepository;
         this.ingredientService = ingredientService;
+        this.redisCacheService = redisCacheService;
     }
 
-    public Page<RecipeModel> getAllRecipes(Pageable pageable, String name) {
+    @Cacheable(value = CACHE_LIST, keyGenerator = "userAwareKeyGenerator")
+    public Page<RecipeDetailsDTO> getAllRecipes(Pageable pageable, String name) {
         UserModel user = userService.getLoggedInUser();
+        Page<RecipeModel> page;
         if(name == null || name.isBlank())
-            return recipeRepository.findAllByUser(user, pageable);
-        return recipeRepository.findByUserAndNameContainingIgnoreCase(user, name, pageable);
+            page = recipeRepository.findAllByUser(user, pageable);
+        else
+            page = recipeRepository.findByUserAndNameContainingIgnoreCase(user, name, pageable);
+
+        return page.map(RecipeDetailsDTO::fromEntity);
     }
 
-    public Page<RecipeModel> getAvailableRecipes(
+    @Cacheable(value = CACHE_LIST, keyGenerator = "userAwareKeyGenerator")
+    public Page<RecipeDetailsDTO> getAvailableRecipes(
             List<Long> ingredientIds,
             Pageable pageable
     ) {
         UserModel user = userService.getLoggedInUser();
+        Page<RecipeModel> page;
         if (ingredientIds == null || ingredientIds.isEmpty()) {
-            return recipeRepository.findAllByUser(user, pageable);
+            page = recipeRepository.findAllByUser(user, pageable);
+        } else {
+            page = recipeRepository.findAvailableRecipes(user, ingredientIds, pageable);
         }
 
-        return recipeRepository.findAvailableRecipes(user, ingredientIds, pageable);
+        return page.map(RecipeDetailsDTO::fromEntity);
     }
 
 
@@ -112,7 +129,11 @@ public class RecipeService {
                 }).toList();
 
         recipe.setIngredients(recipeIngredients);
-        return recipeRepository.save(recipe);
+        RecipeModel saved = recipeRepository.save(recipe);
+
+        redisCacheService.evictUserCache(CACHE_LIST);
+
+        return saved;
     }
 
     @Transactional
@@ -145,12 +166,17 @@ public class RecipeService {
                     .build());
         });
 
-        return recipeRepository.save(recipe);
+        RecipeModel saved = recipeRepository.save(recipe);
+
+        redisCacheService.evictUserCache(CACHE_LIST);
+
+        return saved;
     }
 
     @Transactional
     public void deleteRecipe(Long id) {
         RecipeModel recipe = getRecipe(id);
         recipeRepository.delete(recipe);
+        redisCacheService.evictUserCache(CACHE_LIST);
     }
 }

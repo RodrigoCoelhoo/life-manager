@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "tb_ingredientbrands")
@@ -26,6 +27,6 @@ public class IngredientBrandModel {
     private String name;
 
     @OneToMany(mappedBy = "ingredientBrand", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    private List<NutritionalValueModel> nutritionalValues;
+    private Set<NutritionalValueModel> nutritionalValues;
 
 }

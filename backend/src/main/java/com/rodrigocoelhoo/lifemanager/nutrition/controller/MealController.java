@@ -36,11 +36,8 @@ public class MealController {
             @RequestParam(defaultValue = "20") int size
         ) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("date").descending());
-        Page<MealModel> meals = mealService.getAllMeals(pageable);
 
-        Page<MealDetailsDTO> response = meals.map(meal -> MealDetailsDTO.fromEntities(meal, mealService.getNutritionalLabel(meal)));
-
-        return ResponseEntity.ok(PageResponseDTO.fromPage(response));
+        return ResponseEntity.ok(PageResponseDTO.fromPage(mealService.getAllMeals(pageable)));
     }
 
     @GetMapping("/{id}")

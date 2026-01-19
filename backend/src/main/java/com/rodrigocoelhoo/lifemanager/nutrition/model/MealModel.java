@@ -6,6 +6,7 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "tb_meals")
@@ -32,6 +33,6 @@ public class MealModel {
             cascade = CascadeType.ALL,
             orphanRemoval = true
     )
-    private List<MealIngredientModel> ingredients;
+    private Set<MealIngredientModel> ingredients;
 }
 

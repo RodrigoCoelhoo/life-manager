@@ -34,7 +34,7 @@ export default function Meals() {
 			setTotalElements(Number(data.totalElements));
 		} catch (err) {
 			console.error(err);
-			setError("Failed to fetch exercises");
+			setError("Failed to fetch meals");
 		} finally {
 			setLoading(false);
 		}
@@ -56,7 +56,7 @@ export default function Meals() {
 			setTotalElements(prev => prev + 1);
 		} catch (err) {
 			console.error(err);
-			toast.error("Failed to create training session");
+			toast.error("Failed to create meal");
 		} finally {
 			setLoading(false);
 		}

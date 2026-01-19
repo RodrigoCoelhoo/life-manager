@@ -1,6 +1,5 @@
 package com.rodrigocoelhoo.lifemanager.training.service;
 
-import com.rodrigocoelhoo.lifemanager.config.CachedPage;
 import com.rodrigocoelhoo.lifemanager.config.RedisCacheService;
 import com.rodrigocoelhoo.lifemanager.exceptions.ResourceNotFound;
 import com.rodrigocoelhoo.lifemanager.training.dto.exercisedto.ExerciseDTO;

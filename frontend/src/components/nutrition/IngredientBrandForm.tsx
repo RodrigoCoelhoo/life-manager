@@ -35,21 +35,23 @@ export default function IngredientBrandForm({
 		brand ? brand.nutritionalValues.map(v => v.nutrient) : []
 	);
 
-	const [nutritionalValues, setNutritionalValues] = useState<
-		Record<NutritionalTag, NutritionalValueDTO>
-	>(() => {
-		if (!brand) return {};
+	const [nutritionalValues, setNutritionalValues] = useState<Record<NutritionalTag, NutritionalValueDTO>>(() => {
+		const values: Record<NutritionalTag, NutritionalValueDTO> = {};
 
-		return Object.fromEntries(
-			brand.nutritionalValues.map(v => [
-				v.nutrient,
-				{
-					type: v.nutrient,
-					per100units: v.per100units,
-				},
-			])
-		);
+		if (brand) {
+			brand.nutritionalValues.forEach(v => {
+				values[v.nutrient] = { type: v.nutrient, per100units: v.per100units };
+			});
+		}
+
+		// Always ensure CALORIES exists
+		if (!values[NutritionalTag.CALORIES]) {
+			values[NutritionalTag.CALORIES] = { type: NutritionalTag.CALORIES, per100units: 0 };
+		}
+
+		return values;
 	});
+
 
 	const nameRef = useRef<any>(null);
 
@@ -182,7 +184,7 @@ export default function IngredientBrandForm({
 				/>
 
 				<div className="flex flex-col gap-2 p-2 bg-background border rounded-lg border-primary mt-4">
-					{selectedTags.map((tag, index) => {
+					{[NutritionalTag.CALORIES, ...selectedTags].map((tag, index) => {
 						const value = nutritionalValues[tag];
 						const rowStyle =
 							index % 2 === 0 ? "bg-background" : "bg-foreground";
