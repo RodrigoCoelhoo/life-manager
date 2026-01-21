@@ -31,7 +31,7 @@ public class TokenService {
                     .withIssuer("auth-api")
                     .withSubject(user.getUsername())
                     .withClaim("type", "access")
-                    .withExpiresAt(Instant.now().plus(15, ChronoUnit.SECONDS))
+                    .withExpiresAt(Instant.now().plus(15, ChronoUnit.MINUTES))
                     .sign(getAlgorithm());
         } catch (JWTCreationException exception) {
             throw new RuntimeException("Error while generating access token", exception);

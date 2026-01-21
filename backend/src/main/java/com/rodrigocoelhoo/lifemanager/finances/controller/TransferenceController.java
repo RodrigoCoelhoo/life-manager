@@ -51,7 +51,7 @@ public class TransferenceController {
                 Sort.by("date").descending()
         );
 
-        Page<TransferenceModel> transferences = transferenceService.getAllTransferences(
+        Page<TransferenceResponseDTO> transferences = transferenceService.getAllTransferences(
                 pageable,
                 senderId,
                 receiverId,
@@ -59,9 +59,7 @@ public class TransferenceController {
                 endDate
         );
 
-        Page<TransferenceResponseDTO> response = transferences.map(TransferenceResponseDTO::fromEntity);
-
-        return ResponseEntity.ok(PageResponseDTO.fromPage(response));
+        return ResponseEntity.ok(PageResponseDTO.fromPage(transferences));
     }
 
     @GetMapping("/{id}")

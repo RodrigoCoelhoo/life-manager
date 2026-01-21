@@ -1,8 +1,11 @@
 package com.rodrigocoelhoo.lifemanager.finances.service;
 
+import com.rodrigocoelhoo.lifemanager.config.RedisCacheService;
 import com.rodrigocoelhoo.lifemanager.exceptions.BadRequestException;
 import com.rodrigocoelhoo.lifemanager.exceptions.ResourceNotFound;
 import com.rodrigocoelhoo.lifemanager.finances.dto.TransactionDTO;
+import com.rodrigocoelhoo.lifemanager.finances.dto.TransactionInternalDTO;
+import com.rodrigocoelhoo.lifemanager.finances.dto.TransactionResponseDTO;
 import com.rodrigocoelhoo.lifemanager.finances.model.ExpenseCategory;
 import com.rodrigocoelhoo.lifemanager.finances.model.ExpenseType;
 import com.rodrigocoelhoo.lifemanager.finances.model.TransactionModel;
@@ -13,6 +16,7 @@ import com.rodrigocoelhoo.lifemanager.users.UserModel;
 import com.rodrigocoelhoo.lifemanager.users.UserService;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -20,6 +24,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.List;
 
 @Service
@@ -28,18 +33,24 @@ public class TransactionService {
     private final UserService userService;
     private final TransactionRepository transactionRepository;
     private final WalletService walletService;
+    private final RedisCacheService redisCacheService;
+
+    private static final String CACHE_LIST = "transactions";
 
     public TransactionService(
             UserService userService,
             TransactionRepository transactionRepository,
-            WalletService walletService
+            WalletService walletService,
+            RedisCacheService redisCacheService
     ) {
         this.userService = userService;
         this.transactionRepository = transactionRepository;
         this.walletService = walletService;
+        this.redisCacheService = redisCacheService;
     }
 
-    public Page<TransactionModel> getAllTransactions(
+    @Cacheable(value = CACHE_LIST, keyGenerator = "userAwareKeyGenerator")
+    public Page<TransactionResponseDTO> getAllTransactions(
             Pageable pageable,
             Long walletId,
             ExpenseCategory category,
@@ -57,15 +68,22 @@ public class TransactionService {
                         endDate
                 );
 
-        return transactionRepository.findAll(spec, pageable);
+        return transactionRepository.findAll(spec, pageable).map(TransactionResponseDTO::fromEntity);
     }
 
-    public List<TransactionModel> getTransactionsByRange(
+    @Cacheable(
+            value = CACHE_LIST,
+            key = "T(com.rodrigocoelhoo.lifemanager.config.RedisCacheService).getCurrentUsername() + " +
+                    "'::byRange:' + #start + '|' + #end"
+    )
+    public List<TransactionInternalDTO> getTransactionsByRange(
             LocalDate start,
             LocalDate end
     ) {
         UserModel user = userService.getLoggedInUser();
-        return transactionRepository.findAllByUserAndDateBetweenOrderByDateDescIdDesc(user, start, end);
+        return transactionRepository.findAllByUserAndDateBetweenOrderByDateDescIdDesc(user, start, end)
+                .stream().map(TransactionInternalDTO::fromEntity)
+                .toList();
     }
 
     public TransactionModel getTransaction(
@@ -115,7 +133,15 @@ public class TransactionService {
                 .currency(wallet.getCurrency())
                 .build();
 
-        return transactionRepository.save(transaction);
+        TransactionModel saved = transactionRepository.save(transaction);
+
+        YearMonth yearMonth = YearMonth.from(transaction.getDate());
+        redisCacheService.evictUserCache(CACHE_LIST);
+        redisCacheService.evictUserCache("wallets");
+        redisCacheService.evictUserCacheSpecific("financesDashboard", "yearMonth:" + yearMonth + "*");
+        redisCacheService.evictUserCacheSpecific("financesDashboard", "yearMonth:" + YearMonth.now() + "*");
+
+        return saved;
     }
 
     @Transactional
@@ -139,7 +165,14 @@ public class TransactionService {
         transaction.setType(newCategory.getType());
         transaction.setCurrency(newWallet.getCurrency());
 
-        return transactionRepository.save(transaction);
+        TransactionModel saved = transactionRepository.save(transaction);
+
+        YearMonth yearMonth = YearMonth.from(transaction.getDate());
+        redisCacheService.evictUserCache(CACHE_LIST);
+        redisCacheService.evictUserCache("wallets");
+        redisCacheService.evictUserCacheSpecific("financesDashboard", "yearMonth:" + yearMonth + "*");
+        redisCacheService.evictUserCacheSpecific("financesDashboard", "yearMonth:" + YearMonth.now() + "*");
+        return saved;
     }
 
     private void adjustWalletBalance(
@@ -203,5 +236,11 @@ public class TransactionService {
         wallet.setBalance(newBalance);
 
         transactionRepository.delete(transaction);
+
+        YearMonth yearMonth = YearMonth.from(transaction.getDate());
+        redisCacheService.evictUserCache(CACHE_LIST);
+        redisCacheService.evictUserCache("wallets");
+        redisCacheService.evictUserCacheSpecific("financesDashboard", "yearMonth:" + yearMonth + "*");
+        redisCacheService.evictUserCacheSpecific("financesDashboard", "yearMonth:" + YearMonth.now() + "*");
     }
 }

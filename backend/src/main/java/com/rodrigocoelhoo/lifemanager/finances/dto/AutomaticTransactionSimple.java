@@ -2,7 +2,7 @@ package com.rodrigocoelhoo.lifemanager.finances.dto;
 
 import com.rodrigocoelhoo.lifemanager.finances.model.AutomaticTransactionModel;
 
-import java.math.BigDecimal;
+import java.io.Serializable;
 import java.time.LocalDate;
 
 public record AutomaticTransactionSimple(
@@ -13,8 +13,7 @@ public record AutomaticTransactionSimple(
         String category,
         String type,
         LocalDate nextTransactionDate
-
-) {
+) implements Serializable {
     public static AutomaticTransactionSimple fromEntity(
             AutomaticTransactionModel model
     ) {

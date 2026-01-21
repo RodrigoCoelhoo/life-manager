@@ -3,6 +3,7 @@ package com.rodrigocoelhoo.lifemanager.finances.dto;
 import com.rodrigocoelhoo.lifemanager.finances.model.*;
 import com.rodrigocoelhoo.lifemanager.finances.service.DashboardService;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.YearMonth;
 import java.util.LinkedHashMap;
@@ -21,7 +22,7 @@ public record MonthOverviewDTO(
     List<TransferenceResponseDTO> recentTransferences,
     List<AutomaticTransactionSimple> automaticTransactions,
     List<MonthNetBalanceResponseDTO> previousMonthsNetBalance
-) {
+) implements Serializable {
     public static MonthOverviewDTO fromEntities(
             YearMonth yearMonth,
             Currency currency,
@@ -30,10 +31,10 @@ public record MonthOverviewDTO(
             BigDecimal totalExpenses,
             Map<ExpenseCategory, BigDecimal> expenseCategories,
             BigDecimal netBalance,
-            List<WalletModel> wallets,
-            List<TransactionModel> recentTransactions,
-            List<TransferenceModel> recentTransferences,
-            List<AutomaticTransactionModel> automaticTransactions,
+            List<WalletResponseDTO> wallets,
+            List<TransactionInternalDTO> recentTransactions,
+            List<TransferenceResponseDTO> recentTransferences,
+            List<AutomaticTransactionSimple> automaticTransactions,
             LinkedHashMap<YearMonth, DashboardService.Netbalance> previousMonthsNetBalance
     ) {
         return new MonthOverviewDTO(
@@ -49,10 +50,10 @@ public record MonthOverviewDTO(
                         .map(entry -> CategorySummaryDTO.fromEntity(entry, currency))
                         .toList(),
                 currency.format(netBalance),
-                wallets.stream().map(WalletResponseDTO::fromEntity).toList(),
+                wallets,
                 recentTransactions.stream().map(TransactionResponseDTO::fromEntity).toList(),
-                recentTransferences.stream().map(TransferenceResponseDTO::fromEntity).toList(),
-                automaticTransactions.stream().map(AutomaticTransactionSimple::fromEntity).toList(),
+                recentTransferences,
+                automaticTransactions,
                 previousMonthsNetBalance.entrySet().stream()
                         .map(e -> MonthNetBalanceResponseDTO.fromEntities(
                                 e.getKey(), e.getValue()
@@ -64,7 +65,7 @@ public record MonthOverviewDTO(
     public record CategorySummaryDTO(
             String category,
             String amount
-    ) {
+    ) implements Serializable{
         public static CategorySummaryDTO fromEntity(Map.Entry<ExpenseCategory, BigDecimal> model, Currency currency) {
             return new CategorySummaryDTO(
                     model.getKey().toString(),

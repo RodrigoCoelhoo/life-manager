@@ -3,6 +3,7 @@ package com.rodrigocoelhoo.lifemanager.finances.dto;
 import com.rodrigocoelhoo.lifemanager.finances.model.AutomaticTransactionModel;
 import com.rodrigocoelhoo.lifemanager.finances.model.TransactionRecurrence;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 
 public record AutomaticTransactionResponseDTO(
@@ -16,8 +17,7 @@ public record AutomaticTransactionResponseDTO(
     short interval,
     String description,
     LocalDate nextTransactionDate
-
-) {
+) implements Serializable {
     public static AutomaticTransactionResponseDTO fromEntity(
             AutomaticTransactionModel model
     ) {

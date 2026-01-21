@@ -1,13 +1,17 @@
 package com.rodrigocoelhoo.lifemanager.finances.service;
 
+import com.rodrigocoelhoo.lifemanager.config.RedisCacheService;
 import com.rodrigocoelhoo.lifemanager.exceptions.BadRequestException;
 import com.rodrigocoelhoo.lifemanager.finances.dto.AutomaticTransactionDTO;
+import com.rodrigocoelhoo.lifemanager.finances.dto.AutomaticTransactionResponseDTO;
+import com.rodrigocoelhoo.lifemanager.finances.dto.AutomaticTransactionSimple;
 import com.rodrigocoelhoo.lifemanager.finances.model.*;
 import com.rodrigocoelhoo.lifemanager.finances.repository.AutomaticTransactionRepository;
 import com.rodrigocoelhoo.lifemanager.finances.repository.TransactionRepository;
 import com.rodrigocoelhoo.lifemanager.users.UserModel;
 import com.rodrigocoelhoo.lifemanager.users.UserService;
 import jakarta.transaction.Transactional;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -23,17 +27,23 @@ public class AutomaticTransactionService {
     private final AutomaticTransactionRepository automaticTransactionRepository;
     private final WalletService walletService;
     private final TransactionRepository transactionRepository;
+    private final RedisCacheService redisCacheService;
+
+    private static final String CACHE_LIST = "bills";
+    private static final String CACHE_NEXT = "nextBills";
 
     public AutomaticTransactionService(
             UserService userService,
-           AutomaticTransactionRepository automaticTransactionRepository,
-           WalletService walletService,
-           TransactionRepository transactionRepository
+            AutomaticTransactionRepository automaticTransactionRepository,
+            WalletService walletService,
+            TransactionRepository transactionRepository,
+            RedisCacheService redisCacheService
     ) {
         this.userService = userService;
         this.automaticTransactionRepository = automaticTransactionRepository;
         this.walletService = walletService;
         this.transactionRepository = transactionRepository;
+        this.redisCacheService = redisCacheService;
     }
 
     public AutomaticTransactionModel getAutomaticTransaction(Long id) {
@@ -42,16 +52,20 @@ public class AutomaticTransactionService {
                 .orElseThrow(() -> new BadRequestException("Automatic transaction with ID '" + id + "' doesn't belong to the current user"));
     }
 
-    public Page<AutomaticTransactionModel> getAllAutomaticTransactions(
+    @Cacheable(value = CACHE_LIST, keyGenerator = "userAwareKeyGenerator")
+    public Page<AutomaticTransactionResponseDTO> getAllAutomaticTransactions(
             Pageable pageable
     ) {
         UserModel user = userService.getLoggedInUser();
-        return automaticTransactionRepository.findAllByUser(user, pageable);
+        return automaticTransactionRepository.findAllByUser(user, pageable).map(AutomaticTransactionResponseDTO::fromEntity);
     }
 
-    public List<AutomaticTransactionModel> get5NextAutomaticTransaction() {
+    @Cacheable(value = CACHE_NEXT, keyGenerator = "userAwareKeyGenerator")
+    public List<AutomaticTransactionSimple> get5NextAutomaticTransaction() {
         UserModel user = userService.getLoggedInUser();
-        return automaticTransactionRepository.findTop5ByUserOrderByNextTransactionDateAscIdDesc(user);
+        return automaticTransactionRepository.findTop5ByUserOrderByNextTransactionDateAscIdDesc(user)
+                .stream().map(AutomaticTransactionSimple::fromEntity)
+                .toList();
     }
 
     private ExpenseCategory validateCategory(
@@ -96,7 +110,12 @@ public class AutomaticTransactionService {
                 .nextTransactionDate(data.nextTransactionDate())
                 .build();
 
-        return automaticTransactionRepository.save(automaticTransaction);
+        AutomaticTransactionModel saved = automaticTransactionRepository.save(automaticTransaction);
+
+        redisCacheService.evictUserCache(CACHE_LIST);
+        redisCacheService.evictUserCache(CACHE_NEXT);
+
+        return saved;
     }
 
     @Transactional
@@ -120,13 +139,21 @@ public class AutomaticTransactionService {
         automaticTransaction.setDescription(data.description());
         automaticTransaction.setNextTransactionDate(data.nextTransactionDate());
 
-        return automaticTransactionRepository.save(automaticTransaction);
+        AutomaticTransactionModel saved = automaticTransactionRepository.save(automaticTransaction);
+
+        redisCacheService.evictUserCache(CACHE_LIST);
+        redisCacheService.evictUserCache(CACHE_NEXT);
+
+        return saved;
     }
 
     @Transactional
     public void deleteAutomaticTransaction(Long id) {
         AutomaticTransactionModel automaticTransaction = getAutomaticTransaction(id);
         automaticTransactionRepository.delete(automaticTransaction);
+
+        redisCacheService.evictUserCache(CACHE_LIST);
+        redisCacheService.evictUserCache(CACHE_NEXT);
     }
 
     public void processDailyAutomaticTransactions() {
@@ -136,10 +163,16 @@ public class AutomaticTransactionService {
         for (AutomaticTransactionModel autoTx : dueTransactions) {
             processAutomaticTransaction(autoTx);
         }
+        redisCacheService.evictUserCache(CACHE_LIST);
+        redisCacheService.evictUserCache(CACHE_NEXT);
+        redisCacheService.evictUserCache("transactions");
     }
 
     public void processAutomaticTransaction(Long id) {
         processAutomaticTransaction(getAutomaticTransaction(id));
+        redisCacheService.evictUserCache(CACHE_LIST);
+        redisCacheService.evictUserCache(CACHE_NEXT);
+        redisCacheService.evictUserCache("transactions");
     }
 
     public void processAutomaticTransaction(AutomaticTransactionModel autoTx) {

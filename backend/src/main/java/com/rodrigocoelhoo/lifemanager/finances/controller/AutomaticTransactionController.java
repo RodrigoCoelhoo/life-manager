@@ -33,10 +33,7 @@ public class AutomaticTransactionController {
     ) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("nextTransactionDate").ascending());
 
-        Page<AutomaticTransactionModel> transactions = automaticTransactionService.getAllAutomaticTransactions(pageable);
-        Page<AutomaticTransactionResponseDTO> response = transactions.map(AutomaticTransactionResponseDTO::fromEntity);
-
-        return ResponseEntity.ok(PageResponseDTO.fromPage(response));
+        return ResponseEntity.ok(PageResponseDTO.fromPage(automaticTransactionService.getAllAutomaticTransactions(pageable)));
     }
 
     @PostMapping

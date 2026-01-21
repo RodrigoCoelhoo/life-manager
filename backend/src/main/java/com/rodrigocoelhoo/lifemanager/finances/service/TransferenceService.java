@@ -1,8 +1,10 @@
 package com.rodrigocoelhoo.lifemanager.finances.service;
 
+import com.rodrigocoelhoo.lifemanager.config.RedisCacheService;
 import com.rodrigocoelhoo.lifemanager.exceptions.BadRequestException;
 import com.rodrigocoelhoo.lifemanager.exceptions.ResourceNotFound;
 import com.rodrigocoelhoo.lifemanager.finances.dto.TransferenceDTO;
+import com.rodrigocoelhoo.lifemanager.finances.dto.TransferenceResponseDTO;
 import com.rodrigocoelhoo.lifemanager.finances.model.Currency;
 import com.rodrigocoelhoo.lifemanager.finances.model.TransferenceModel;
 import com.rodrigocoelhoo.lifemanager.finances.model.WalletModel;
@@ -12,6 +14,7 @@ import com.rodrigocoelhoo.lifemanager.finances.specification.TransferenceSpecifi
 import com.rodrigocoelhoo.lifemanager.users.UserModel;
 import com.rodrigocoelhoo.lifemanager.users.UserService;
 import jakarta.transaction.Transactional;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -19,6 +22,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -31,21 +35,26 @@ public class TransferenceService {
     private final WalletRepository walletRepository;
     private final TransferenceRepository transferenceRepository;
     private final UserService userService;
+    private final RedisCacheService redisCacheService;
+
+    private static final String CACHE_LIST = "transferences";
 
     public TransferenceService(
             WalletService walletService,
             WalletRepository walletRepository,
             TransferenceRepository transferenceRepository,
-            UserService userService
+            UserService userService,
+            RedisCacheService redisCacheService
     ) {
         this.walletService = walletService;
         this.walletRepository = walletRepository;
         this.transferenceRepository = transferenceRepository;
         this.userService = userService;
+        this.redisCacheService = redisCacheService;
     }
 
-
-    public Page<TransferenceModel> getAllTransferences(
+    @Cacheable(value = CACHE_LIST, keyGenerator = "userAwareKeyGenerator")
+    public Page<TransferenceResponseDTO> getAllTransferences(
             Pageable pageable,
             Long sender,
             Long receiver,
@@ -63,7 +72,7 @@ public class TransferenceService {
                         endDate
                 );
 
-        return transferenceRepository.findAll(spec, pageable);
+        return transferenceRepository.findAll(spec, pageable).map(TransferenceResponseDTO::fromEntity);
     }
 
     public TransferenceModel getTransference(Long id) {
@@ -72,12 +81,19 @@ public class TransferenceService {
                 .orElseThrow(() -> new ResourceNotFound("Transference with ID '"+ id + "' doesn't belong to the current user"));
     }
 
-    public List<TransferenceModel> get5RecentTransferences(
+    @Cacheable(
+            value = CACHE_LIST,
+            key = "T(com.rodrigocoelhoo.lifemanager.config.RedisCacheService).getCurrentUsername() + " +
+                    "'::recent5:' + #start + '|' + #end"
+    )
+    public List<TransferenceResponseDTO> get5RecentTransferences(
             LocalDate start,
             LocalDate end
     ) {
         UserModel user = userService.getLoggedInUser();
-        return transferenceRepository.findTop5ByUserAndDateBetweenOrderByDateDescIdDesc(user, start, end);
+        return transferenceRepository.findTop5ByUserAndDateBetweenOrderByDateDescIdDesc(user, start, end)
+                .stream().map(TransferenceResponseDTO::fromEntity)
+                .toList();
     }
 
     private void revertWalletBalance(
@@ -145,7 +161,16 @@ public class TransferenceService {
         walletRepository.save(fromWallet);
         walletRepository.save(toWallet);
 
-        return transferenceRepository.save(transference);
+        TransferenceModel saved = transferenceRepository.save(transference);
+
+        redisCacheService.evictUserCache(CACHE_LIST);
+        redisCacheService.evictUserCacheSpecific("wallets", "wallet:" + fromWallet.getId());
+        redisCacheService.evictUserCacheSpecific("wallets", "wallet:" + toWallet.getId());
+        YearMonth yearMonth = YearMonth.from(transference.getDate());
+        redisCacheService.evictUserCacheSpecific("financesDashboard", "yearMonth:" + yearMonth + "*");
+        redisCacheService.evictUserCacheSpecific("financesDashboard", "yearMonth:" + YearMonth.now() + "*");
+
+        return saved;
     }
 
     @Transactional
@@ -170,7 +195,18 @@ public class TransferenceService {
         Set<WalletModel> affectedWallets = new HashSet<>(List.of(oldFrom, oldTo, newFrom, newTo));
         affectedWallets.forEach(walletRepository::save);
 
-        return transferenceRepository.save(transference);
+        TransferenceModel saved = transferenceRepository.save(transference);
+
+        redisCacheService.evictUserCache(CACHE_LIST);
+        redisCacheService.evictUserCacheSpecific("wallets", "wallet:" + oldFrom.getId());
+        redisCacheService.evictUserCacheSpecific("wallets", "wallet:" + oldTo.getId());
+        redisCacheService.evictUserCacheSpecific("wallets", "wallet:" + newFrom.getId());
+        redisCacheService.evictUserCacheSpecific("wallets", "wallet:" + newTo.getId());
+        YearMonth yearMonth = YearMonth.from(transference.getDate());
+        redisCacheService.evictUserCacheSpecific("financesDashboard", "yearMonth:" + yearMonth + "*");
+        redisCacheService.evictUserCacheSpecific("financesDashboard", "yearMonth:" + YearMonth.now() + "*");
+
+        return saved;
     }
 
     @Transactional
@@ -185,5 +221,12 @@ public class TransferenceService {
         walletRepository.save(toWallet);
 
         transferenceRepository.delete(transference);
+
+        redisCacheService.evictUserCache(CACHE_LIST);
+        redisCacheService.evictUserCacheSpecific("wallets", "wallet:" + fromWallet.getId());
+        redisCacheService.evictUserCacheSpecific("wallets", "wallet:" + toWallet.getId());
+        YearMonth yearMonth = YearMonth.from(transference.getDate());
+        redisCacheService.evictUserCacheSpecific("financesDashboard", "yearMonth:" + yearMonth + "*");
+        redisCacheService.evictUserCacheSpecific("financesDashboard", "yearMonth:" + YearMonth.now() + "*");
     }
 }

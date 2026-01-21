@@ -1,15 +1,16 @@
 package com.rodrigocoelhoo.lifemanager.finances.service;
 
-import com.rodrigocoelhoo.lifemanager.finances.dto.MonthOverviewDTO;
+import com.rodrigocoelhoo.lifemanager.finances.dto.*;
 import com.rodrigocoelhoo.lifemanager.finances.model.*;
 import com.rodrigocoelhoo.lifemanager.finances.model.Currency;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.YearMonth;
@@ -23,6 +24,8 @@ public class DashboardService {
     private final TransferenceService transferenceService;
     private final AutomaticTransactionService automaticTransactionService;
 
+    private static final String CACHE_DASHBOARD = "financesDashboard";
+
     public DashboardService(
             TransactionService transactionService,
             WalletService walletService,
@@ -35,11 +38,17 @@ public class DashboardService {
         this.automaticTransactionService = automaticTransactionService;
     }
 
+    @Cacheable(
+            value = CACHE_DASHBOARD,
+            key = "T(com.rodrigocoelhoo.lifemanager.config.RedisCacheService).getCurrentUsername() + " +
+                    "'::yearMonth:' + #yearMonth + " +
+                    "'::currency:' + #currency.name()"
+    )
     public MonthOverviewDTO getMonthOverview(YearMonth yearMonth, Currency currency) {
         LocalDate start = yearMonth.atDay(1);
         LocalDate end   = yearMonth.atEndOfMonth();
 
-        List<TransactionModel> currentMonthTransactions = transactionService.getTransactionsByRange(start, end);
+        List<TransactionInternalDTO> currentMonthTransactions = transactionService.getTransactionsByRange(start, end);
 
         BigDecimal totalExpenses = BigDecimal.ZERO;
         LinkedHashMap<ExpenseCategory, BigDecimal> expenses = new LinkedHashMap<>();
@@ -47,9 +56,9 @@ public class DashboardService {
         BigDecimal totalIncome = BigDecimal.ZERO;
         LinkedHashMap<ExpenseCategory, BigDecimal> income = new LinkedHashMap<>();
 
-        for(TransactionModel transaction : currentMonthTransactions) {
-            ExpenseCategory transactionCategory = transaction.getCategory();
-            BigDecimal amount = transaction.getCurrency().convertTo(transaction.getAmount(), currency);
+        for(TransactionInternalDTO transaction : currentMonthTransactions) {
+            ExpenseCategory transactionCategory = transaction.category();
+            BigDecimal amount = transaction.currency().convertTo(transaction.amount(), currency);
 
             if (transactionCategory.getType().equals(ExpenseType.EXPENSE)) {
                 totalExpenses = totalExpenses.add(amount);
@@ -70,12 +79,12 @@ public class DashboardService {
         }
 
         BigDecimal netBalance = totalIncome.subtract(totalExpenses);
-        List<TransactionModel> recentTransactions = currentMonthTransactions.subList(0, Math.min(currentMonthTransactions.size(), 5));
-        List<TransferenceModel> recentTransferences = transferenceService.get5RecentTransferences(start, end);
+        List<TransactionInternalDTO> recentTransactions = currentMonthTransactions.subList(0, Math.min(currentMonthTransactions.size(), 5));
+        List<TransferenceResponseDTO> recentTransferences = transferenceService.get5RecentTransferences(start, end);
 
         boolean isCurrentMonth = YearMonth.now().equals(yearMonth);
-        List<WalletModel> wallets = new ArrayList<>();
-        List<AutomaticTransactionModel> automaticTransactions = new ArrayList<>();
+        List<WalletResponseDTO> wallets = new ArrayList<>();
+        List<AutomaticTransactionSimple> automaticTransactions = new ArrayList<>();
         LinkedHashMap<YearMonth, Netbalance> previousMonthsNetBalance = new LinkedHashMap<>();
 
         if(isCurrentMonth) {
@@ -85,25 +94,25 @@ public class DashboardService {
             automaticTransactions = automaticTransactionService.get5NextAutomaticTransaction();
 
             // NetBalance
-            List<TransactionModel> pastMonthTransactions = transactionService.getTransactionsByRange(
+            List<TransactionInternalDTO> pastMonthTransactions = transactionService.getTransactionsByRange(
                     yearMonth.minusMonths(5).atDay(1),
                     yearMonth.minusMonths(1).atEndOfMonth()
             );
 
-            LinkedHashMap<YearMonth, List<TransactionModel>> months = new LinkedHashMap<>();
+            LinkedHashMap<YearMonth, List<TransactionInternalDTO>> months = new LinkedHashMap<>();
             for (int i = 1; i <= 5; i++) {
                 months.put(yearMonth.minusMonths(i), new ArrayList<>());
             }
 
-            for (TransactionModel tx : pastMonthTransactions) {
-                YearMonth txMonth = YearMonth.from(tx.getDate());
+            for (TransactionInternalDTO tx : pastMonthTransactions) {
+                YearMonth txMonth = YearMonth.from(tx.date());
 
                 if (months.containsKey(txMonth)) {
                     months.get(txMonth).add(tx);
                 }
             }
 
-            for (Map.Entry<YearMonth, List<TransactionModel>> entry : months.entrySet()) {
+            for (Map.Entry<YearMonth, List<TransactionInternalDTO>> entry : months.entrySet()) {
                 Netbalance monthNetbalance = calculateNetBalanceForList(entry.getValue(), currency);
                 previousMonthsNetBalance.put(entry.getKey(), monthNetbalance);
             }
@@ -127,16 +136,16 @@ public class DashboardService {
     }
 
     private Netbalance calculateNetBalanceForList(
-            List<TransactionModel> txs,
+            List<TransactionInternalDTO> txs,
             Currency targetCurrency
     ) {
         BigDecimal income = BigDecimal.ZERO;
         BigDecimal expenses = BigDecimal.ZERO;
 
-        for (TransactionModel tx : txs) {
-            BigDecimal converted = tx.getWallet().getCurrency().convertTo(tx.getAmount(), targetCurrency);
+        for (TransactionInternalDTO tx : txs) {
+            BigDecimal converted = tx.wallet().currency().convertTo(tx.amount(), targetCurrency);
 
-            if (tx.getCategory().getType() == ExpenseType.EXPENSE) {
+            if (tx.category().getType() == ExpenseType.EXPENSE) {
                 expenses = expenses.add(converted);
             } else {
                 income = income.add(converted);
@@ -146,10 +155,5 @@ public class DashboardService {
         return new Netbalance(income, expenses);
     }
 
-    @Getter
-    @AllArgsConstructor
-    public class Netbalance {
-        private final BigDecimal income;
-        private final BigDecimal expenses;
-    }
+    public record Netbalance(BigDecimal income, BigDecimal expenses) implements Serializable { }
 }

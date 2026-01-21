@@ -28,7 +28,7 @@ export default function WalletForm({ wallet, onClose, onCreate, onUpdate, onDele
 
 	const handleUpdate = async () => {
 		if (!onUpdate || !wallet) return;
-		await onUpdate(wallet.id, { name, type, currency });
+		await onUpdate(wallet.id, { name, type });
 		onClose();
 	};
 

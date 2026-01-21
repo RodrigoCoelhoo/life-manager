@@ -37,11 +37,7 @@ public class WalletController {
     ) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
 
-        Page<WalletModel> wallets = walletService.getWallets(pageable, name);
-
-        Page<WalletResponseDTO> response = wallets.map(WalletResponseDTO::fromEntity);
-
-        return ResponseEntity.ok(PageResponseDTO.fromPage(response));
+        return ResponseEntity.ok(PageResponseDTO.fromPage(walletService.getWallets(pageable, name)));
     }
 
     @GetMapping("/{id}")

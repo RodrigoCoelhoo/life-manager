@@ -24,7 +24,6 @@ export interface WalletResponseDTO {
 export interface WalletUpdateDTO {
 	name: string;
 	type: WalletType;
-	currency: string;
 }
 
 export interface WalletSimpleResponseDTO {

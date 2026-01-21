@@ -45,22 +45,20 @@ public class TransactionController {
             @RequestParam(required = false)
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
             LocalDate endDate
-            ) {
+    ) {
         Pageable pageable = PageRequest.of(
                 page,
                 size,
                 Sort.by("date").descending().and(Sort.by("id").descending())
         );
 
-        Page<TransactionModel> transactions = transactionService.getAllTransactions(
+        Page<TransactionResponseDTO> response = transactionService.getAllTransactions(
                 pageable,
                 walletId,
                 category,
                 startDate,
                 endDate
         );
-
-        Page<TransactionResponseDTO> response = transactions.map(TransactionResponseDTO::fromEntity);
 
         return ResponseEntity.ok(PageResponseDTO.fromPage(response));
     }
