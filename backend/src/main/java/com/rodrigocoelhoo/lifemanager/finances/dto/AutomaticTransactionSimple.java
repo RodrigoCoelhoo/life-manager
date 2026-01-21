@@ -1,6 +1,8 @@
 package com.rodrigocoelhoo.lifemanager.finances.dto;
 
 import com.rodrigocoelhoo.lifemanager.finances.model.AutomaticTransactionModel;
+import com.rodrigocoelhoo.lifemanager.finances.model.ExpenseCategory;
+import com.rodrigocoelhoo.lifemanager.finances.model.ExpenseType;
 
 import java.io.Serializable;
 import java.time.LocalDate;
@@ -10,8 +12,8 @@ public record AutomaticTransactionSimple(
         String walletName,
         String name,
         String amount,
-        String category,
-        String type,
+        ExpenseCategory category,
+        ExpenseType type,
         LocalDate nextTransactionDate
 ) implements Serializable {
     public static AutomaticTransactionSimple fromEntity(
@@ -22,8 +24,8 @@ public record AutomaticTransactionSimple(
                 model.getWallet().getName(),
                 model.getName(),
                 model.getWallet().getCurrency().format(model.getAmount()),
-                model.getCategory().toString(),
-                model.getType().toString(),
+                model.getCategory(),
+                model.getType(),
                 model.getNextTransactionDate()
         );
     }

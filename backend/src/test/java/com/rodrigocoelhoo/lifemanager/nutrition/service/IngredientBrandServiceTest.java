@@ -1,5 +1,6 @@
 package com.rodrigocoelhoo.lifemanager.nutrition.service;
 
+import com.rodrigocoelhoo.lifemanager.config.RedisCacheService;
 import com.rodrigocoelhoo.lifemanager.exceptions.ResourceNotFound;
 import com.rodrigocoelhoo.lifemanager.nutrition.dto.IngredientBrandDTO;
 import com.rodrigocoelhoo.lifemanager.nutrition.dto.NutritionalValueDTO;
@@ -17,7 +18,9 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -37,6 +40,9 @@ class IngredientBrandServiceTest {
 
     private IngredientModel ingredient;
 
+    @Mock
+    private RedisCacheService redisCacheService;
+
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
@@ -44,8 +50,11 @@ class IngredientBrandServiceTest {
         ingredient = IngredientModel.builder()
                 .id(1L)
                 .name("Egg")
-                .brands(new ArrayList<>())
+                .brands(new HashSet<>())
                 .build();
+
+        doNothing().when(redisCacheService).evictUserCache(anyString());
+        doNothing().when(redisCacheService).evictUserCacheSpecific(anyString(), anyString());
     }
 
     @Nested
@@ -71,7 +80,7 @@ class IngredientBrandServiceTest {
 
             when(ingredientService.getIngredient(1L)).thenReturn(ingredient);
 
-            List<IngredientBrandModel> result = ingredientBrandService.getAllIngredientBrands(1L);
+            Set<IngredientBrandModel> result = ingredientBrandService.getAllIngredientBrands(1L);
 
             assertThat(result).hasSize(2);
             assertThat(result).containsExactlyInAnyOrder(brand1, brand2);
@@ -190,7 +199,7 @@ class IngredientBrandServiceTest {
                     .id(1L)
                     .name("Pingo Doce")
                     .ingredient(ingredient)
-                    .nutritionalValues(new ArrayList<>(List.of(n1)))
+                    .nutritionalValues(new HashSet<>(List.of(n1)))
                     .build();
             ingredient.getBrands().add(brand);
 
@@ -222,7 +231,7 @@ class IngredientBrandServiceTest {
                     .id(1L)
                     .name("Pingo Doce")
                     .ingredient(ingredient)
-                    .nutritionalValues(new ArrayList<>(List.of()))
+                    .nutritionalValues(new HashSet<>(List.of()))
                     .build();
             ingredient.getBrands().add(brand);
 
@@ -238,8 +247,13 @@ class IngredientBrandServiceTest {
             assertThat(result.getIngredient()).isEqualTo(ingredient);
 
             assertThat(result.getNutritionalValues()).hasSize(1);
-            assertThat(result.getNutritionalValues().getFirst().getTag()).isEqualTo(NutritionalTag.CALORIES);
-            assertThat(result.getNutritionalValues().getFirst().getPer100units()).isEqualTo(0.00);
+            assertThat(result.getNutritionalValues())
+                    .first()
+                    .satisfies(n -> {
+                        assertThat(n.getTag()).isEqualTo(NutritionalTag.CALORIES);
+                        assertThat(n.getPer100units()).isEqualTo(0.00);
+                    });
+
 
             verify(ingredientService).getIngredient(1L);
             verify(ingredientBrandRepository).save(any());
@@ -277,7 +291,7 @@ class IngredientBrandServiceTest {
                     .id(1L)
                     .name("Continente")
                     .ingredient(ingredient)
-                    .nutritionalValues(new ArrayList<>())
+                    .nutritionalValues(new HashSet<>())
                     .build();
 
             ingredient.getBrands().add(brand);

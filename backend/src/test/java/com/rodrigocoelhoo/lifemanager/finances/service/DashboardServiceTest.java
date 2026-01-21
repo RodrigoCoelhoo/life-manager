@@ -1,7 +1,8 @@
 package com.rodrigocoelhoo.lifemanager.finances.service;
 
-import com.rodrigocoelhoo.lifemanager.exceptions.ResourceNotFound;
 import com.rodrigocoelhoo.lifemanager.finances.dto.MonthOverviewDTO;
+import com.rodrigocoelhoo.lifemanager.finances.dto.TransactionInternalDTO;
+import com.rodrigocoelhoo.lifemanager.finances.dto.WalletResponseDTO;
 import com.rodrigocoelhoo.lifemanager.finances.model.*;
 import com.rodrigocoelhoo.lifemanager.users.UserModel;
 import com.rodrigocoelhoo.lifemanager.users.UserService;
@@ -9,14 +10,13 @@ import org.junit.jupiter.api.*;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.List;
-import java.util.LinkedHashMap;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
@@ -91,7 +91,7 @@ class DashboardServiceTest {
             when(transactionService.getTransactionsByRange(
                     yearMonth.atDay(1),
                     yearMonth.atEndOfMonth()
-            )).thenReturn(transactions);
+            )).thenReturn(transactions.stream().map(TransactionInternalDTO::fromEntity).toList());
 
             WalletModel wallet = new WalletModel();
             wallet.setBalance(new BigDecimal(500));
@@ -99,7 +99,7 @@ class DashboardServiceTest {
             wallet.setName("Test");
             wallet.setCurrency(Currency.EUR);
 
-            when(walletService.getWallets(any(), any())).thenReturn(new PageImpl<>(List.of(wallet)));
+            when(walletService.getWallets(any(), any())).thenReturn(new PageImpl<>(List.of(WalletResponseDTO.fromEntity(wallet))));
 
             when(transferenceService.get5RecentTransferences(
                     yearMonth.atDay(1),
@@ -131,6 +131,7 @@ class DashboardServiceTest {
 
             WalletModel wallet = new WalletModel();
             wallet.setCurrency(Currency.AUD);
+            wallet.setBalance(new BigDecimal(10000));
 
             TransactionModel pastTx = new TransactionModel();
             pastTx.setAmount(new BigDecimal(50));
@@ -148,7 +149,7 @@ class DashboardServiceTest {
             when(transactionService.getTransactionsByRange(
                     currentMonth.minusMonths(5).atDay(1),
                     currentMonth.minusMonths(1).atEndOfMonth()
-            )).thenReturn(List.of(pastTx));
+            )).thenReturn(Stream.of(pastTx).map(TransactionInternalDTO::fromEntity).toList());
 
             MonthOverviewDTO result = dashboardService.getMonthOverview(currentMonth, currency);
 
@@ -204,7 +205,9 @@ class DashboardServiceTest {
                 tx.setDate(LocalDate.of(2026, 1, 5));
             });
 
-            when(transactionService.getTransactionsByRange(yearMonth.atDay(1), yearMonth.atEndOfMonth())).thenReturn(transactions);
+            when(transactionService.getTransactionsByRange(yearMonth.atDay(1), yearMonth.atEndOfMonth())).thenReturn(
+                    transactions.stream().map(TransactionInternalDTO::fromEntity).toList()
+            );
             when(walletService.getWallets(any(), any())).thenReturn(new PageImpl<>(List.of()));
             when(transferenceService.get5RecentTransferences(any(), any())).thenReturn(List.of());
             when(automaticTransactionService.get5NextAutomaticTransaction()).thenReturn(List.of());

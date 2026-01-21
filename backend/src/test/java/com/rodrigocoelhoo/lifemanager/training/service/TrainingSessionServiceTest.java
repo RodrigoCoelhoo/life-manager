@@ -1,5 +1,6 @@
 package com.rodrigocoelhoo.lifemanager.training.service;
 
+import com.rodrigocoelhoo.lifemanager.config.RedisCacheService;
 import com.rodrigocoelhoo.lifemanager.exceptions.ResourceNotFound;
 import com.rodrigocoelhoo.lifemanager.training.dto.trainingsessiondto.*;
 import com.rodrigocoelhoo.lifemanager.training.mapper.SessionExerciseMapper;
@@ -42,6 +43,9 @@ class TrainingSessionServiceTest {
     @Mock
     private SessionExerciseMapper mapper;
 
+    @Mock
+    private RedisCacheService redisCacheService;
+
     private UserModel user;
 
     @BeforeEach
@@ -50,19 +54,24 @@ class TrainingSessionServiceTest {
         user = new UserModel();
         user.setId(1L);
         when(userService.getLoggedInUser()).thenReturn(user);
+        doNothing().when(redisCacheService).evictUserCache(anyString());
+        doNothing().when(redisCacheService).evictUserCacheSpecific(anyString(), anyString());
     }
 
     @Test
     @DisplayName("should return all sessions for logged-in user")
     void shouldReturnAllSessions() {
-        TrainingSessionModel session = TrainingSessionModel.builder().user(user).build();
+        TrainingSessionModel session = TrainingSessionModel.builder()
+                .user(user)
+                .exercises(new ArrayList<>())
+                .build();
         Page<TrainingSessionModel> page = new PageImpl<>(List.of(session));
 
         when(sessionRepository.findAllByUser(user, Pageable.unpaged())).thenReturn(page);
 
-        List<TrainingSessionModel> result = service.getAllSessions(Pageable.unpaged()).toList();
+        List<TrainingSessionResponseDTO> result = service.getAllSessions(Pageable.unpaged()).toList();
 
-        assertThat(result).hasSize(1).containsExactly(session);
+        assertThat(result).hasSize(1).containsExactly(TrainingSessionResponseDTO.fromEntity(session));
         verify(sessionRepository).findAllByUser(user, Pageable.unpaged());
     }
 
@@ -84,8 +93,11 @@ class TrainingSessionServiceTest {
         @Test
         @DisplayName("should create session successfully")
         void shouldCreateSession() {
-            TrainingSessionDTO dto = new TrainingSessionDTO(LocalDateTime.now(), List.of());
-            TrainingSessionModel saved = TrainingSessionModel.builder().user(user).build();
+            TrainingSessionDTO dto = new TrainingSessionDTO(LocalDateTime.now(), new ArrayList<>());
+            TrainingSessionModel saved = TrainingSessionModel.builder()
+                    .user(user)
+                    .date(LocalDateTime.now())
+                    .build();
 
             when(sessionRepository.save(any())).thenReturn(saved);
 
@@ -126,7 +138,10 @@ class TrainingSessionServiceTest {
         @Test
         @DisplayName("should delete session successfully")
         void shouldDeleteSession() {
-            TrainingSessionModel existing = TrainingSessionModel.builder().user(user).build();
+            TrainingSessionModel existing = TrainingSessionModel.builder()
+                    .user(user)
+                    .date(LocalDateTime.now())
+                    .build();
             when(sessionRepository.findByIdAndUser(1L, user)).thenReturn(Optional.of(existing));
 
             service.deleteSession(1L);

@@ -1,8 +1,10 @@
 package com.rodrigocoelhoo.lifemanager.nutrition.service;
 
+import com.rodrigocoelhoo.lifemanager.config.RedisCacheService;
 import com.rodrigocoelhoo.lifemanager.exceptions.BadRequestException;
 import com.rodrigocoelhoo.lifemanager.exceptions.ResourceNotFound;
 import com.rodrigocoelhoo.lifemanager.nutrition.dto.MealDTO;
+import com.rodrigocoelhoo.lifemanager.nutrition.dto.MealDetailsDTO;
 import com.rodrigocoelhoo.lifemanager.nutrition.dto.MealIngredientDTO;
 import com.rodrigocoelhoo.lifemanager.nutrition.model.*;
 import com.rodrigocoelhoo.lifemanager.nutrition.repository.MealRepository;
@@ -20,10 +22,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -44,6 +43,9 @@ class MealServiceTest {
     @InjectMocks
     private MealService mealService;
 
+    @Mock
+    private RedisCacheService redisCacheService;
+
     private UserModel user;
 
     @BeforeEach
@@ -55,6 +57,8 @@ class MealServiceTest {
         user.setUsername("testuser");
 
         when(userService.getLoggedInUser()).thenReturn(user);
+        doNothing().when(redisCacheService).evictUserCache(anyString());
+        doNothing().when(redisCacheService).evictUserCacheSpecific(anyString(), anyString());
     }
 
     @Nested
@@ -66,15 +70,20 @@ class MealServiceTest {
         void shouldReturnAllMeals() {
             MealModel meal = MealModel.builder()
                     .user(user)
+                    .ingredients(new HashSet<>())
                     .build();
 
             Page<MealModel> page = new PageImpl<>(List.of(meal));
             when(mealRepository.findAllByUser(user, Pageable.unpaged())).thenReturn(page);
 
-            List<MealModel> result = mealService.getAllMeals(Pageable.unpaged()).toList();
+            List<MealDetailsDTO> result = mealService.getAllMeals(Pageable.unpaged()).toList();
 
             assertThat(result).hasSize(1);
-            assertThat(result).containsExactlyInAnyOrder(meal);
+            assertThat(result).containsExactlyInAnyOrder(MealDetailsDTO.fromEntities(
+                    meal,
+                    new LinkedHashMap<>()
+                    )
+            );
 
             verify(mealRepository).findAllByUser(user, Pageable.unpaged());
         }
@@ -127,7 +136,7 @@ class MealServiceTest {
                     .user(user)
                     .id(1L)
                     .name("Egg")
-                    .brands(new ArrayList<>())
+                    .brands(new HashSet<>())
                     .build();
 
             IngredientBrandModel ingredientBrandModel = IngredientBrandModel.builder()
@@ -156,7 +165,7 @@ class MealServiceTest {
             assertThat(meal.getDate()).isEqualTo(mealDTO.date());
             assertThat(meal.getIngredients()).hasSize(1);
 
-            MealIngredientModel mealIngredient = meal.getIngredients().getFirst();
+            MealIngredientModel mealIngredient = meal.getIngredients().iterator().next();
             assertThat(mealIngredient.getIngredient()).isEqualTo(ingredientModel);
             assertThat(mealIngredient.getBrand()).isEqualTo(ingredientBrandModel);
             assertThat(mealIngredient.getAmount()).isEqualTo(50.0);
@@ -194,7 +203,7 @@ class MealServiceTest {
             IngredientModel ingredientModel = IngredientModel.builder()
                     .user(user)
                     .id(1L)
-                    .brands(new ArrayList<>())
+                    .brands(new HashSet<>())
                     .build();
 
             MealIngredientDTO mealIngredientDTO = new MealIngredientDTO(1L, 999L, 100.0, "G");
@@ -251,7 +260,7 @@ class MealServiceTest {
                     .id(1L)
                     .user(user)
                     .date(LocalDateTime.of(2026, 1, 1, 0, 0))
-                    .ingredients(new ArrayList<>())
+                    .ingredients(new HashSet<>())
                     .build();
 
             MealIngredientDTO mealIngredientDTO = new MealIngredientDTO(1L, 1L, 50.0, "G");
@@ -263,7 +272,7 @@ class MealServiceTest {
             IngredientModel ingredient = IngredientModel.builder()
                     .id(1L)
                     .user(user)
-                    .brands(new ArrayList<>())
+                    .brands(new HashSet<>())
                     .build();
 
             IngredientBrandModel brand = IngredientBrandModel.builder()
@@ -282,8 +291,12 @@ class MealServiceTest {
             assertThat(result).isNotNull();
             assertThat(result.getDate()).isEqualTo(updateDTO.date());
             assertThat(result.getIngredients()).hasSize(1);
-            assertThat(result.getIngredients().getFirst().getIngredient()).isEqualTo(ingredient);
-            assertThat(result.getIngredients().getFirst().getBrand()).isEqualTo(brand);
+            assertThat(result.getIngredients())
+                    .first()
+                            .satisfies(n -> {
+                                assertThat(n.getIngredient()).isEqualTo(ingredient);
+                                assertThat(n.getBrand()).isEqualTo(brand);
+                            });
 
             verify(mealRepository).findByUserAndId(user, 1L);
             verify(ingredientService).getIngredients(List.of(1L));
@@ -313,7 +326,7 @@ class MealServiceTest {
             MealModel existingMeal = MealModel.builder()
                     .id(1L)
                     .user(user)
-                    .ingredients(new ArrayList<>())
+                    .ingredients(new HashSet<>())
                     .build();
 
             MealIngredientDTO dto = new MealIngredientDTO(1L, 999L, 100.0, "G");
@@ -322,7 +335,7 @@ class MealServiceTest {
             IngredientModel ingredient = IngredientModel.builder()
                     .id(1L)
                     .user(user)
-                    .brands(new ArrayList<>())
+                    .brands(new HashSet<>())
                     .build();
 
             when(mealRepository.findByUserAndId(user, 1L)).thenReturn(Optional.of(existingMeal));
@@ -372,6 +385,7 @@ class MealServiceTest {
             MealModel existingMeal = MealModel.builder()
                     .id(1L)
                     .user(user)
+                    .date(LocalDateTime.now())
                     .build();
 
             when(mealRepository.findByUserAndId(user, 1L)).thenReturn(Optional.of(existingMeal));
@@ -410,13 +424,13 @@ class MealServiceTest {
                     .id(1L)
                     .user(user)
                     .name("Egg")
-                    .brands(new ArrayList<>())
+                    .brands(new HashSet<>())
                     .build();
 
             IngredientBrandModel brand = IngredientBrandModel.builder()
                     .id(1L)
                     .ingredient(ingredient)
-                    .nutritionalValues(new ArrayList<>())
+                    .nutritionalValues(new HashSet<>())
                     .build();
 
             brand.getNutritionalValues().addAll(List.of(
@@ -441,7 +455,7 @@ class MealServiceTest {
             MealModel meal = MealModel.builder()
                     .id(1L)
                     .user(user)
-                    .ingredients(new ArrayList<>(List.of(mealIngredient)))
+                    .ingredients(new HashSet<>(List.of(mealIngredient)))
                     .build();
 
             LinkedHashMap<NutritionalTag, Double> label = mealService.getNutritionalLabel(meal);
@@ -456,7 +470,7 @@ class MealServiceTest {
             MealModel meal = MealModel.builder()
                     .id(1L)
                     .user(user)
-                    .ingredients(new ArrayList<>())
+                    .ingredients(new HashSet<>())
                     .build();
 
             LinkedHashMap<NutritionalTag, Double> label = mealService.getNutritionalLabel(meal);

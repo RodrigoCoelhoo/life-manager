@@ -1,7 +1,9 @@
 package com.rodrigocoelhoo.lifemanager.training.service;
 
+import com.rodrigocoelhoo.lifemanager.config.RedisCacheService;
 import com.rodrigocoelhoo.lifemanager.exceptions.ResourceNotFound;
 import com.rodrigocoelhoo.lifemanager.training.dto.exercisedto.ExerciseDTO;
+import com.rodrigocoelhoo.lifemanager.training.dto.exercisedto.ExerciseResponseDTO;
 import com.rodrigocoelhoo.lifemanager.training.dto.exercisedto.ExerciseStats;
 import com.rodrigocoelhoo.lifemanager.training.dto.exercisedto.ExerciseUpdateDTO;
 import com.rodrigocoelhoo.lifemanager.training.model.ExerciseModel;
@@ -50,6 +52,9 @@ class ExerciseServiceTest {
     @InjectMocks
     private ExerciseService exerciseService;
 
+    @Mock
+    private RedisCacheService redisCacheService;
+
     private UserModel user;
 
     @BeforeEach
@@ -59,6 +64,8 @@ class ExerciseServiceTest {
         user.setId(1L);
         user.setUsername("testuser");
         when(userService.getLoggedInUser()).thenReturn(user);
+        doNothing().when(redisCacheService).evictUserCache(anyString());
+        doNothing().when(redisCacheService).evictUserCacheSpecific(anyString(), anyString());
     }
 
     @Nested
@@ -73,9 +80,12 @@ class ExerciseServiceTest {
             Page<ExerciseModel> page = new PageImpl<>(List.of(ex1, ex2));
             when(exerciseRepository.findAllByUser(user, Pageable.unpaged())).thenReturn(page);
 
-            Page<ExerciseModel> result = exerciseService.getAllExercisesByUser(Pageable.unpaged(), null);
+            Page<ExerciseResponseDTO> result = exerciseService.getAllExercisesByUser(Pageable.unpaged(), null);
 
-            assertThat(result.getContent()).hasSize(2).containsExactlyInAnyOrder(ex1, ex2);
+            assertThat(result.getContent()).hasSize(2).containsExactlyInAnyOrder(
+                    ExerciseResponseDTO.fromEntity(ex1),
+                    ExerciseResponseDTO.fromEntity(ex2)
+            );
             verify(exerciseRepository).findAllByUser(user, Pageable.unpaged());
         }
 
@@ -87,9 +97,9 @@ class ExerciseServiceTest {
             when(exerciseRepository.findByUserAndNameContainingIgnoreCase(user, "Squat", Pageable.unpaged()))
                     .thenReturn(page);
 
-            Page<ExerciseModel> result = exerciseService.getAllExercisesByUser(Pageable.unpaged(), "Squat");
+            Page<ExerciseResponseDTO> result = exerciseService.getAllExercisesByUser(Pageable.unpaged(), "Squat");
 
-            assertThat(result.getContent()).hasSize(1).containsExactly(ex);
+            assertThat(result.getContent()).hasSize(1).containsExactly(ExerciseResponseDTO.fromEntity(ex));
             verify(exerciseRepository).findByUserAndNameContainingIgnoreCase(user, "Squat", Pageable.unpaged());
         }
     }

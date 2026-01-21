@@ -1,6 +1,8 @@
 package com.rodrigocoelhoo.lifemanager.finances.dto;
 
 import com.rodrigocoelhoo.lifemanager.finances.model.AutomaticTransactionModel;
+import com.rodrigocoelhoo.lifemanager.finances.model.ExpenseCategory;
+import com.rodrigocoelhoo.lifemanager.finances.model.ExpenseType;
 import com.rodrigocoelhoo.lifemanager.finances.model.TransactionRecurrence;
 
 import java.io.Serializable;
@@ -11,8 +13,8 @@ public record AutomaticTransactionResponseDTO(
     WalletSimpleResponseDTO wallet,
     String name,
     String amount,
-    String category,
-    String type,
+    ExpenseCategory category,
+    ExpenseType type,
     TransactionRecurrence recurrence,
     short interval,
     String description,
@@ -26,8 +28,8 @@ public record AutomaticTransactionResponseDTO(
                 WalletSimpleResponseDTO.fromEntity(model.getWallet()),
                 model.getName(),
                 model.getWallet().getCurrency().format(model.getAmount()),
-                model.getCategory().toString(),
-                model.getType().toString(),
+                model.getCategory(),
+                model.getType(),
                 model.getRecurrence(),
                 model.getInterval(),
                 model.getDescription(),

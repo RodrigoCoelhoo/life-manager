@@ -1,6 +1,8 @@
 package com.rodrigocoelhoo.lifemanager.nutrition.service;
+import com.rodrigocoelhoo.lifemanager.config.RedisCacheService;
 import com.rodrigocoelhoo.lifemanager.exceptions.ResourceNotFound;
 import com.rodrigocoelhoo.lifemanager.nutrition.dto.IngredientDTO;
+import com.rodrigocoelhoo.lifemanager.nutrition.dto.IngredientDetailsDTO;
 import com.rodrigocoelhoo.lifemanager.nutrition.model.IngredientModel;
 import com.rodrigocoelhoo.lifemanager.nutrition.repository.IngredientRepository;
 import com.rodrigocoelhoo.lifemanager.users.UserModel;
@@ -14,6 +16,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,6 +35,9 @@ class IngredientServiceTest {
     @InjectMocks
     private IngredientService ingredientService;
 
+    @Mock
+    private RedisCacheService redisCacheService;
+
     private UserModel user;
 
     @BeforeEach
@@ -43,6 +49,8 @@ class IngredientServiceTest {
         user.setUsername("RodrigoCoelho");
 
         when(userService.getLoggedInUser()).thenReturn(user);
+        doNothing().when(redisCacheService).evictUserCache(anyString());
+        doNothing().when(redisCacheService).evictUserCacheSpecific(anyString(), anyString());
     }
 
     @Nested
@@ -56,22 +64,24 @@ class IngredientServiceTest {
                     .id(1L)
                     .name("Egg")
                     .user(user)
+                    .brands(new HashSet<>())
                     .build();
 
             IngredientModel ingredient2 = IngredientModel.builder()
                     .id(2L)
                     .name("Cheese")
                     .user(user)
+                    .brands(new HashSet<>())
                     .build();
 
             Page<IngredientModel> page = new PageImpl<>(List.of(ingredient1, ingredient2));
 
             when(ingredientRepository.findAllByUser(user, Pageable.unpaged())).thenReturn(page);
 
-            Page<IngredientModel> result = ingredientService.getAllIngredients(Pageable.unpaged(), null);
+            Page<IngredientDetailsDTO> result = ingredientService.getAllIngredients(Pageable.unpaged(), null);
 
             assertThat(result.getContent()).hasSize(2);
-            assertThat(result.getContent()).containsExactlyInAnyOrder(ingredient1, ingredient2);
+            assertThat(result.getContent()).containsExactlyInAnyOrder(IngredientDetailsDTO.fromEntity(ingredient1), IngredientDetailsDTO.fromEntity(ingredient2));
         }
 
         @Test
@@ -81,22 +91,24 @@ class IngredientServiceTest {
                     .id(1L)
                     .name("Egg")
                     .user(user)
+                    .brands(new HashSet<>())
                     .build();
 
             IngredientModel ingredient2 = IngredientModel.builder()
                     .id(2L)
                     .name("Cheese")
                     .user(user)
+                    .brands(new HashSet<>())
                     .build();
 
             Page<IngredientModel> page = new PageImpl<>(List.of(ingredient1, ingredient2));
 
             when(ingredientRepository.findAllByUser(user, Pageable.unpaged())).thenReturn(page);
 
-            Page<IngredientModel> result = ingredientService.getAllIngredients(Pageable.unpaged(), "");
+            Page<IngredientDetailsDTO> result = ingredientService.getAllIngredients(Pageable.unpaged(), "");
 
             assertThat(result.getContent()).hasSize(2);
-            assertThat(result.getContent()).containsExactlyInAnyOrder(ingredient1, ingredient2);
+            assertThat(result.getContent()).containsExactlyInAnyOrder(IngredientDetailsDTO.fromEntity(ingredient1), IngredientDetailsDTO.fromEntity(ingredient2));
         }
 
         @Test
@@ -106,22 +118,24 @@ class IngredientServiceTest {
                     .id(1L)
                     .name("Egg")
                     .user(user)
+                    .brands(new HashSet<>())
                     .build();
 
             IngredientModel ingredient2 = IngredientModel.builder()
                     .id(2L)
                     .name("Cheese")
                     .user(user)
+                    .brands(new HashSet<>())
                     .build();
 
             Page<IngredientModel> page = new PageImpl<>(List.of(ingredient1));
 
             when(ingredientRepository.findByUserAndNameContainingIgnoreCase(user, "eg", Pageable.unpaged())).thenReturn(page);
 
-            Page<IngredientModel> result = ingredientService.getAllIngredients(Pageable.unpaged(), "eg");
+            Page<IngredientDetailsDTO> result = ingredientService.getAllIngredients(Pageable.unpaged(), "eg");
 
             assertThat(result.getContent()).hasSize(1);
-            assertThat(result.getContent()).containsExactlyInAnyOrder(ingredient1);
+            assertThat(result.getContent()).containsExactlyInAnyOrder(IngredientDetailsDTO.fromEntity(ingredient1));
         }
 
         @Test
@@ -131,24 +145,26 @@ class IngredientServiceTest {
                     .id(1L)
                     .name("Egg")
                     .user(user)
+                    .brands(new HashSet<>())
                     .build();
 
             IngredientModel ingredient2 = IngredientModel.builder()
                     .id(2L)
                     .name("Cheese")
                     .user(user)
+                    .brands(new HashSet<>())
                     .build();
 
             Page<IngredientModel> page = new PageImpl<>(List.of(ingredient1, ingredient2));
 
             when(ingredientRepository.findAllByUser(user, Pageable.unpaged())).thenReturn(page);
 
-            Page<IngredientModel> result = ingredientService.getAllIngredients(Pageable.unpaged(), null);
+            Page<IngredientDetailsDTO> result = ingredientService.getAllIngredients(Pageable.unpaged(), null);
 
             verify(ingredientRepository).findAllByUser(user, Pageable.unpaged());
 
             assertThat(result.getContent()).hasSize(2);
-            assertThat(result.getContent()).containsExactlyInAnyOrder(ingredient1, ingredient2);
+            assertThat(result.getContent()).containsExactlyInAnyOrder(IngredientDetailsDTO.fromEntity(ingredient1), IngredientDetailsDTO.fromEntity(ingredient2));
         }
     }
 
@@ -199,7 +215,7 @@ class IngredientServiceTest {
                     .id(1L)
                     .name("Egg")
                     .user(user)
-                    .brands(new ArrayList<>())
+                    .brands(new HashSet<>())
                     .build();
 
             when(ingredientRepository.save(any(IngredientModel.class))).thenReturn(savedIngredient);
@@ -234,7 +250,7 @@ class IngredientServiceTest {
                     .id(ingredientId)
                     .name("Egg")
                     .user(user)
-                    .brands(new ArrayList<>())
+                    .brands(new HashSet<>())
                     .build();
 
             when(ingredientRepository.findByUserAndId(user, ingredientId)).thenReturn(Optional.of(existingIngredient));
@@ -262,7 +278,7 @@ class IngredientServiceTest {
                     .id(1L)
                     .name("Egg")
                     .user(user)
-                    .brands(new ArrayList<>())
+                    .brands(new HashSet<>())
                     .build();
 
             when(ingredientRepository.findByUserAndId(user, 1L)).thenReturn(Optional.of(existingIngredient));

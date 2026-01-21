@@ -1,8 +1,10 @@
 package com.rodrigocoelhoo.lifemanager.nutrition.service;
 
+import com.rodrigocoelhoo.lifemanager.config.RedisCacheService;
 import com.rodrigocoelhoo.lifemanager.exceptions.BadRequestException;
 import com.rodrigocoelhoo.lifemanager.exceptions.ResourceNotFound;
 import com.rodrigocoelhoo.lifemanager.nutrition.dto.RecipeDTO;
+import com.rodrigocoelhoo.lifemanager.nutrition.dto.RecipeDetailsDTO;
 import com.rodrigocoelhoo.lifemanager.nutrition.dto.RecipeIngredientDTO;
 import com.rodrigocoelhoo.lifemanager.nutrition.model.*;
 import com.rodrigocoelhoo.lifemanager.nutrition.repository.RecipeRepository;
@@ -42,6 +44,9 @@ class RecipeServiceTest {
     @InjectMocks
     private RecipeService recipeService;
 
+    @Mock
+    private RedisCacheService redisCacheService;
+
     private UserModel user;
 
     @BeforeEach
@@ -53,6 +58,8 @@ class RecipeServiceTest {
         user.setUsername("testuser");
 
         when(userService.getLoggedInUser()).thenReturn(user);
+        doNothing().when(redisCacheService).evictUserCache(anyString());
+        doNothing().when(redisCacheService).evictUserCacheSpecific(anyString(), anyString());
     }
 
     @Nested
@@ -65,20 +72,25 @@ class RecipeServiceTest {
             RecipeModel omelette = RecipeModel.builder()
                     .user(user)
                     .name("Omelette")
+                    .ingredients(new ArrayList<>())
                     .build();
 
             RecipeModel omeletteAndBacon = RecipeModel.builder()
                     .user(user)
                     .name("Omelette And Bacon")
+                    .ingredients(new ArrayList<>())
                     .build();
 
             Page<RecipeModel> page = new PageImpl<>(List.of(omelette, omeletteAndBacon));
             when(recipeRepository.findAllByUser(user, Pageable.unpaged())).thenReturn(page);
 
-            Page<RecipeModel> result = recipeService.getAllRecipes(Pageable.unpaged(), null);
+            Page<RecipeDetailsDTO> result = recipeService.getAllRecipes(Pageable.unpaged(), null);
 
             assertThat(result.getContent()).hasSize(2);
-            assertThat(result.getContent()).containsExactlyInAnyOrder(omelette, omeletteAndBacon);
+            assertThat(result.getContent()).containsExactlyInAnyOrder(
+                    RecipeDetailsDTO.fromEntity(omelette),
+                    RecipeDetailsDTO.fromEntity(omeletteAndBacon)
+            );
             verify(recipeRepository).findAllByUser(user, Pageable.unpaged());
             verify(recipeRepository, never()).findByUserAndNameContainingIgnoreCase(any(), any(), any());
         }
@@ -89,20 +101,25 @@ class RecipeServiceTest {
             RecipeModel omelette = RecipeModel.builder()
                     .user(user)
                     .name("Omelette")
+                    .ingredients(new ArrayList<>())
                     .build();
 
             RecipeModel omeletteAndBacon = RecipeModel.builder()
                     .user(user)
                     .name("Omelette And Bacon")
+                    .ingredients(new ArrayList<>())
                     .build();
 
             Page<RecipeModel> page = new PageImpl<>(List.of(omelette, omeletteAndBacon));
             when(recipeRepository.findAllByUser(user, Pageable.unpaged())).thenReturn(page);
 
-            Page<RecipeModel> result = recipeService.getAllRecipes(Pageable.unpaged(), "");
+            Page<RecipeDetailsDTO> result = recipeService.getAllRecipes(Pageable.unpaged(), "");
 
             assertThat(result.getContent()).hasSize(2);
-            assertThat(result.getContent()).containsExactlyInAnyOrder(omelette, omeletteAndBacon);
+            assertThat(result.getContent()).containsExactlyInAnyOrder(
+                    RecipeDetailsDTO.fromEntity(omelette),
+                    RecipeDetailsDTO.fromEntity(omeletteAndBacon)
+            );
             verify(recipeRepository).findAllByUser(user, Pageable.unpaged());
             verify(recipeRepository, never()).findByUserAndNameContainingIgnoreCase(any(), any(), any());
         }
@@ -113,20 +130,24 @@ class RecipeServiceTest {
             RecipeModel omelette = RecipeModel.builder()
                     .user(user)
                     .name("Omelette")
+                    .ingredients(new ArrayList<>())
                     .build();
 
             RecipeModel omeletteAndBacon = RecipeModel.builder()
                     .user(user)
                     .name("Omelette And Bacon")
+                    .ingredients(new ArrayList<>())
                     .build();
 
             Page<RecipeModel> page = new PageImpl<>(List.of(omeletteAndBacon));
             when(recipeRepository.findByUserAndNameContainingIgnoreCase(user, "Bacon", Pageable.unpaged())).thenReturn(page);
 
-            Page<RecipeModel> result = recipeService.getAllRecipes(Pageable.unpaged(), "Bacon");
+            Page<RecipeDetailsDTO> result = recipeService.getAllRecipes(Pageable.unpaged(), "Bacon");
 
             assertThat(result.getContent()).hasSize(1);
-            assertThat(result.getContent()).containsExactlyInAnyOrder(omeletteAndBacon);
+            assertThat(result.getContent()).containsExactlyInAnyOrder(
+                    RecipeDetailsDTO.fromEntity(omeletteAndBacon)
+            );
             verify(recipeRepository, never()).findAllByUser(any(), any());
             verify(recipeRepository).findByUserAndNameContainingIgnoreCase(user, "Bacon", Pageable.unpaged());
         }
@@ -143,21 +164,26 @@ class RecipeServiceTest {
                     .id(1L)
                     .user(user)
                     .name("Omelette")
+                    .ingredients(new ArrayList<>())
                     .build();
 
             RecipeModel omeletteAndBacon = RecipeModel.builder()
                     .id(2L)
                     .user(user)
                     .name("Omelette And Bacon")
+                    .ingredients(new ArrayList<>())
                     .build();
 
             Page<RecipeModel> page = new PageImpl<>(List.of(omelette, omeletteAndBacon));
             when(recipeRepository.findAllByUser(user, Pageable.unpaged())).thenReturn(page);
 
-            Page<RecipeModel> result = recipeService.getAvailableRecipes(null, Pageable.unpaged());
+            Page<RecipeDetailsDTO> result = recipeService.getAvailableRecipes(null, Pageable.unpaged());
 
             assertThat(result.getContent()).hasSize(2);
-            assertThat(result.getContent()).containsExactlyInAnyOrder(omelette, omeletteAndBacon);
+            assertThat(result.getContent()).containsExactlyInAnyOrder(
+                    RecipeDetailsDTO.fromEntity(omelette),
+                    RecipeDetailsDTO.fromEntity(omeletteAndBacon)
+            );
             verify(recipeRepository).findAllByUser(user, Pageable.unpaged());
             verify(recipeRepository, never()).findAvailableRecipes(any(), any(), any());
         }
@@ -169,21 +195,26 @@ class RecipeServiceTest {
                     .id(1L)
                     .user(user)
                     .name("Omelette")
+                    .ingredients(new ArrayList<>())
                     .build();
 
             RecipeModel omeletteAndBacon = RecipeModel.builder()
                     .id(2L)
                     .user(user)
                     .name("Omelette And Bacon")
+                    .ingredients(new ArrayList<>())
                     .build();
 
             Page<RecipeModel> page = new PageImpl<>(List.of(omelette, omeletteAndBacon));
             when(recipeRepository.findAllByUser(user, Pageable.unpaged())).thenReturn(page);
 
-            Page<RecipeModel> result = recipeService.getAvailableRecipes(List.of(), Pageable.unpaged());
+            Page<RecipeDetailsDTO> result = recipeService.getAvailableRecipes(List.of(), Pageable.unpaged());
 
             assertThat(result.getContent()).hasSize(2);
-            assertThat(result.getContent()).containsExactlyInAnyOrder(omelette, omeletteAndBacon);
+            assertThat(result.getContent()).containsExactlyInAnyOrder(
+                    RecipeDetailsDTO.fromEntity(omelette),
+                    RecipeDetailsDTO.fromEntity(omeletteAndBacon)
+            );
             verify(recipeRepository).findAllByUser(user, Pageable.unpaged());
             verify(recipeRepository, never()).findAvailableRecipes(any(), any(), any());
         }
@@ -200,21 +231,25 @@ class RecipeServiceTest {
                     .id(1L)
                     .user(user)
                     .name("Omelette")
+                    .ingredients(new ArrayList<>())
                     .build();
 
             RecipeModel omeletteAndBacon = RecipeModel.builder()
                     .id(2L)
                     .user(user)
                     .name("Omelette And Bacon")
+                    .ingredients(new ArrayList<>())
                     .build();
 
             Page<RecipeModel> page = new PageImpl<>(List.of(omelette));
             when(recipeRepository.findAvailableRecipes(user, List.of(1L, 2L), Pageable.unpaged())).thenReturn(page);
 
-            Page<RecipeModel> result = recipeService.getAvailableRecipes(List.of(1L, 2L), Pageable.unpaged());
+            Page<RecipeDetailsDTO> result = recipeService.getAvailableRecipes(List.of(1L, 2L), Pageable.unpaged());
 
             assertThat(result.getContent()).hasSize(1);
-            assertThat(result.getContent()).containsExactlyInAnyOrder(omelette);
+            assertThat(result.getContent()).containsExactlyInAnyOrder(
+                    RecipeDetailsDTO.fromEntity(omelette)
+            );
             verify(recipeRepository, never()).findAllByUser(any(), any());
             verify(recipeRepository).findAvailableRecipes(user, List.of(1L, 2L), Pageable.unpaged());
         }
@@ -242,7 +277,7 @@ class RecipeServiceTest {
             Page<RecipeModel> page = new PageImpl<>(List.of());
             when(recipeRepository.findAvailableRecipes(user, List.of(1L), Pageable.unpaged())).thenReturn(page);
 
-            Page<RecipeModel> result = recipeService.getAvailableRecipes(List.of(1L), Pageable.unpaged());
+            Page<RecipeDetailsDTO> result = recipeService.getAvailableRecipes(List.of(1L), Pageable.unpaged());
 
             assertThat(result.getContent()).isEmpty();
             verify(recipeRepository, never()).findAllByUser(any(), any());

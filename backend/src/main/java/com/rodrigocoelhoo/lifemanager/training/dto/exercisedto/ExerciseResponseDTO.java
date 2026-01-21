@@ -1,6 +1,7 @@
 package com.rodrigocoelhoo.lifemanager.training.dto.exercisedto;
 
 import com.rodrigocoelhoo.lifemanager.training.model.ExerciseModel;
+import com.rodrigocoelhoo.lifemanager.training.model.ExerciseType;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -9,7 +10,7 @@ public record ExerciseResponseDTO(
         Long id,
         String name,
         String description,
-        String type,
+        ExerciseType type,
         String demoUrl,
         LocalDateTime createdAt,
         LocalDateTime updatedAt
@@ -19,7 +20,7 @@ public record ExerciseResponseDTO(
                 model.getId(),
                 model.getName(),
                 model.getDescription()  != null ? model.getDescription() : "",
-                model.getType().toString(),
+                model.getType(),
                 model.getDemoUrl() != null ? model.getDemoUrl() : "",
                 model.getCreatedAt(),
                 model.getUpdatedAt()

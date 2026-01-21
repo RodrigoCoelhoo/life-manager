@@ -1,8 +1,10 @@
 package com.rodrigocoelhoo.lifemanager.finances.service;
 
+import com.rodrigocoelhoo.lifemanager.config.RedisCacheService;
 import com.rodrigocoelhoo.lifemanager.exceptions.BadRequestException;
 import com.rodrigocoelhoo.lifemanager.exceptions.ResourceNotFound;
 import com.rodrigocoelhoo.lifemanager.finances.dto.WalletDTO;
+import com.rodrigocoelhoo.lifemanager.finances.dto.WalletResponseDTO;
 import com.rodrigocoelhoo.lifemanager.finances.dto.WalletUpdateDTO;
 import com.rodrigocoelhoo.lifemanager.finances.model.Currency;
 import com.rodrigocoelhoo.lifemanager.finances.model.WalletModel;
@@ -37,6 +39,9 @@ class WalletServiceTest {
     @Mock
     private WalletRepository walletRepository;
 
+    @Mock
+    private RedisCacheService redisCacheService;
+
     private UserModel user;
 
     @BeforeEach
@@ -46,6 +51,8 @@ class WalletServiceTest {
         user.setId(1L);
         user.setUsername("testuser");
         when(userService.getLoggedInUser()).thenReturn(user);
+        doNothing().when(redisCacheService).evictUserCache(anyString());
+        doNothing().when(redisCacheService).evictUserCacheSpecific(anyString(), anyString());
     }
 
     @Nested
@@ -56,15 +63,20 @@ class WalletServiceTest {
         @DisplayName("should return all wallets when name is null")
         void shouldReturnAllWallets() {
             WalletModel w1 = new WalletModel();
+            w1.setBalance(new BigDecimal(10));
+            w1.setCurrency(Currency.EUR);
+
             WalletModel w2 = new WalletModel();
+            w2.setBalance(new BigDecimal(10));
+            w2.setCurrency(Currency.EUR);
 
             Page<WalletModel> page = new PageImpl<>(List.of(w1, w2));
             when(walletRepository.findAllByUser(user, Pageable.unpaged())).thenReturn(page);
 
-            Page<WalletModel> result = walletService.getWallets(Pageable.unpaged(), null);
+            Page<WalletResponseDTO> result = walletService.getWallets(Pageable.unpaged(), null);
 
             assertThat(result).hasSize(2);
-            assertThat(result).containsExactlyInAnyOrder(w1, w2);
+            assertThat(result).containsExactlyInAnyOrder(WalletResponseDTO.fromEntity(w1), WalletResponseDTO.fromEntity(w2));
 
             verify(walletRepository).findAllByUser(user, Pageable.unpaged());
             verify(walletRepository, never()).findByUserAndNameContainingIgnoreCase(any(), any(), any());
@@ -75,17 +87,23 @@ class WalletServiceTest {
         void shouldReturnWalletsFilteredByName() {
             WalletModel w1 = new WalletModel();
             w1.setName("Caixa Geral de Depositos");
+            w1.setType(WalletType.BANK);
+            w1.setBalance(new BigDecimal(10));
+            w1.setCurrency(Currency.EUR);
 
             WalletModel w2 = new WalletModel();
             w2.setName("Santander");
+            w2.setType(WalletType.BANK);
+            w2.setBalance(new BigDecimal(10));
+            w2.setCurrency(Currency.EUR);
 
             Page<WalletModel> page = new PageImpl<>(List.of(w1));
             when(walletRepository.findByUserAndNameContainingIgnoreCase(user, "Caixa" ,Pageable.unpaged())).thenReturn(page);
 
-            Page<WalletModel> result = walletService.getWallets(Pageable.unpaged(), "Caixa");
+            Page<WalletResponseDTO> result = walletService.getWallets(Pageable.unpaged(), "Caixa");
 
             assertThat(result).hasSize(1);
-            assertThat(result).containsExactlyInAnyOrder(w1);
+            assertThat(result).containsExactlyInAnyOrder(WalletResponseDTO.fromEntity(w1));
 
             verify(walletRepository, never()).findAllByUser(any(), any());
             verify(walletRepository).findByUserAndNameContainingIgnoreCase(user, "Caixa" ,Pageable.unpaged());

@@ -1,5 +1,6 @@
 package com.rodrigocoelhoo.lifemanager.nutrition.service;
 
+import com.rodrigocoelhoo.lifemanager.config.RedisCacheService;
 import com.rodrigocoelhoo.lifemanager.nutrition.dto.DayDTO;
 import com.rodrigocoelhoo.lifemanager.nutrition.dto.WeekOverviewDTO;
 import com.rodrigocoelhoo.lifemanager.nutrition.model.*;
@@ -16,10 +17,13 @@ import org.mockito.MockitoAnnotations;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
 @DisplayName("NutritionDashboardService Tests")
@@ -34,6 +38,12 @@ class NutritionDashboardServiceTest {
     @InjectMocks
     private NutritionDashboardService dashboardService;
 
+    @Mock
+    private MealService mealService;
+
+    @Mock
+    private RedisCacheService redisCacheService;
+
     private UserModel user;
 
     @BeforeEach
@@ -44,6 +54,8 @@ class NutritionDashboardServiceTest {
         user.setUsername("testuser");
 
         when(userService.getLoggedInUser()).thenReturn(user);
+        doNothing().when(redisCacheService).evictUserCache(anyString());
+        doNothing().when(redisCacheService).evictUserCacheSpecific(anyString(), anyString());
     }
 
     @Nested
@@ -59,13 +71,13 @@ class NutritionDashboardServiceTest {
 
             IngredientModel ingredient = IngredientModel.builder()
                     .id(1L)
-                    .brands(new ArrayList<>())
+                    .brands(new HashSet<>())
                     .build();
 
             IngredientBrandModel brand = IngredientBrandModel.builder()
                     .id(1L)
                     .ingredient(ingredient)
-                    .nutritionalValues(new ArrayList<>())
+                    .nutritionalValues(new HashSet<>())
                     .build();
 
             brand.getNutritionalValues().addAll(List.of(
@@ -90,16 +102,14 @@ class NutritionDashboardServiceTest {
             MealModel meal = MealModel.builder()
                     .user(user)
                     .date(mealTime)
-                    .ingredients(new ArrayList<>())
+                    .ingredients(new HashSet<>())
                     .build();
 
             meal.getIngredients().add(mealIngredient);
 
-            when(mealRepository.findAllByUserAndDateBetweenOrderByDateDescIdDesc(
-                    user,
-                    monday.with(java.time.DayOfWeek.MONDAY).atTime(0,0),
-                    monday.with(java.time.DayOfWeek.MONDAY).atTime(23,59,59).plusDays(6)
-            )).thenReturn(List.of(meal));
+            when(mealService.getMealsByRange(any(LocalDateTime.class), any(LocalDateTime.class)))
+                    .thenReturn(List.of(meal));
+
 
             WeekOverviewDTO overview = dashboardService.getWeekOverview(monday);
 

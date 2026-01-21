@@ -1,7 +1,9 @@
 package com.rodrigocoelhoo.lifemanager.training.service;
 
+import com.rodrigocoelhoo.lifemanager.config.RedisCacheService;
 import com.rodrigocoelhoo.lifemanager.exceptions.ResourceNotFound;
 import com.rodrigocoelhoo.lifemanager.training.dto.trainingplandto.TrainingPlanDTO;
+import com.rodrigocoelhoo.lifemanager.training.dto.trainingplandto.TrainingPlanResponseDTO;
 import com.rodrigocoelhoo.lifemanager.training.dto.trainingplandto.TrainingPlanUpdateDTO;
 import com.rodrigocoelhoo.lifemanager.training.model.ExerciseModel;
 import com.rodrigocoelhoo.lifemanager.training.model.TrainingPlanModel;
@@ -41,6 +43,9 @@ class TrainingPlanServiceTest {
     @InjectMocks
     private TrainingPlanService trainingPlanService;
 
+    @Mock
+    private RedisCacheService redisCacheService;
+
     private UserModel user;
 
     @BeforeEach
@@ -52,6 +57,8 @@ class TrainingPlanServiceTest {
         user.setUsername("testuser");
 
         when(userService.getLoggedInUser()).thenReturn(user);
+        doNothing().when(redisCacheService).evictUserCache(anyString());
+        doNothing().when(redisCacheService).evictUserCacheSpecific(anyString(), anyString());
     }
 
     @Nested
@@ -61,14 +68,17 @@ class TrainingPlanServiceTest {
         @Test
         @DisplayName("should return all training plans for logged-in user")
         void shouldReturnAllTrainingPlans() {
-            TrainingPlanModel plan = TrainingPlanModel.builder().user(user).build();
+            TrainingPlanModel plan = TrainingPlanModel.builder()
+                    .user(user)
+                    .exercises(new ArrayList<>())
+                    .build();
             Page<TrainingPlanModel> page = new PageImpl<>(List.of(plan));
 
             when(trainingPlanRepository.findAllByUser(user, Pageable.unpaged())).thenReturn(page);
 
-            Page<TrainingPlanModel> result = trainingPlanService.getAllTrainingPlansByUser(Pageable.unpaged());
+            Page<TrainingPlanResponseDTO> result = trainingPlanService.getAllTrainingPlansByUser(Pageable.unpaged());
 
-            assertThat(result.getContent()).hasSize(1).containsExactly(plan);
+            assertThat(result.getContent()).hasSize(1).containsExactly(TrainingPlanResponseDTO.fromEntity(plan));
             verify(trainingPlanRepository).findAllByUser(user, Pageable.unpaged());
         }
     }

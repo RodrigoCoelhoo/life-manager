@@ -1,8 +1,11 @@
 package com.rodrigocoelhoo.lifemanager.finances.service;
 
+import com.rodrigocoelhoo.lifemanager.config.RedisCacheService;
 import com.rodrigocoelhoo.lifemanager.exceptions.BadRequestException;
 import com.rodrigocoelhoo.lifemanager.exceptions.ResourceNotFound;
 import com.rodrigocoelhoo.lifemanager.finances.dto.TransactionDTO;
+import com.rodrigocoelhoo.lifemanager.finances.dto.TransactionInternalDTO;
+import com.rodrigocoelhoo.lifemanager.finances.dto.TransactionResponseDTO;
 import com.rodrigocoelhoo.lifemanager.finances.model.*;
 import com.rodrigocoelhoo.lifemanager.finances.repository.TransactionRepository;
 import com.rodrigocoelhoo.lifemanager.users.UserModel;
@@ -14,6 +17,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -39,6 +43,9 @@ class TransactionServiceTest {
     @Mock
     private WalletService walletService;
 
+    @Mock
+    private RedisCacheService redisCacheService;
+
     private UserModel user;
 
     @BeforeEach
@@ -48,28 +55,40 @@ class TransactionServiceTest {
         user.setId(1L);
         user.setUsername("testuser");
         when(userService.getLoggedInUser()).thenReturn(user);
+        doNothing().when(redisCacheService).evictUserCache(anyString());
+        doNothing().when(redisCacheService).evictUserCacheSpecific(anyString(), anyString());
     }
 
-    /*@Nested
+    @Nested
     @DisplayName("getAllTransactions")
     class GetAllTransactionsTests {
 
         @Test
         @DisplayName("should return all transactions for logged-in user")
         void shouldReturnAllTransactions() {
+            WalletModel w1 = new WalletModel();
+            w1.setBalance(new BigDecimal(10));
+            w1.setCurrency(Currency.EUR);
+
             TransactionModel t1 = new TransactionModel();
+            t1.setWallet(w1);
+            t1.setAmount(new BigDecimal(10));
+
             TransactionModel t2 = new TransactionModel();
+            t2.setWallet(w1);
+            t2.setAmount(new BigDecimal(10));
 
             PageImpl<TransactionModel> page = new PageImpl<>(List.of(t1, t2));
-            when(transactionRepository.findAllByUser(user, Pageable.unpaged())).thenReturn(page);
+            when(transactionRepository.findAll(any(Specification.class), any(Pageable.class)))
+                    .thenReturn(page);
 
-            Page<TransactionModel> result = transactionService.getAllTransactions(Pageable.unpaged());
+            Page<TransactionResponseDTO> result = transactionService.getAllTransactions(Pageable.unpaged(), null, null, null, null);
 
             assertThat(result.getContent()).hasSize(2);
-            assertThat(result.getContent()).containsExactlyInAnyOrder(t1, t2);
-            verify(transactionRepository).findAllByUser(user, Pageable.unpaged());
+            assertThat(result.getContent()).containsExactlyInAnyOrder(TransactionResponseDTO.fromEntity(t1), TransactionResponseDTO.fromEntity(t2));
+            verify(transactionRepository).findAll(any(Specification.class), any(Pageable.class));
         }
-    }*/
+    }
 
     @Nested
     @DisplayName("getTransactionsByRange")
@@ -78,13 +97,20 @@ class TransactionServiceTest {
         @Test
         @DisplayName("should return transactions within date range")
         void shouldReturnTransactionsByRange() {
+            WalletModel w1 = new WalletModel();
+            w1.setBalance(new BigDecimal(10));
+            w1.setCurrency(Currency.EUR);
+
             TransactionModel t1 = new TransactionModel();
             TransactionModel t2 = new TransactionModel();
             TransactionModel t3 = new TransactionModel();
 
             t1.setDate(LocalDate.of(2026, 1, 1));
+            t1.setWallet(w1);
             t2.setDate(LocalDate.of(2026, 1, 2));
+            t2.setWallet(w1);
             t3.setDate(LocalDate.of(2026, 1, 3));
+            t3.setWallet(w1);
 
             when(transactionRepository.findAllByUserAndDateBetweenOrderByDateDescIdDesc(
                     user,
@@ -92,13 +118,13 @@ class TransactionServiceTest {
                     LocalDate.of(2026, 1, 3)
             )).thenReturn(List.of(t2, t3));
 
-            List<TransactionModel> result = transactionService.getTransactionsByRange(
+            List<TransactionInternalDTO> result = transactionService.getTransactionsByRange(
                     LocalDate.of(2026, 1, 2),
                     LocalDate.of(2026, 1, 3)
             );
 
             assertThat(result).hasSize(2);
-            assertThat(result).containsExactlyInAnyOrder(t2, t3);
+            assertThat(result).containsExactlyInAnyOrder(TransactionInternalDTO.fromEntity(t2), TransactionInternalDTO.fromEntity(t3));
             verify(transactionRepository).findAllByUserAndDateBetweenOrderByDateDescIdDesc(
                     user,
                     LocalDate.of(2026, 1, 2),
@@ -344,6 +370,7 @@ class TransactionServiceTest {
             t1.setType(ExpenseType.EXPENSE);
             t1.setWallet(wallet);
             t1.setAmount(new BigDecimal(10));
+            t1.setDate(LocalDate.now());
 
             when(walletService.getWallet(1L)).thenReturn(wallet);
             when(transactionRepository.findByUserAndId(user, 1L)).thenReturn(Optional.of(t1));

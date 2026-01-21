@@ -1,7 +1,10 @@
 package com.rodrigocoelhoo.lifemanager.finances.service;
 
+import com.rodrigocoelhoo.lifemanager.config.RedisCacheService;
 import com.rodrigocoelhoo.lifemanager.exceptions.BadRequestException;
 import com.rodrigocoelhoo.lifemanager.finances.dto.AutomaticTransactionDTO;
+import com.rodrigocoelhoo.lifemanager.finances.dto.AutomaticTransactionResponseDTO;
+import com.rodrigocoelhoo.lifemanager.finances.dto.AutomaticTransactionSimple;
 import com.rodrigocoelhoo.lifemanager.finances.model.*;
 import com.rodrigocoelhoo.lifemanager.finances.repository.AutomaticTransactionRepository;
 import com.rodrigocoelhoo.lifemanager.finances.repository.TransactionRepository;
@@ -42,6 +45,9 @@ class AutomaticTransactionServiceTest {
     @Mock
     private TransactionRepository transactionRepository;
 
+    @Mock
+    private RedisCacheService redisCacheService;
+
     private UserModel user;
 
     @BeforeEach
@@ -51,6 +57,8 @@ class AutomaticTransactionServiceTest {
         user.setId(1L);
         user.setUsername("testuser");
         when(userService.getLoggedInUser()).thenReturn(user);
+        doNothing().when(redisCacheService).evictUserCache(anyString());
+        doNothing().when(redisCacheService).evictUserCacheSpecific(anyString(), anyString());
     }
 
     @Nested
@@ -92,11 +100,23 @@ class AutomaticTransactionServiceTest {
         @Test
         @DisplayName("should return all automatic transactions for logged-in user")
         void shouldReturnAllAutomaticTransactions() {
-            Page<AutomaticTransactionModel> page = new PageImpl<>(List.of(new AutomaticTransactionModel(), new AutomaticTransactionModel()));
+            WalletModel w1 = new WalletModel();
+            w1.setBalance(new BigDecimal(10));
+            w1.setCurrency(Currency.EUR);
+
+            AutomaticTransactionModel at1 = new AutomaticTransactionModel();
+            at1.setWallet(w1);
+            at1.setAmount(new BigDecimal(1));
+
+            AutomaticTransactionModel at2 = new AutomaticTransactionModel();
+            at2.setWallet(w1);
+            at2.setAmount(new BigDecimal(1));
+
+            Page<AutomaticTransactionModel> page = new PageImpl<>(List.of(at1, at2));
 
             when(automaticTransactionRepository.findAllByUser(user, Pageable.unpaged())).thenReturn(page);
 
-            Page<AutomaticTransactionModel> result = automaticTransactionService.getAllAutomaticTransactions(Pageable.unpaged());
+            Page<AutomaticTransactionResponseDTO> result = automaticTransactionService.getAllAutomaticTransactions(Pageable.unpaged());
 
             assertThat(result.getContent()).hasSize(2);
             verify(automaticTransactionRepository).findAllByUser(user, Pageable.unpaged());
@@ -110,13 +130,26 @@ class AutomaticTransactionServiceTest {
         @Test
         @DisplayName("should return next 5 automatic transactions")
         void shouldReturnNextAutomaticTransactions() {
-            List<AutomaticTransactionModel> list = List.of(new AutomaticTransactionModel(), new AutomaticTransactionModel());
+            WalletModel w1 = new WalletModel();
+            w1.setName("Test");
+            w1.setBalance(new BigDecimal(10));
+            w1.setCurrency(Currency.EUR);
+
+            AutomaticTransactionModel at1 = new AutomaticTransactionModel();
+            at1.setWallet(w1);
+            at1.setAmount(new BigDecimal(1));
+
+            AutomaticTransactionModel at2 = new AutomaticTransactionModel();
+            at2.setWallet(w1);
+            at2.setAmount(new BigDecimal(1));
+
+            List<AutomaticTransactionModel> list = List.of(at1, at2);
 
             when(automaticTransactionRepository
                     .findTop5ByUserOrderByNextTransactionDateAscIdDesc(user))
                     .thenReturn(list);
 
-            List<AutomaticTransactionModel> result = automaticTransactionService.get5NextAutomaticTransaction();
+            List<AutomaticTransactionSimple> result = automaticTransactionService.get5NextAutomaticTransaction();
 
             assertThat(result).hasSize(2);
         }

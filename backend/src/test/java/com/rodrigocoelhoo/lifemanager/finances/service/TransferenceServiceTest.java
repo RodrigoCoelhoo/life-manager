@@ -1,8 +1,10 @@
 package com.rodrigocoelhoo.lifemanager.finances.service;
 
+import com.rodrigocoelhoo.lifemanager.config.RedisCacheService;
 import com.rodrigocoelhoo.lifemanager.exceptions.BadRequestException;
 import com.rodrigocoelhoo.lifemanager.exceptions.ResourceNotFound;
 import com.rodrigocoelhoo.lifemanager.finances.dto.TransferenceDTO;
+import com.rodrigocoelhoo.lifemanager.finances.dto.TransferenceResponseDTO;
 import com.rodrigocoelhoo.lifemanager.finances.model.Currency;
 import com.rodrigocoelhoo.lifemanager.finances.model.TransferenceModel;
 import com.rodrigocoelhoo.lifemanager.finances.model.WalletModel;
@@ -17,6 +19,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -45,6 +48,9 @@ class TransferenceServiceTest {
     @Mock
     private UserService userService;
 
+    @Mock
+    private RedisCacheService redisCacheService;
+
     private UserModel user;
 
     @BeforeEach
@@ -54,27 +60,45 @@ class TransferenceServiceTest {
         user.setId(1L);
         user.setUsername("testuser");
         when(userService.getLoggedInUser()).thenReturn(user);
+        doNothing().when(redisCacheService).evictUserCache(anyString());
+        doNothing().when(redisCacheService).evictUserCacheSpecific(anyString(), anyString());
     }
 
-    /*@Nested
+    @Nested
     @DisplayName("getAllTransferences")
     class GetAllTransferencesTests {
 
         @Test
         @DisplayName("should return all transferences for logged-in user")
         void shouldReturnAllTransferences() {
+            WalletModel w1 = new WalletModel();
+            w1.setBalance(new BigDecimal(10));
+            w1.setCurrency(Currency.EUR);
+
+            WalletModel w2 = new WalletModel();
+            w2.setBalance(new BigDecimal(10));
+            w2.setCurrency(Currency.EUR);
+
             TransferenceModel t1 = new TransferenceModel();
+            t1.setFromWallet(w1);
+            t1.setToWallet(w2);
+            t1.setAmount(new BigDecimal(1));
+
             TransferenceModel t2 = new TransferenceModel();
+            t2.setFromWallet(w1);
+            t2.setToWallet(w2);
+            t2.setAmount(new BigDecimal(1));
 
             Page<TransferenceModel> page = new PageImpl<>(List.of(t1, t2));
-            when(transferenceRepository.findAllByUser(user, Pageable.unpaged())).thenReturn(page);
+            when(transferenceRepository.findAll(any(Specification.class), any(Pageable.class)))
+                    .thenReturn(page);
 
-            Page<TransferenceModel> result = transferenceService.getAllTransferences(Pageable.unpaged());
+            Page<TransferenceResponseDTO> result = transferenceService.getAllTransferences(Pageable.unpaged(), null, null, null, null);
 
             assertThat(result.getContent()).hasSize(2);
-            verify(transferenceRepository).findAllByUser(user, Pageable.unpaged());
+            verify(transferenceRepository).findAll(any(Specification.class), any(Pageable.class));
         }
-    }*/
+    }
 
     @Nested
     @DisplayName("getTransference")
@@ -121,14 +145,29 @@ class TransferenceServiceTest {
             LocalDate start = LocalDate.now().minusDays(5);
             LocalDate end = LocalDate.now();
 
-            List<TransferenceModel> transferences = List.of(
-                    new TransferenceModel(),
-                    new TransferenceModel()
-            );
+            WalletModel w1 = new WalletModel();
+            w1.setBalance(new BigDecimal(10));
+            w1.setCurrency(Currency.EUR);
+
+            WalletModel w2 = new WalletModel();
+            w2.setBalance(new BigDecimal(10));
+            w2.setCurrency(Currency.EUR);
+
+            TransferenceModel t1 = new TransferenceModel();
+            t1.setFromWallet(w1);
+            t1.setToWallet(w2);
+            t1.setAmount(new BigDecimal(1));
+
+            TransferenceModel t2 = new TransferenceModel();
+            t2.setFromWallet(w1);
+            t2.setToWallet(w2);
+            t2.setAmount(new BigDecimal(1));
+
+            List<TransferenceModel> transferences = List.of(t1, t2);
 
             when(transferenceRepository.findTop5ByUserAndDateBetweenOrderByDateDescIdDesc(user, start, end)).thenReturn(transferences);
 
-            List<TransferenceModel> result = transferenceService.get5RecentTransferences(start, end);
+            List<TransferenceResponseDTO> result = transferenceService.get5RecentTransferences(start, end);
 
             assertThat(result).hasSize(2);
             verify(transferenceRepository).findTop5ByUserAndDateBetweenOrderByDateDescIdDesc(user, start, end);
@@ -402,6 +441,7 @@ class TransferenceServiceTest {
             transference.setAmount(new BigDecimal(10));
             transference.setFromWallet(from);
             transference.setToWallet(to);
+            transference.setDate(LocalDate.now());
 
             when(transferenceRepository.findByUserAndId(user, 1L)).thenReturn(Optional.of(transference));
 
