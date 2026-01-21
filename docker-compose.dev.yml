@@ -27,8 +27,12 @@ services:
     environment:
       SPRING_PROFILES_ACTIVE: dev
       SPRING_REDIS_HOST: redis
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/lifemanager
+      SPRING_DATASOURCE_USERNAME: admin
+      SPRING_DATASOURCE_PASSWORD: admin
     depends_on:
       - redis
+      - postgres
     networks:
       - lifemanager-network
 
@@ -39,8 +43,22 @@ services:
     networks:
       - lifemanager-network
 
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: lifemanager
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - lifemanager-network
+
 volumes:
   maven-repo:
+  postgres-data:
   
 networks:
   lifemanager-network:
