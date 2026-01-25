@@ -53,4 +53,135 @@ https://github.com/iuricode/readme-template/tree/main/avancado
 - **Caching:** Redis integrated using Spring Cache abstraction
 - **Infrastructure:** Docker for local development
 
-## Getting Started
+## 🛠️ Getting Started
+
+### Docker
+
+> [!IMPORTANT]
+> Docker Desktop must be installed on your device
+
+1. Go to the project root directory:
+```bash
+cd .../life-manager
+```
+
+2. Build and start docker containers:
+```bash
+docker compose -f docker-compose.dev.yml up --build -d
+```
+
+#### Stopping containers
+```bash
+docker compose -f docker-compose.dev.yml down
+```
+
+---
+
+### Locally
+
+#### Frontend
+
+> [!IMPORTANT]
+> Node.js (LTS version recommended, with npm) must be installed on your device
+
+1. Go to the project root directory:
+```bash
+cd .../life-manager/frontend
+```
+
+2. Install dependencies:
+```bash
+npm install
+```
+
+3. Start the development server:
+```bash
+npm run dev
+```
+
+4. Go to the web page:
+
+<a href="http://localhost:3000/">Life Manager - Web page</a>
+
+#### Backend
+
+> [!IMPORTANT]
+> The following must be installed on your device:
+> - Java JDK 17+  
+> - Maven or Intellij IDEA
+> - PostgreSQL  
+> - Redis
+
+1. Open ``application.properties`` file in an editor:
+`.../life-manager/backend/src/main/resources/application.properties`
+
+2. Update ``application.properties`` with your Redis and PostgreSQL information:
+```properties
+spring.application.name=lifemanager
+
+# ===============================
+# Database (PostgreSQL - Local)
+# ===============================
+spring.datasource.url=jdbc:postgresql://localhost:5432/lifemanager
+spring.datasource.username=postgres
+spring.datasource.password=postgres
+spring.datasource.driver-class-name=org.postgresql.Driver
+
+# ===============================
+# JPA / Hibernate
+# ===============================
+spring.jpa.database-platform=org.hibernate.dialect.PostgreSQLDialect
+spring.jpa.hibernate.ddl-auto=validate
+spring.jpa.show-sql=true
+spring.jpa.open-in-view=false
+
+# ===============================
+# Security
+# ===============================
+# Uses JWT_SECRET env variable if present, otherwise fallback
+api.security.token.secret=${JWT_SECRET:my-secret-key}
+
+# ===============================
+# Error handling
+# ===============================
+server.error.include-message=always
+server.error.include-stacktrace=always
+
+# ===============================
+# Logging
+# ===============================
+logging.level.org.hibernate.SQL=DEBUG
+logging.level.org.hibernate.type.descriptor.sql=TRACE
+logging.level.org.springframework.transaction=TRACE
+
+# ===============================
+# Redis (Local)
+# ===============================
+spring.data.redis.host=localhost
+spring.data.redis.port=6379
+spring.cache.type=redis
+spring.cache.redis.time-to-live=600000
+spring.cache.redis.cache-null-values=false
+```
+
+3. Go to the backend project root directory:
+```bash
+cd .../life-manager/backend
+```
+
+4. Start the Spring Boot application:
+
+**Option 1 – Using Maven CLI:**
+
+Run this command from the backend project root (where `pom.xml` is):
+
+```bash
+cd .../life-manager/backend
+mvn spring-boot:run
+```
+
+**Option 2 – Using IntelliJ IDEA:**
+1. Open the backend folder as a project in IntelliJ.
+2. Locate LifeManagerApplication.java in src/main/java/....
+3. Right-click the file and select ``Run 'LifeManagerApplication'``.
+4. The application will start, and the backend API will be available at http://localhost:8080.
