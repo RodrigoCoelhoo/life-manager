@@ -17,6 +17,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.time.ZoneOffset;
 import java.util.List;
 
@@ -114,6 +115,7 @@ public class AutomaticTransactionService {
 
         redisCacheService.evictUserCache(CACHE_LIST);
         redisCacheService.evictUserCache(CACHE_NEXT);
+        redisCacheService.evictUserCacheSpecific("financesDashboard", "yearMonth:" + YearMonth.now() + "*");
 
         return saved;
     }
@@ -143,6 +145,7 @@ public class AutomaticTransactionService {
 
         redisCacheService.evictUserCache(CACHE_LIST);
         redisCacheService.evictUserCache(CACHE_NEXT);
+        redisCacheService.evictUserCacheSpecific("financesDashboard", "yearMonth:" + YearMonth.now() + "*");
 
         return saved;
     }
@@ -154,6 +157,7 @@ public class AutomaticTransactionService {
 
         redisCacheService.evictUserCache(CACHE_LIST);
         redisCacheService.evictUserCache(CACHE_NEXT);
+        redisCacheService.evictUserCacheSpecific("financesDashboard", "yearMonth:" + YearMonth.now() + "*");
     }
 
     public void processDailyAutomaticTransactions() {
@@ -166,6 +170,7 @@ public class AutomaticTransactionService {
         redisCacheService.evictUserCache(CACHE_LIST);
         redisCacheService.evictUserCache(CACHE_NEXT);
         redisCacheService.evictUserCache("transactions");
+        redisCacheService.evictUserCacheSpecific("financesDashboard", "yearMonth:" + YearMonth.now() + "*");
     }
 
     public void processAutomaticTransaction(Long id) {
@@ -173,6 +178,7 @@ public class AutomaticTransactionService {
         redisCacheService.evictUserCache(CACHE_LIST);
         redisCacheService.evictUserCache(CACHE_NEXT);
         redisCacheService.evictUserCache("transactions");
+        redisCacheService.evictUserCacheSpecific("financesDashboard", "yearMonth:" + YearMonth.now() + "*");
     }
 
     public void processAutomaticTransaction(AutomaticTransactionModel autoTx) {

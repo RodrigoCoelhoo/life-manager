@@ -13,8 +13,6 @@
   <img src="https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white" alt="Docker Badge Shield" />
 </p>
 
-https://github.com/iuricode/readme-template/tree/main/avancado
-
 > [!NOTE]  
 > **Life Manager** is an all-in-one personal management app designed to help users organize and track the most important areas of their life: **Finances, Nutrition, and Training**.
 
@@ -44,6 +42,23 @@ https://github.com/iuricode/readme-template/tree/main/avancado
 ### 💰 Finance Management
 - Record expenses and income
 - Categorize financial activity
+
+## 🖼️ Application Preview
+
+### Nutrition management
+<p align="center">
+  <img src="docs/images/nutritionDashboard.PNG" alt="Nutrition Dashboard" />
+</p>
+
+### Training management
+<p align="center">
+  <img src="docs/images/trainingDashboard.PNG" alt="Training Dashboard" />
+</p>
+
+### Finance management
+<p align="center">
+  <img src="docs/images/financesDashboard.PNG" alt="Finances Dashboard" />
+</p>
 
 ## 🏗️ Architecture Overview
 - **Frontend:** Single Page Application built with React and TypeScript
@@ -84,7 +99,7 @@ docker compose -f docker-compose.dev.yml down
 > [!IMPORTANT]
 > Node.js (LTS version recommended, with npm) must be installed on your device
 
-1. Go to the project root directory:
+1. Go to the project frontend directory:
 ```bash
 cd .../life-manager/frontend
 ```
@@ -99,9 +114,7 @@ npm install
 npm run dev
 ```
 
-4. Go to the web page:
-
-<a href="http://localhost:3000/">Life Manager - Web page</a>
+4. <a href="http://localhost:3000/">Go to the web page</a>
 
 #### Backend
 
@@ -164,12 +177,7 @@ spring.cache.redis.time-to-live=600000
 spring.cache.redis.cache-null-values=false
 ```
 
-3. Go to the backend project root directory:
-```bash
-cd .../life-manager/backend
-```
-
-4. Start the Spring Boot application:
+3. Start the Spring Boot application:
 
 **Option 1 – Using Maven CLI:**
 
@@ -185,3 +193,46 @@ mvn spring-boot:run
 2. Locate LifeManagerApplication.java in src/main/java/....
 3. Right-click the file and select ``Run 'LifeManagerApplication'``.
 4. The application will start, and the backend API will be available at http://localhost:8080.
+
+## 🧪 Running Tests
+
+### Using Maven CLI
+1. Go to the project backend directory:
+```bash
+cd .../life-manager/backend
+```
+
+2. Run unit tests:
+```bash
+mvn test
+```
+
+### Using IntelliJ IDEA
+
+**Run all tests**
+1. Open the backend project in IntelliJ
+2. Right-click the src/test/java folder
+3. Select run tests
+
+**Run a single test**
+1. Open the test class
+2. Click the green ▶️ icon next to the class or test method
+
+## 📘 API Documentation
+
+The backend exposes a Swagger UI for API exploration and testing ``(When backend is running)``.
+
+- Swagger UI: http://localhost:8080/swagger-ui/index.html
+- OpenAPI spec: http://localhost:8080/v3/api-docs
+
+> Authentication is handled via JWT.  
+> To test secured endpoints, obtain a token using the `/api/auth/signin` endpoint.
+
+## 🔐 Authentication Flow
+
+- Users authenticate using username and password
+- On successful login:
+  - An **access token (JWT)** is returned for API authentication
+  - An **refresh token** is returned via ``HttpOnly`` to obtain new access tokens
+- Stateless authentication (no HTTP session)
+- Tokens are validated on each request via a Spring Security filter

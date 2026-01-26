@@ -1,3 +1,5 @@
+import { NutritionalTag } from "../../services/nutrition/ingredient-brand/ingredient-brand.dto";
+
 interface Tag {
 	nutrient: string;
 	amount: number;
@@ -40,7 +42,8 @@ export function WeekView({ weekOverview, currentDate }: WeekOverviewProps) {
 					{day.tags.map((tag, idx) => (
 						<li
 							key={idx}
-							className="flex justify-between items-center p-0.5 rounded hover:bg-gray-200/20 transition text-xs sm:text-sm"
+							className={`flex justify-between items-center p-0.5 rounded hover:bg-gray-200/20 transition text-xs sm:text-sm 
+								${tag.nutrient === NutritionalTag.CALORIES ? "text-secondary border-b border-primary/50" : ""}`}
 						>
 							<span className="font-medium truncate pr-1">{tag.nutrient}:</span>
 							<span className="font-light whitespace-nowrap">

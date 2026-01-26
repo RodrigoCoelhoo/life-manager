@@ -22,7 +22,7 @@ export default function TransferenceCard({ transference }: TransferenceCardProps
 				/>
 			</div>
 			<div className="flex flex-col w-4/10 justify-center items-end">
-				<span className="text-lg">{transference.toWallet.name}</span>
+				<span className="text-base truncate">{transference.toWallet.name}</span>
 				<span className="text-sm text-[#34D399]">+ {formatBalance(transference.toAmount)}</span>
 			</div>
 		</div>

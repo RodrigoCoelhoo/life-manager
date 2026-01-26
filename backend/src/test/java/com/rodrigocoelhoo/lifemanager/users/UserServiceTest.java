@@ -13,6 +13,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
 
@@ -25,6 +26,9 @@ class UserServiceTest {
 
     @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private PasswordEncoder passwordEncoder;
 
     @InjectMocks
     private UserService userService;
@@ -52,6 +56,7 @@ class UserServiceTest {
             when(userRepository.findByUsername("johndoe")).thenReturn(Optional.empty());
             when(userRepository.findByEmail("john@example.com")).thenReturn(Optional.empty());
             when(userRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
+            when(passwordEncoder.encode(anyString())).thenReturn("encoded-password");
 
             UserModel result = userService.createUser(signUp);
 
@@ -204,7 +209,7 @@ class UserServiceTest {
                     () -> userService.getLoggedInUser()
             );
 
-            assertThat(exception.getMessage()).contains("User not found");
+            assertThat(exception.getMessage()).isEqualTo("User with Username 'johndoe' not found");
         }
 
     }
